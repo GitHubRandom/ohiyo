@@ -272,6 +272,10 @@ body {
     display: flex;
 }
 
+.servers-category:not(:last-child) {
+    margin-left: 5px;
+}
+
 .anime-episodes-list {
     position: absolute;
     z-index: 1;
