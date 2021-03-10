@@ -10,18 +10,16 @@ const supportedServers = [ "OU", "MF", "UP" ]
 
 const EpisodePlayer = ({ relatedContent, setEpisodeName, animeId, episodeNumber }) => {
 
-    var mixdrop = ""
-
     const [ episodesList, updateList ] = useState([])
     const [ episodeSources, updateSources ] = useState({})
     const [ currentSource, updateCurrent ] = useState([])
     const [ introInterval, updateIntroInterval ] = useState([])
 
     function getServers(sources) {
+        // Remove backslashes in sources list
         var s = sources.replace(/\\/g, "").slice(2,-2).split("\",\"")
         var currentUpdated = false
         s.forEach((item) => {
-            console.log(item)
             var headers = { 'User-Agent': navigator.userAgent }
             var method = 'GET'
             if (item.includes("tune.pk")) {
@@ -181,7 +179,7 @@ const EpisodePlayer = ({ relatedContent, setEpisodeName, animeId, episodeNumber 
             <div className="related-content">
                 <h2>ذات صلة</h2>
                 <div className="content-list">
-                    { relatedContent.map((content) => {
+                    { relatedContent.slice(0,5).map((content) => {
                         return <Episode key={ content["anime_id"] } showEpisodeName={ false }
                                     animeName = {content["anime_name"]}
                                     url = {'/' + content["anime_id"] + '/1'}
@@ -208,13 +206,6 @@ const EpisodePlayer = ({ relatedContent, setEpisodeName, animeId, episodeNumber 
                 }
             })]    
         }
-        if (s.includes("tune.pk")) {
-            if ("data" in data && data["data"]["videos"] && data["data"]["videos"]["files"]) {
-                var files = data["data"]["videos"]["files"]
-                var firstKey = Math.max(...Object.keys(files))
-                return ["TP", [{ size: firstKey, src: files[firstKey]["file"] }]]
-            }
-        }
         if (s.includes("ok.ru")) {
             var q = { mobile: "144", lowest: "240", low: "360", sd: "480", hd: "720" }
             var qualities = []
@@ -233,63 +224,6 @@ const EpisodePlayer = ({ relatedContent, setEpisodeName, animeId, episodeNumber 
             if (matches) {
                 return ["MF", [{ src: matches[1], size: "720" }]]
             }
-        }
-        if (s.includes("fembed")) {
-            // The link is already a JSON with meta about the video
-            var qualities = []
-            JSON.parse(data)["data"].forEach((quality) => {
-                qualities.push({ src: quality["file"], size: quality["label"].slice(0,-1) })
-            })
-            return ["FD", qualities]
-        }
-        if (s.includes("mixdrop")) {
-            mixdrop = s
-            // This one is true pain as the data is hidden in p,a,c,k,e,d JS code
-            var regex = /<script>\n(?:MDCore(?:.|\n)+)(eval\(function(?:.|\n)+)<\/script>\n<div class=\"title\">/
-            var matches = data.match(regex)
-            if (matches) {
-                var meta = P_A_C_K_E_R.unpack(matches[1])
-                var regexBis = /wurl ?= ?\"([^\"]+)/
-                var link = "https:" + meta.match(regexBis)[1]
-                return ["MP", [{ src: link, size: "720" }]]    
-            }
-        }
-        if (s.includes("vidloxnot")) {
-            var urls = []
-            var myRegEx = /sources\s*:\s*\[(.+?)\]/g
-            console.log(data)
-            var matches = myRegEx.exec(data)
-            var res = matches[0].split("\",\"")
-            for (var i = 0; i < res.length; i++) {
-                var link = res[i].replace("\"","")
-                if (link.includes(".mp4")) {
-                    urls.push({ src: link, size: '720' });
-                }
-            }
-            return ["VL", urls]
-        }
-        if (s.includes("jawcloud")) {
-            var urls = []
-            var myRegEx = /source\ssrc="(https:.*?),(.*?),(.*?),[^"]*|source src="([^"]*)/g
-            var matches = myRegEx.exec(data)
-            if (matches[4] && matches[4].includes("m3u8")) {
-                var link = matches[4].replace(/,/g,'')
-                if (!link.includes("window.jawplayer")) {
-                    urls.push({ src: link, size: '720' })
-                }
-            } else {
-                var j = 0
-                var qual = ['720','360']
-                for (var i = 2; i < matches.length; i++) {
-                    link = matches[1] + matches[i] + '/index-v1-a1.m3u8'
-                    if (!link.includes("undefined") && !link.includes("window.jawplayer")) {
-                        urls.push({ src: link, size: qual[j] })
-                        j++
-                    }
-                }
-    
-            }
-            return ["JC", urls]
         }
         return []
     }

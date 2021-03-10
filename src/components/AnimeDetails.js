@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import ExpandableText from "./ExpandableText"
 
 const ANIME_DETAILS_URL = "https://cors.bridged.cc/https://anslayer.com/anime/public/anime/get-anime-details?anime_id={id}&fetch_episodes=No&more_info=Yes"
 const CLIENT_ID = "web-app"
@@ -35,7 +36,7 @@ const AnimeDetails = ({ setRelated, setTitle, animeId }) => {
                     <span className="anime-details-rating"><span className="mdi mdi-star"></span>{ animeDetails["anime_rating"] }</span>
                     { animeDetails["anime_genres"] ? animeDetails["anime_genres"].split(',').map((genre, index) => <span key={ index } className="anime-details-category">{ genre }</span>) : <></> }
                 </div>**/}
-                <p className="anime-details-synopsis">{ animeDetails["anime_description"] }</p>
+                <ExpandableText expandText="معرفة المزيد" hideText="اخفاء" text={ animeDetails["anime_description"] } className="anime-details-synopsis" />
                 <p className="anime-details-misc">
                     <b>النوع : </b>{ animeDetails["anime_type"] }<br />
                     <b>الحالة : </b>{ animeDetails["anime_status"] != "Currently Airing" ? "مكتمل" : "غير مكتمل" }<br />

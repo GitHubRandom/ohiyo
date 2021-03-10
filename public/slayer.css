@@ -105,6 +105,35 @@ body {
     padding: 20px;
 }
 
+.error-message {
+    height: 60vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25pt;
+    font-weight: bold;
+    color: #272727;
+}
+
+.error-message span {
+    margin-left: 10px;
+}
+
+#anime-search {
+    align-self: center;
+    background-color: rgba(255, 255, 255, 0.116);
+    height: 35px;
+    border-radius: 5px;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+}
+
+.anime-list-header {
+    display: flex;
+    justify-content: space-between;
+}
+
 .home-page {
     max-width: 865px;
     margin: 0 auto;
@@ -185,6 +214,12 @@ body {
     color: var(--accent-color);
     font-size: 15pt;
     font-weight: bold;
+}
+
+.more-text {
+    color: var(--accent-color);
+    cursor: pointer;
+    border-bottom: 1px dotted var(--accent-color);
 }
 
 .anime-details {
