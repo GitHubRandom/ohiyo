@@ -470,7 +470,21 @@ body {
         width: 135px;
     }
 
+    .anime-title {
+        font-size: 9pt;
+    }
+
     .anime-details-trailer {
         font-size: 9pt;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    .content-list {
+        grid-template-columns: repeat(auto-fill, 95px);
+    }
+
+    .anime-cover {
+        height: 140px;
     }
 }
