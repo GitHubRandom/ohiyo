@@ -22,6 +22,7 @@ const EpisodePlayer = ({ relatedContent, setEpisodeName, animeId, episodeNumber 
         s.forEach((item) => {
             var headers = { 'User-Agent': navigator.userAgent }
             var method = 'GET'
+            item = item.replace("http://", "https://")
             if (item.includes("tune.pk")) {
                 var sliced = item.slice(item.indexOf("video/") + 6)
                 item = "https://embed.tune.pk/play/" + sliced.substring(0, sliced.indexOf("/"))
