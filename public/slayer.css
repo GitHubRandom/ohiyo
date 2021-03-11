@@ -445,3 +445,32 @@ body {
         min-width: unset;
     }
 }
+
+@media only screen and (max-width: 600px) {
+    .player-episode-skip#next { order: 3; }
+    .player-episode-skip#previous { order: 2 }
+    .server-settings { order: 1 }
+
+    .player-settings {
+        flex-direction: column;
+    }
+    .player-settings * {
+        width: 100%;
+        text-align: center;
+    }
+
+    .player-settings *:not(:last-child) {
+        margin-bottom: 5px;
+    }
+}
+
+@media only screen and (max-wiidth: 490px) {
+    .anime-details-cover {
+        height: 190px;
+        width: 135px;
+    }
+
+    .anime-details-trailer {
+        font-size: 9pt;
+    }
+}
