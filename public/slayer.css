@@ -464,7 +464,7 @@ body {
     }
 }
 
-@media only screen and (max-wiidth: 490px) {
+@media only screen and (max-width: 490px) {
     .anime-details-cover {
         height: 190px;
         width: 135px;
