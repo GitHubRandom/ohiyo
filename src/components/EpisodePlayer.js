@@ -151,7 +151,7 @@ const EpisodePlayer = ({ relatedContent, setEpisodeName, animeId, episodeNumber 
                             {
                                 Object.keys(episodeSources).map((key) => {
                                     if (supportedServers.includes(key)) {
-                                        return <div id={ key } onClick={() => updateCurrent([ key, episodeSources[key] ]) } className={ currentSource[0] == key ? "server selected" : "server" }><span className="mdi mdi-play"></span>{ key }</div>
+                                        return <div key={ key } id={ key } onClick={() => updateCurrent([ key, episodeSources[key] ]) } className={ currentSource[0] == key ? "server selected" : "server" }><span className="mdi mdi-play"></span>{ key }</div>
                                     } return
                                 })
                             }
@@ -160,7 +160,7 @@ const EpisodePlayer = ({ relatedContent, setEpisodeName, animeId, episodeNumber 
                             {
                                 Object.keys(episodeSources).map((key) => {
                                     if (!supportedServers.includes(key)) {
-                                        return <div data-tippy-content="هذا الخادم لا يدعم المشغل السريع" id={ key } onClick={() => updateCurrent([ key, episodeSources[key] ]) } className={ currentSource[0] == key ? "server selected" : "server" }><span className="mdi mdi-server"></span>{ key }</div>
+                                        return <div key={ key } data-tippy-content="هذا الخادم لا يدعم المشغل السريع" id={ key } onClick={() => updateCurrent([ key, episodeSources[key] ]) } className={ currentSource[0] == key ? "server selected" : "server" }><span className="mdi mdi-server"></span>{ key }</div>
                                     } return
                                 })
                             }
