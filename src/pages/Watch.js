@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom"
 import AnimeDetails from "../components/AnimeDetails"
 import EpisodePlayer from "../components/EpisodePlayer"
 import WatchTopBar from "../components/WatchTopBar"
+import Episode from "../components/Episode"
 
 const ANIME_DETAILS_URL = "https://cors.bridged.cc/https://anslayer.com/anime/public/anime/get-anime-details?anime_id={id}&fetch_episodes=No&more_info=Yes"
 const CLIENT_ID = "web-app"
@@ -17,8 +18,20 @@ const Watch = () => {
     return (
         <div className="watch-page">
             <WatchTopBar episodeName={ episodeName } animeTitle={ animeTitle } />
-            <EpisodePlayer relatedContent={ relatedContent } setEpisodeName={ (episodeName) => updateName(episodeName) } animeId={ aId } episodeNumber={ eNum } />
+            <EpisodePlayer setEpisodeName={ (episodeName) => updateName(episodeName) } animeId={ aId } episodeNumber={ eNum } />
             <AnimeDetails setRelated={ (related) => updateRelated(related) } setTitle={ (animeTitle) => updateTitle(animeTitle) } animeId={ aId } />
+            { relatedContent ?
+            <div className="related-content">
+                <h2>ذات صلة</h2>
+                <div className="content-list">
+                    { relatedContent.slice(0,5).map((content) => {
+                        return <Episode key={ content["anime_id"] } showEpisodeName={ false }
+                                    animeName = {content["anime_name"]}
+                                    url = {'/' + content["anime_id"] + '/1'}
+                                    cover = {content["anime_cover_image_url"]} />
+                    }) }
+                </div>
+            </div> : null }
         </div>
     )
 }

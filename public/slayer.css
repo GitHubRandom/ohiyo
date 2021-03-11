@@ -190,13 +190,17 @@ body {
 .watch-page {
     display: grid;
     grid-template-columns: 65% 210px;
-    grid-auto-rows: auto auto;
-    grid-template-areas: "topbar topbar" "content details";
+    grid-auto-rows: auto auto auto;
+    grid-template-areas: "topbar topbar" "content details" "related details";
     grid-column-gap: 40px;
     justify-content: center;
     grid-row-gap: 0;
     margin: 0 auto;
     width: auto;
+}
+
+.related-content {
+    grid-area: related;
 }
 
 .top-bar {
@@ -326,22 +330,13 @@ body {
     color: #474747;
 }
 
-.server {
-    padding: 3px 5px;
-    cursor: pointer;
-}
-
-.server span {
-    color: var(--accent-color);
-}
-
-.server:not(:last-child) {
-    margin-left: 5px;
-}
-
-.server.selected,
-.server:hover {
-    border-bottom: 2px solid var(--accent-color);
+#server-select {
+    border-radius: 5px;
+    padding: 5px 10px;
+    color: white;
+    background-color: #3d212d;
+    font-weight: bold;
+    border: none;
 }
 
 .server-settings {
@@ -426,4 +421,27 @@ body {
 
 .trailer-popup {
     display: none;
+}
+
+@media only screen and (max-width: 1065px) {
+    .watch-page {
+        display: block;
+    }
+    .anime-details {
+        display: flex;
+    }
+    .anime-details-synopsis {
+        margin: 0;
+    }
+    .anime-details {
+        margin-top: 20px;
+    }
+    .anime-details-side {
+        margin-left: 20px;
+    }
+    .anime-details-cover {
+        height: 240px;
+        width: 165px;
+        min-width: unset;
+    }
 }

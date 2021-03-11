@@ -29,8 +29,10 @@ const AnimeDetails = ({ setRelated, setTitle, animeId }) => {
 
     return (
         <section className="anime-details">
-            <div style={{ backgroundImage: 'url(' + animeDetails["anime_cover_image_url"] + ')' }} className="anime-details-cover"></div>
-            <button className="anime-details-trailer"><span className="mdi mdi-play"></span>العرض الدعائي</button>
+            <div className="anime-details-side">
+                <div style={{ backgroundImage: 'url(' + animeDetails["anime_cover_image_url"] + ')' }} className="anime-details-cover"></div>
+                <button className="anime-details-trailer"><span className="mdi mdi-play"></span>العرض الدعائي</button>
+            </div>
             <div className="anime-meta">
                 {/**<div className="anime-details-categories">
                     <span className="anime-details-rating"><span className="mdi mdi-star"></span>{ animeDetails["anime_rating"] }</span>

@@ -8,12 +8,14 @@ import 'tippy.js/dist/tippy.css'
 
 const supportedServers = [ "OU", "MF", "UP" ]
 
-const EpisodePlayer = ({ relatedContent, setEpisodeName, animeId, episodeNumber }) => {
+const EpisodePlayer = ({ setEpisodeName, animeId, episodeNumber }) => {
 
     const [ episodesList, updateList ] = useState([])
     const [ episodeSources, updateSources ] = useState({})
     const [ currentSource, updateCurrent ] = useState([])
     const [ introInterval, updateIntroInterval ] = useState([])
+
+    // Make the website responsive
 
     function getServers(sources) {
         // Remove backslashes in sources list
@@ -146,27 +148,14 @@ const EpisodePlayer = ({ relatedContent, setEpisodeName, animeId, episodeNumber 
                     className: "player-episode-skip disabled"
                 } } ><span className="mdi mdi-chevron-right"></span>الحلقة السابقة</a>
                 <div className="server-settings">
-                    { Object.keys(episodeSources).length != 0 ? 
-                        <>
-                        <div id="supported" className="servers-category">
+                    { Object.keys(episodeSources).length != 0 ?
+                        <select name="server" id="server-select" onChange={ (e) => updateCurrent([ e.target.value, episodeSources[e.target.value] ]) } value={ currentSource[0] }>
                             {
                                 Object.keys(episodeSources).map((key) => {
-                                    if (supportedServers.includes(key)) {
-                                        return <div key={ key } id={ key } onClick={() => updateCurrent([ key, episodeSources[key] ]) } className={ currentSource[0] == key ? "server selected" : "server" }><span className="mdi mdi-play"></span>{ key }</div>
-                                    } return
+                                    return <option key={ key } value={ key } id={ key }>{ key }{ supportedServers.includes(key) ? " - المشغل السريع" : " - مشغل خارجي"}</option>
                                 })
                             }
-                        </div>
-                        <div id="external" className="servers-category">
-                            {
-                                Object.keys(episodeSources).map((key) => {
-                                    if (!supportedServers.includes(key)) {
-                                        return <div key={ key } data-tippy-content="هذا الخادم لا يدعم المشغل السريع" id={ key } onClick={() => updateCurrent([ key, episodeSources[key] ]) } className={ currentSource[0] == key ? "server selected" : "server" }><span className="mdi mdi-server"></span>{ key }</div>
-                                    } return
-                                })
-                            }
-                        </div>
-                        </>
+                        </select>
                         : <span className="servers-loading-message"><span className="mdi mdi-loading mdi-spin"></span>جاري العمل على الخوادم</span> }
                 </div>
                 <a id="next" {... episodeNumber < episodesList.length ? { 
@@ -176,18 +165,6 @@ const EpisodePlayer = ({ relatedContent, setEpisodeName, animeId, episodeNumber 
                     className: "player-episode-skip disabled"
                 }}>الحلقة القادمة<span className="mdi mdi-left mdi-chevron-left"></span></a>
             </div>
-            { relatedContent ?
-            <div className="related-content">
-                <h2>ذات صلة</h2>
-                <div className="content-list">
-                    { relatedContent.slice(0,5).map((content) => {
-                        return <Episode key={ content["anime_id"] } showEpisodeName={ false }
-                                    animeName = {content["anime_name"]}
-                                    url = {'/' + content["anime_id"] + '/1'}
-                                    cover = {content["anime_cover_image_url"]} />
-                    }) }
-                </div>
-            </div> : null }
         </section>
     )
 
