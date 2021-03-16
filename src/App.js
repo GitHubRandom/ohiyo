@@ -22,8 +22,8 @@ const App = () => {
           </Route>
           <Route exact path="/all">
             <Navigation selected="list-all" />
-            <div toggleMenu={ () => updateMenu((show) => !show) } className="menu-content">
-              <All />
+            <div className="menu-content">
+              <All toggleMenu={ () => updateMenu((show) => !show) } />
             </div>
           </Route>
           <Route exact path="/:aId/:eNum">
