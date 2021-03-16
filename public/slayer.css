@@ -524,6 +524,9 @@ body {
 }
 
 @media only screen and (max-width: 1065px) {
+    .content-list {
+        margin-bottom: 40px;
+    }
     .main-menu {
         position: fixed;
         bottom: 0;
@@ -590,6 +593,12 @@ body {
 
     .floating-button {
         position: fixed;
+    }
+
+    .main-menu .menu-section {
+        display: flex;
+        position: unset;
+        font-size: 10pt;
     }
 
     .player-settings *:not(:last-child) { margin-bottom: 5px; }
