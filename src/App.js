@@ -10,18 +10,22 @@ const App = () => {
 
   const [ showMenu, updateMenu ] = useState(false)
 
+  const GetNavigation = ({ selected }) => {
+    return <Navigation updateMenu={ (shown) => updateMenu(() => shown) } shown={ showMenu } selected={ selected } />
+  }
+
   return (
     <>
       <BrowserRouter>
         <Switch>
           <Route exact path="/">
-            <Navigation updateMenu={ (shown) => updateMenu(() => shown) } shown={ showMenu } selected="home" />
+            <GetNavigation selected="home" />
             <div className="menu-content">
               <Home toggleMenu={ () => updateMenu((show) => !show) } />
             </div>
           </Route>
           <Route exact path="/all">
-            <Navigation selected="list-all" />
+            <GetNavigation selected="list-all" />
             <div className="menu-content">
               <All toggleMenu={ () => updateMenu((show) => !show) } />
             </div>

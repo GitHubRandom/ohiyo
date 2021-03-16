@@ -520,8 +520,10 @@ body {
     .main-menu {
         position: fixed;
         background-color: var(--primary-color);
+        justify-content: start;
         z-index: 3;
         width: 275px;
+        border-left: 1px solid #1c1c1c;
     }
     #hamburger-menu {
         display: inline;
