@@ -565,6 +565,15 @@ body {
     .player-episode-skip#next { order: 3; }
     .player-episode-skip#previous { order: 2 }
 
+    .anime-list-header {
+        display: block;
+    }
+
+    #anime-search {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
     .server-settings { 
         order: 1;
         flex-direction: column; 

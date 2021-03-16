@@ -6,7 +6,7 @@ import Home from './pages/Home'
 import Watch from './pages/Watch';
 import All from './pages/All'
 
-const App = (props) => {
+const App = () => {
 
   const [ showMenu, updateMenu ] = useState(false)
 
@@ -22,7 +22,7 @@ const App = (props) => {
           </Route>
           <Route exact path="/all">
             <Navigation selected="list-all" />
-            <div className="menu-content">
+            <div toggleMenu={ () => updateMenu((show) => !show) } className="menu-content">
               <All />
             </div>
           </Route>
