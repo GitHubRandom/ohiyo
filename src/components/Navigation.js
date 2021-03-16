@@ -1,8 +1,9 @@
 import { NavLink } from "react-router-dom"
 
-const Navigation = ({ selected }) => {
+const Navigation = ({ updateMenu, selected, shown }) => {
+
     return (
-        <nav className="main-menu">
+        <nav className={ shown ? "main-menu shown" : "main-menu hidden" }>
             <section className="logo-section">
 
             </section>
@@ -11,6 +12,9 @@ const Navigation = ({ selected }) => {
                 <NavLink className={ selected == "list-all" ? "menu-item selected" : "menu-item"} to="/all"><span className="mdi mdi-format-list-text mdi-flip-h"></span>قائمة الأنمي</NavLink>
                 <NavLink className={ selected == "favorite" ? "menu-item selected" : "menu-item"} to="#"><span className="mdi mdi-star"></span>أنمياتي المفضلة</NavLink>
             </section>
+            <div onClick={ () => updateMenu(!shown) } className="main-menu-close">
+                <span className="mdi mdi-close mdi-nm"></span>
+            </div>
         </nav>
     )
 }

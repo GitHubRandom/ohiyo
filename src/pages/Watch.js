@@ -42,7 +42,7 @@ const Watch = () => {
             <EpisodePlayer episodesList={ episodesList } setEpisodeName={ (episodeName) => updateName(episodeName) } animeId={ aId } episodeNumber={ eNum } />
             <AnimeDetails episodeNumber={ eNum } episodesList={ episodesList } setRelated={ (related) => updateRelated(related) } setTitle={ (animeTitle) => updateTitle(animeTitle) } animeId={ aId } />
             { relatedContent ?
-            <div className="related-content">
+            <div style={{ marginBottom: "55px" }} className="related-content">
                 <h2>ذات صلة</h2>
                 <div className="content-list">
                     { relatedContent.slice(0,5).map((content) => {

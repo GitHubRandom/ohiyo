@@ -43,6 +43,10 @@ span.mdi.mdi-left {
     margin-right: 5px;
 }
 
+span.mdi.mdi-nm {
+    margin-left: 0;
+}
+
 body {
     padding: 0;
     margin: 0;
@@ -68,11 +72,17 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: right 0.125s ease-out;
 }
 
 .menu-section span {
     margin-left: 10px;
     color: var(--accent-color);
+}
+
+.main-menu-close {
+    display: none;
+    cursor: pointer;
 }
 
 .main-menu section {
@@ -297,15 +307,6 @@ body {
     grid-area: content;
 }
 
-.plyr--video {
-    position: absolute !important;
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: 100% !important;
-    border: none;
-}
-
 .servers-category {
     display: flex;
 }
@@ -388,12 +389,6 @@ body {
     font-weight: bold;
 }
 
-.anime-video-player {
-    position: relative;
-    border-radius: 5px;
-    overflow: hidden;
-    padding-bottom: 56.25%;
-}
 
 #episode-skip-intro {
     border-radius: 5px;
@@ -412,14 +407,6 @@ body {
 #episode-skip-intro:hover {
     background-color: var(--accent-color);
     color: black;
-}
-
-.plyr video#main-content {
-    width: 100%;
-}
-
-.plyr {
-    height: 100%;
 }
 
 .trailer-popup {
@@ -509,35 +496,48 @@ body {
 .floating-button {
     animation-name: reveal;
     animation-duration: 1s;
-    /*animation-delay: 1s;*/
     animation-timing-function: ease-out;
     cursor: pointer;
     border-radius: 50px;
     padding: 10px 20px;
     bottom: 20px;
     left: calc(50vw - 65px);
-    box-shadow: 0 1 10px rgba(0, 0, 0, 0.116);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.116);
     background-color: var(--accent-color);
     color: black;
     z-index: 1;
     font-weight: bold;
+    flex-shrink: 0;
+}
+
+#hamburger-menu {
+    display: none;
+    margin-left: 15px;
+    cursor: pointer;
 }
 
 @media only screen and (max-width: 1065px) {
-    .content-list {
-        margin-bottom: 55px;
-    }
     .main-menu {
         position: fixed;
-        bottom: 0;
         background-color: var(--primary-color);
-        height: unset;
-        width: 100vw;
         z-index: 3;
+        width: 275px;
     }
-    .main-menu .menu-section {
-        display: flex;
-        position: unset;
+    #hamburger-menu {
+        display: inline;
+    }
+    .main-menu-close {
+        display: block;
+        position: absolute;
+        font-size: 16pt;
+        top: 20px;
+        right: 20px;
+    }
+    .main-menu.hidden {
+        right: -275px;
+    }
+    .main-menu.shown {
+        right: 0;
     }
     .watch-page {
         display: block;
@@ -580,15 +580,6 @@ body {
 
     .floating-button {
         position: fixed;
-    }
-
-    .main-menu .menu-section {
-        display: flex;
-        position: unset;
-    }
-
-    .menu-section .menu-item {
-        font-size: 11pt;
     }
 
     .player-settings *:not(:last-child) { margin-bottom: 5px; }

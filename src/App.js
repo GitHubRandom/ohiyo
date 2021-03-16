@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BrowserRouter, Link, Route, Switch } from 'react-router-dom';
 import PropTypes from 'prop-types'
 import Navigation from './components/Navigation'
@@ -7,14 +7,17 @@ import Watch from './pages/Watch';
 import All from './pages/All'
 
 const App = (props) => {
+
+  const [ showMenu, updateMenu ] = useState(false)
+
   return (
     <>
       <BrowserRouter>
         <Switch>
           <Route exact path="/">
-            <Navigation selected="home" />
+            <Navigation updateMenu={ (shown) => updateMenu(() => shown) } shown={ showMenu } selected="home" />
             <div className="menu-content">
-              <Home />
+              <Home toggleMenu={ () => updateMenu((show) => !show) } />
             </div>
           </Route>
           <Route exact path="/all">
