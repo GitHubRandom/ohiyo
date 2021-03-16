@@ -542,19 +542,6 @@ body {
     .watch-page {
         display: block;
     }
-    .episodes-list {
-        display: flex;
-        height: unset;
-        flex-wrap: wrap;
-        max-height: 300px;
-    }
-    .episode-link {
-        border: 1px solid #1c1c1c;
-        padding: 5px 15px;
-        margin: 5px 5px;
-        flex-shrink: 0;
-        border-radius: 50px;
-    }
     .anime-details-info {
         display: flex;
     }
@@ -600,7 +587,7 @@ body {
         position: unset;
     }
 
-    .menu-item {
+    .menu-section .menu-item {
         font-size: 11pt;
     }
 
