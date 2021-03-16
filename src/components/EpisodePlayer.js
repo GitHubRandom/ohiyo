@@ -3,19 +3,17 @@ import Episode from "./Episode"
 import VideoPlayer from './VideoPlayer'
 import tippy from 'tippy.js'
 import 'tippy.js/dist/tippy.css'
+import { Link } from "react-router-dom/cjs/react-router-dom.min"
 
 // Possible API key from tune.pk : 777750fea4d3bd585bf47dc1873619fc
 
 const supportedServers = [ "OU", "MF", "UP" ]
 
-const EpisodePlayer = ({ setEpisodeName, animeId, episodeNumber }) => {
+const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber }) => {
 
-    const [ episodesList, updateList ] = useState([])
     const [ episodeSources, updateSources ] = useState({})
     const [ currentSource, updateCurrent ] = useState([])
     const [ introInterval, updateIntroInterval ] = useState([])
-
-    // Make the website responsive
 
     function getServers(sources) {
         // Remove backslashes in sources list
@@ -100,26 +98,29 @@ const EpisodePlayer = ({ setEpisodeName, animeId, episodeNumber }) => {
             })
         })
     }
-    
+
+    // TODO: VERY IMPORTANT ! Move every fetch data ops to Watch component !
+
     useEffect(() => {
-        fetch('https://cors.bridged.cc/https://anslayer.com/anime/public/episodes/get-episodes?json=%7B"more_info":"Yes","anime_id":' + animeId + '%7D', {headers: new Headers({
-            "Client-Id": process.env.REACT_APP_CLIENT_ID,
-            "Client-Secret": process.env.REACT_APP_CLIENT_SECRET
-        })})
-        .then((response) => { return response.json() })
-        .then((data) => {
-            updateList(data["response"]["data"])
-            var episode = data["response"]["data"][episodeNumber - 1]
+        const controller = new AbortController()
+        const signal = controller.signal        
+        if (episodesList.length != 0) {
+            var episode = episodesList[episodeNumber - 1]
             setEpisodeName(episode["episode_name"])
             updateIntroInterval([episode["skip_from"], episode["skip_to"]])
-            fetch("https://cors.bridged.cc/" + encodeURI(episode["episode_urls"][1]["episode_url"]))
+            fetch("https://cors.bridged.cc/" + encodeURI(episode["episode_urls"][1]["episode_url"]), { signal: signal })
             .then((response) => { 
                 response.text().then((sources) => {
                     getServers(sources)
                 })
             })
-        })
-    }, [])
+        }
+        return () => {
+            try { controller.abort() } catch (error) {}
+            updateCurrent([])
+            updateSources({})    
+        }
+    }, [episodeNumber,episodesList])
 
     useEffect(() => {
         tippy("[data-tippy-content]")
@@ -129,41 +130,38 @@ const EpisodePlayer = ({ setEpisodeName, animeId, episodeNumber }) => {
         <section className="anime-watch">
             { supportedServers.includes(currentSource[0]) ? 
             <VideoPlayer 
-                title = { currentSource.length != 0 ? episodesList[episodeNumber - 1]["episode_name"] : "" }
                 introInterval = { introInterval }
                 sources = {{ 
                     type: 'video',
                     sources: currentSource != [] ? currentSource[1] : {}
-                }}
-                episodesList = { episodesList } 
-                animeId = { animeId } 
-                episodeNumber = { episodeNumber } />
+                }} />
             : <div className="anime-video-player"><iframe allowFullScreen={ true } className = "plyr--video" src = { currentSource[1] } /></div> }
                 
             <div className="player-settings">
-                <a id="previous" {... episodeNumber > 1 && episodesList.length != 0 ? { 
-                    href: "/" + animeId + "/" + (parseInt(episodeNumber) - 1).toString(),
-                    className: "player-episode-skip"
-                } : {
-                    className: "player-episode-skip disabled"
-                } } ><span className="mdi mdi-chevron-right"></span>الحلقة السابقة</a>
+                { episodeNumber > 1 && episodesList.length != 0 ? 
+                    <Link data-tippy-content={ episodesList[(parseInt(episodeNumber) - 2)]["episode_name"] } id="previous" to={ "/" + animeId + "/" + (parseInt(episodeNumber) - 1).toString() }
+                        className="player-episode-skip"><span className="mdi mdi-chevron-right"></span>الحلقة السابقة</Link>
+                    : 
+                    <a className="player-episode-skip disabled"><span className="mdi mdi-chevron-right"></span>الحلقة السابقة</a> 
+                }
                 <div className="server-settings">
                     { Object.keys(episodeSources).length != 0 ?
-                        <select name="server" id="server-select" onChange={ (e) => updateCurrent([ e.target.value, episodeSources[e.target.value] ]) } value={ currentSource[0] }>
+                        <select name="server" className="selection" id="server-select" onChange={ (e) => updateCurrent([ e.target.value, episodeSources[e.target.value] ]) } value={ currentSource[0] }>
                             {
                                 Object.keys(episodeSources).map((key) => {
                                     return <option key={ key } value={ key } id={ key }>{ key }{ supportedServers.includes(key) ? " - المشغل السريع" : " - مشغل خارجي"}</option>
                                 })
                             }
                         </select>
-                        : <span className="servers-loading-message"><span className="mdi mdi-loading mdi-spin"></span>جاري العمل على الخوادم</span> }
+                        : <span className="servers-loading-message"><span className="mdi mdi-loading mdi-spin"></span>جاري العمل على الخوادم</span>
+                    }
                 </div>
-                <a id="next" {... episodeNumber < episodesList.length ? { 
-                    href: "/" + animeId + "/" + (parseInt(episodeNumber) + 1).toString(),
-                    className: "player-episode-skip"
-                } : {
-                    className: "player-episode-skip disabled"
-                }}>الحلقة القادمة<span className="mdi mdi-left mdi-chevron-left"></span></a>
+                { episodeNumber < episodesList.length ? 
+                    <Link data-tippy-content={ episodesList[parseInt(episodeNumber)]["episode_name"] } id="next" to={ "/" + animeId + "/" + (parseInt(episodeNumber) + 1).toString() }
+                        className="player-episode-skip">الحلقة القادمة<span className="mdi mdi-chevron-left mdi-left"></span></Link>
+                    : 
+                    <a className="player-episode-skip disabled">الحلقة القادمة<span className="mdi mdi-chevron-left mdi-left"></span></a> 
+                }
             </div>
         </section>
     )

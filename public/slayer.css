@@ -205,6 +205,9 @@ body {
 
 .top-bar {
     grid-area: topbar;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .top-bar-anime-title {
@@ -227,14 +230,10 @@ body {
 }
 
 .anime-details {
-    /*display: flex;*/
     margin: 0 auto;
     color: white;
-    border-radius: 10px;
     grid-area: details;
-    /*background: #0F2027;
-    background: -webkit-linear-gradient(to bottom right, #2C5364, #203A43, #0F2027);
-    background: linear-gradient(to bottom right, #2C5364, #203A43, #0F2027);*/
+    width: 100%;
 }
 
 .anime-details-cover {
@@ -330,13 +329,17 @@ body {
     color: #474747;
 }
 
-#server-select {
+.selection {
     border-radius: 5px;
     padding: 5px 10px;
     color: white;
     background-color: #3d212d;
     font-weight: bold;
     border: none;
+}
+
+#server-select {
+    margin-left: 10px;
 }
 
 .server-settings {
@@ -423,11 +426,133 @@ body {
     display: none;
 }
 
+.tab-selection {
+    border-radius: 5px;
+    display: flex;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border: 1px solid var(--accent-color);
+}
+
+.episodes-list {
+    max-height: 500px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    overflow-y: scroll;
+    border: 1px solid #1c1c1c;
+    height: 437px;
+}
+
+.episode-link {
+    display: block;
+    color: white;
+    padding: 10px 0;
+    font-weight: bold;
+}
+
+.tab.selected {
+    background-color: var(--accent-color);
+    color: black;
+}
+
+.tab {
+    padding: 5px 10px;
+    width: 50%;
+    text-align: center;
+    color: var(--accent-color);
+    cursor: pointer;
+}
+
+#episodes-popup {
+    z-index: 2;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #0009;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.episodes-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.episodes-popup-close {
+    color: var(--accent-color);
+    cursor: pointer;
+}
+
+.episodes-popup-container {
+    background-color: var(--primary-color);
+    width: 400px;
+    height: 80%;
+    border-radius: 5px;
+    padding: 10px 20px;
+}
+
+.episodes-popup-list {
+    height: calc(100% - 75px);
+    overflow-y: scroll;
+}
+
+@keyframes reveal {
+    0% { bottom: -45px; }
+    80% { bottom: -45px; }
+    100% { bottom: 20px; }
+}
+
+.floating-button {
+    animation-name: reveal;
+    animation-duration: 1s;
+    /*animation-delay: 1s;*/
+    animation-timing-function: ease-out;
+    cursor: pointer;
+    border-radius: 50px;
+    padding: 10px 20px;
+    bottom: 20px;
+    left: calc(50vw - 65px);
+    box-shadow: 0 1 10px rgba(0, 0, 0, 0.116);
+    background-color: var(--accent-color);
+    color: black;
+    z-index: 1;
+    font-weight: bold;
+}
+
 @media only screen and (max-width: 1065px) {
+    .main-menu {
+        position: fixed;
+        bottom: 0;
+        background-color: var(--primary-color);
+        height: unset;
+        width: 100vw;
+        z-index: 3;
+    }
+    .main-menu .menu-section {
+        display: flex;
+        position: unset;
+    }
     .watch-page {
         display: block;
     }
-    .anime-details {
+    .episodes-list {
+        display: flex;
+        height: unset;
+        flex-wrap: wrap;
+        max-height: 300px;
+    }
+    .episode-link {
+        border: 1px solid #1c1c1c;
+        padding: 5px 15px;
+        margin: 5px 5px;
+        flex-shrink: 0;
+        border-radius: 50px;
+    }
+    .anime-details-info {
         display: flex;
     }
     .anime-details-synopsis {
@@ -449,19 +574,25 @@ body {
 @media only screen and (max-width: 600px) {
     .player-episode-skip#next { order: 3; }
     .player-episode-skip#previous { order: 2 }
-    .server-settings { order: 1 }
 
-    .player-settings {
-        flex-direction: column;
+    .server-settings { 
+        order: 1;
+        flex-direction: column; 
     }
+
+    #server-select { margin-left: 0; }
+    .player-settings { flex-direction: column; }
+
     .player-settings * {
         width: 100%;
         text-align: center;
     }
 
-    .player-settings *:not(:last-child) {
-        margin-bottom: 5px;
+    .floating-button {
+        position: fixed;
     }
+
+    .player-settings *:not(:last-child) { margin-bottom: 5px; }
 }
 
 @media only screen and (max-width: 490px) {

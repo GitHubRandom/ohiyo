@@ -11,7 +11,7 @@ class VideoPlayer extends React.Component {
             fullscreen: {
                 container: ".anime-video-player"
             },
-            ratio: "16:9"
+            //ratio: "16:9" // TODO: Fix bug with non-16:9 screen ratio UI getting cut out
         })
         this.player.source = this.props.sources
         if (this.props.introInterval.length != 0 && this.props.introInterval != undefined) {
