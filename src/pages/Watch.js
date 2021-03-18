@@ -38,7 +38,7 @@ const Watch = () => {
 
     return (
         <div className="watch-page">
-            <WatchTopBar episodeName={ episodeName } animeTitle={ animeTitle } />
+            <WatchTopBar showEpisodeButton={ episodesList.length > 1 } episodeName={ episodeName } animeTitle={ animeTitle } />
             <EpisodePlayer episodesList={ episodesList } setEpisodeName={ (episodeName) => updateName(episodeName) } animeId={ aId } episodeNumber={ eNum } />
             <AnimeDetails episodeNumber={ eNum } episodesList={ episodesList } setRelated={ (related) => updateRelated(related) } setTitle={ (animeTitle) => updateTitle(animeTitle) } animeId={ aId } />
             { relatedContent ?

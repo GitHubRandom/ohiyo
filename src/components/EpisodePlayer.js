@@ -135,7 +135,7 @@ const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber })
                     type: 'video',
                     sources: currentSource != [] ? currentSource[1] : {}
                 }} />
-            : <div className="anime-video-player"><iframe allowFullScreen={ true } className = "plyr--video" src = { currentSource[1] } /></div> }
+            : <div className={ Object.keys(episodeSources).length ? "iframe-video-player" : "iframe-video-player loading" }><iframe allowFullScreen={ true } className="iframe-video" src={ currentSource[1] } /></div> }
                 
             <div className="player-settings">
                 { episodeNumber > 1 && episodesList.length != 0 ? 

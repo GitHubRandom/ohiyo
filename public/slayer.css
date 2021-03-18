@@ -246,7 +246,34 @@ body {
     width: 100%;
 }
 
+@keyframes loading {
+    0% { background-position: -50% 50%}
+    100% { background-position: 150% 50%}
+}
+
+.loading {
+    animation: loading 2s ease-in-out infinite;
+    background: linear-gradient(to right, var(--primary-color), #0f0f0f, #141414, #0f0f0f, var(--primary-color));
+    background-size: 400% 400% !important;
+    background-repeat: no-repeat;
+}
+
+.anime-title-placeholder {
+    margin-top: 21.44px;
+    height: 38.4px;
+    width: 300px;
+    border-radius: 5px;
+}
+
+.episode-name-placeholder {
+    height: 24px;
+    width: 150px;
+    margin: 5px 0 20px;
+    border-radius: 5px;
+}
+
 .anime-details-cover {
+    background-size: 400% 400%;
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -254,6 +281,9 @@ body {
     width: 0;
     min-width: 210px;
     border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .anime-details-categories {
@@ -297,11 +327,6 @@ body {
 }
 
 .anime-watch {
-    /*display: grid;
-    grid-template-columns: 210px 800px;
-    grid-template-rows: 450px 50px;
-    grid-template-areas: "sidebar content"
-                         "empty misc";*/
     overflow: hidden;
     justify-content: center;
     grid-area: content;
@@ -448,6 +473,33 @@ body {
     text-align: center;
     color: var(--accent-color);
     cursor: pointer;
+}
+
+#anime-cover-loading {
+    font-size: 24pt;
+    color: #3b3b3b;
+}
+
+.anime-video-player {
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.iframe-video-player {
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+    padding-bottom: 56.25%;
+}
+
+.iframe-video {
+    position: absolute !important;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100% !important;
+    border: none;
 }
 
 #episodes-popup {
