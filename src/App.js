@@ -6,7 +6,7 @@ import Home from './pages/Home'
 import Watch from './pages/Watch';
 import All from './pages/All'
 import { useLocation } from 'react-router-dom/cjs/react-router-dom.min';
-import "tippy.js/dist/tippy.css"
+import 'tippy.js/dist/tippy.css'
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search)
