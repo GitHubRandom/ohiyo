@@ -87,7 +87,20 @@ body {
 
 .main-menu section {
     position: fixed;
-    /*width: inherit;*/
+}
+
+.logo-section {
+    position: absolute;
+    width: inherit;
+    top: 20px;
+    padding: 20px;
+    font-size: 18pt;
+    color: var(--accent-color);
+}
+
+#main-logo {
+    text-align: center;
+    font-family: "Ninja Naruto";
 }
 
 .menu-section .menu-item:hover {
@@ -113,6 +126,10 @@ body {
 .menu-content {
     flex-grow: 1;
     padding: 20px;
+}
+
+.error-message.no-height {
+    height: unset;
 }
 
 .error-message {
@@ -273,7 +290,6 @@ body {
 }
 
 .anime-details-cover {
-    background-size: 400% 400%;
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -281,9 +297,21 @@ body {
     width: 0;
     min-width: 210px;
     border-radius: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    position: relative;
+}
+
+.anime-details-score {
+    background-color: rgba(0, 0, 0, 0.322);
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    font-size: 10pt;
+    border-radius: 50px;
+}
+
+.anime-details-score .mdi {
+    color: var(--accent-color);
 }
 
 .anime-details-categories {
@@ -502,7 +530,7 @@ body {
     border: none;
 }
 
-#episodes-popup {
+.popup {
     z-index: 2;
     height: 100vh;
     width: 100vw;
@@ -515,28 +543,44 @@ body {
     align-items: center;
 }
 
-.episodes-popup-header {
+.popup-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.episodes-popup-close {
+.popup-close {
     color: var(--accent-color);
     cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
 }
 
-.episodes-popup-container {
+.popup-close:hover {
+    background-color: #ffffff0f;
+}
+
+.popup-container {
     background-color: var(--primary-color);
     width: 400px;
     height: 80%;
     border-radius: 5px;
     padding: 10px 20px;
+    max-width: 90%;
 }
 
-.episodes-popup-list {
+.popup-list {
     height: calc(100% - 75px);
     overflow-y: scroll;
+}
+
+#trailer-popup iframe {
+    height: calc(100% - 75px);
+    width: 100%;
+}
+
+#trailer-popup .popup-container {
+    width: 600px;
 }
 
 @keyframes reveal {
@@ -661,9 +705,7 @@ body {
     .anime-details-trailer {
         font-size: 9pt;
     }
-}
 
-@media only screen and (max-width: 400px) {
     .content-list {
         grid-template-columns: repeat(auto-fill, 95px);
     }

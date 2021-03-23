@@ -1,10 +1,37 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom/cjs/react-router-dom.min"
 import ExpandableText from "./ExpandableText"
+import Popup from "./Popup"
 
-const ANIME_DETAILS_URL = "https://cors.bridged.cc/https://anslayer.com/anime/public/anime/get-anime-details?anime_id={id}&fetch_episodes=No&more_info=Yes"
+const ANIME_DETAILS_URL = "https://cors.bridged.cc/https://anslayer.com/anime/public/anime/get-anime-details"
 const CLIENT_ID = "web-app"
 const CLIENT_SECRET = "90b63e11b9b4634f124df024516id495ab749c6b"
+
+const type = {
+    "OVA": "اوفا",
+    "ONA": "اونا",
+    "TV": "مسلسل",
+    "Special": "خاصة",
+    "Movie": "فلم"
+}
+
+const source = {
+    // TODO: An object with all possible values of anime source
+    "4-koma manga": "مانجا 4-كوما",
+    "Digital manga": "مانجا رقمية",
+    "Picture book": "كتاب مصور",
+    "Web manga": "مانجا ويب",
+    "Book": "كتاب",
+    "Game": "لعبة",
+    "Manga": "مانجا",
+    "Music": "موسيقى",
+    "Novel": "رواية",
+    "Radio": "راديو",
+    "Visual novel": "رواية مرئية",
+    "Original": "نص اصلي",
+    "Card game": "اوراق لعب",
+    "Light novel": "رواية خفيفة"
+}
 
 const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }) => {
 
@@ -31,16 +58,14 @@ const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }) => {
         }
     }, [animeId])
 
-    function showPopup() {
-        document.getElementById("episodes-popup").style.display = "flex"
-    }
-
     function dismissPopup() {
-        document.getElementById("episodes-popup").style.display = "none"
+        document.getElementsByClassName("popup")[0].style.display = "none"
     }
 
     function render() {
         var ready = Object.keys(animeDetails).length != 0
+        var mal = null
+        if (ready && animeDetails["more_info_result"]) mal = animeDetails["more_info_result"]
         return (
             <section className="anime-details">
                 <div className="anime-details-info">
@@ -52,8 +77,9 @@ const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }) => {
                             className: "anime-details-cover"
                         } : {
                             className: "anime-details-cover loading"
-                        } }></div>
-                        { ready ? <button className="anime-details-trailer"><span className="mdi mdi-play"></span>العرض الدعائي</button> : null }
+                        } }>{ ready && animeDetails && mal ? <span data-tippy-content="تقييم MAL" className="anime-details-score"><span className="mdi mdi-star"></span>{ mal["score"] }</span> : null}</div>
+                        { ready && animeDetails && mal && mal["trailer_url"] ? 
+                        <button id="trailer-button" className="anime-details-trailer"><span className="mdi mdi-play"></span>العرض الدعائي</button> : null }
                     </div>
                     { ready ? 
                     <div className="anime-meta">
@@ -63,28 +89,43 @@ const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }) => {
                         </div>**/}
                         <ExpandableText expandText="معرفة المزيد" hideText="اخفاء" text={ animeDetails["anime_description"] } className="anime-details-synopsis" />
                         <p className="anime-details-misc">
-                            <strong>النوع : </strong>{ animeDetails["anime_type"] }<br />
-                            <strong>الحالة : </strong>{ animeDetails["anime_status"] != "Currently Airing" ? "مكتمل" : "غير مكتمل" }<br />
-                            <strong>الاستوديو : </strong>{ animeDetails["more_info_result"] ? animeDetails["more_info_result"]["anime_studios"] : null }<br />
-                            <strong>الفئة العمرية : </strong>{ animeDetails["anime_age_rating"] }<br />
-                            <strong>المصدر : </strong>{ animeDetails["more_info_result"] ? (animeDetails["more_info_result"]["source"] == "Manga" ? "من مانجا" : "ليس له مانجا") : null }<br />
+
+                            { animeDetails["anime_type"] ?
+                                <><strong>النوع : </strong>{ animeDetails["anime_type"] in type ? type[animeDetails["anime_type"]] : "غير معروف" }<br /></> 
+                            : null }
+
+                            { animeDetails["anime_status"] ?
+                                <><strong>الحالة : </strong>{ animeDetails["anime_status"] != "Currently Airing" ? "مكتمل" : "غير مكتمل" }<br /></>
+                            : null }
+
+                            <strong>الاستوديو : </strong>{ mal ? mal["anime_studios"] : null }<br />
+                            
+                            { animeDetails["anime_age_rating"] ?
+                            <><strong>الفئة العمرية : </strong>{ animeDetails["anime_age_rating"] != "All" ? animeDetails["anime_age_rating"] : "للجميع" }<br /></>
+                            : null }
+
+                            { mal && mal["source"] ?
+                            <><strong>المصدر : </strong>{ mal["source"] in source ? source[mal["source"]] : "غير معروف" }<br /></>
+                            : null }
+
+                            { mal && mal["episodes"] ?
+                                <><strong>عدد الحلقات : </strong> { mal["episodes"] }</>
+                            : null }
                         </p> 
                     </div> : null }
                 </div>
-                <div id="episodes-popup">
-                    <div className="episodes-popup-container">
-                        <div className="episodes-popup-header">
-                            <h2 className="episodes-popup-title">الحلقات</h2>
-                            <div className="episodes-popup-close" onClick={ () => dismissPopup() }>إغلاق</div>
-                        </div>
-                        <div className="episodes-popup-list">
-                            { episodesList.map((episode,index) => {
-                                return <Link onClick={ () => dismissPopup() } to={ "/" + animeId + "/" + (index + 1) } className="episode-link" key={ index }>{ episode["episode_name"] }</Link>
-                            }) }
-                        </div>
+                { ready && episodesList.length > 1 ?
+                <Popup id="episodes-popup" trigger="#episodes-button" title="الحلقات">
+                    <div className="popup-list">
+                        { episodesList.map((episode,index) => {
+                            return <Link onClick={ () => dismissPopup() } to={ "/" + animeId + "/" + (index + 1) } className="episode-link" key={ index }>{ episode["episode_name"] }</Link>
+                        }) }
                     </div>
-                </div>
-    
+                </Popup> : null }
+                { ready && animeDetails && mal && mal["trailer_url"] ? 
+                <Popup id="trailer-popup" trigger="#trailer-button" title="العرض الدعائي">
+                    <iframe allowFullScreen={ true } src={ mal["trailer_url"] } frameBorder="0"></iframe>
+                </Popup> : null }
             </section>
         )
     }

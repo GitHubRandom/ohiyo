@@ -1,7 +1,15 @@
-import { useEffect,useState } from 'react'
+import React, { useEffect,useState } from 'react'
 import Episode from '../components/Episode'
+import tippy, { followCursor } from 'tippy.js'
 
-const AnimeList = ({ endpoint, showEpisodeName, params, className, searchTerm }) => {
+const ENDPOINT = "https://cors.bridged.cc/https://anslayer.com/anime/public/animes/get-published-animes"
+var params = {
+    _limit: 30,
+    _order_by: "latest_first",
+    just_info: "Yes"
+}
+
+const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }) => {
 
     const [ content, updateContent ] = useState([])
 
@@ -10,35 +18,60 @@ const AnimeList = ({ endpoint, showEpisodeName, params, className, searchTerm })
      * error: if any error occured
      * no-results: no result found
      * success: search finished with positive results
+     * @Ritzy
      */
     const [ status, updateStatus ] = useState("searching")
     const [ page, updatePage ] = useState(1)
+    const [ lastHeight, updateLastHeight ] = useState(0)
 
     useEffect(() => {
-        var paramaters = params ? params : {}
-        if (params && searchTerm.length != 0) {
-            params["anime_name"] = searchTerm
+        tippy("[data-tippy-content]", {
+            plugins: [ followCursor ],
+            followCursor: "initial",
+            arrow: false,
+            delay: [1000,0]
+        })
+    })
+
+    function fetchData(resetPage) {
+        const controller = new AbortController()
+        if (resetPage) {
+            updateContent([])
+            updatePage(1)
+            updateLastHeight(0)
         }
-        if (params) endpoint = endpoint + "?json=" + encodeURI(JSON.stringify(paramaters))
+        params["_offset"] = (page - 1) * 30
+        if (searchTerm && searchTerm.length != 0) {
+            params["list_type"] = "filter"
+            params["anime_name"] = searchTerm
+        } else {
+            if (searchMode) {
+                params["list_type"] = "anime_list"
+            } else {
+                params["list_type"] = "latest_updated_episode_new"
+            }
+            if (params["anime_name"]) delete params["anime_name"]
+        }    
+        var endpoint = ENDPOINT + "?json=" + encodeURI(JSON.stringify(params))
         updateStatus("searching")
 
-        const controller = new AbortController()
-        const signal = controller.signal    
         fetch(endpoint, { 
             headers: new Headers({
                 "Client-Id": process.env.REACT_APP_CLIENT_ID,
                 "Client-Secret": process.env.REACT_APP_CLIENT_SECRET,
-            }), signal: signal
+            }), signal: controller.signal
         })
         .then((response) => {
             return response.json()
         })
         .then((data) => {
             if (data && data["response"] && !Array.isArray(data["response"])) {
-                updateContent(data["response"]["data"])
+                updateContent((oldData) => oldData.concat(data["response"]["data"]))
                 updateStatus("success")
             } else {
-                updateContent([])
+                if (page == 1) {
+                    updateContent([])
+                }
                 updateStatus("no-results")
             }
         })
@@ -47,35 +80,63 @@ const AnimeList = ({ endpoint, showEpisodeName, params, className, searchTerm })
             updateContent([])
             updateStatus("error")
         })
-        return () => controller.abort()
+        return () => { if (controller) controller.abort() }
+    }
+
+    useEffect(() => {
+        if (searchMode) {
+            return fetchData(true)
+        }
     }, [searchTerm])
 
-    function NoResults() {
+    useEffect(() => {
+        return fetchData(false)
+    }, [page])
+
+    useEffect(() => {
+        /**
+         * To prevent bottom event from recurring,
+         * I set a state for latest scroll height so 
+         * the function will only be triggered when
+         * it's on the bottom and also higher than the
+         * last height triggered height.
+         * Also I added 200px offset for the loading
+         * element. @Ritzy
+         */
+        window.onscroll = () => {
+            if (status == "success" && window.pageYOffset > window.scrollMaxY - 30 && window.pageYOffset > lastHeight + 200) {
+                updateLastHeight(window.scrollMaxY)
+                updatePage((page) => page + 1)
+            }
+        }
+    })
+
+    function NoResults({ NoHeight }) {
+        var className = NoHeight ? "error-message no-height" : "error-message"
         if (status == "searching") {
-            return <div className="error-message"><span className="mdi mdi-loading mdi-spin"></span><p>جاري العمل</p></div>
+            return <div className={ className }><span className="mdi mdi-loading mdi-spin"></span><p>جاري العمل</p></div>
         } else if (status == "no-results") {
-            return <div className="error-message"><span className="mdi mdi-close"></span><p>لا توجد نتائج</p></div>
+            return <div className={ className }><span className="mdi mdi-close"></span><p>لا توجد نتائج</p></div>
         } else {
-            return <div className="error-message"><span className="mdi mdi-exclamation-thick"></span><p>حصل خطأ ما</p></div>
+            return <div className={ className }><span className="mdi mdi-exclamation-thick"></span><p>حصل خطأ ما</p></div>
         }
     }
 
-    //TODO: Fix searching crashing app
     return (
         <>
-        { status == "success" ?
+        { status != "success" && (page == 1) ? <NoResults /> : 
             <div className={ className }>
-                { content.map((episode) => 
-                    <Episode key = { showEpisodeName ? episode["latest_episode_id"] : episode["anime_id"] }
+                { content.map((episode,index) => 
+                    <Episode key = { index }
                         showEpisodeName = { showEpisodeName }
                         animeName = {episode["anime_name"]}
-                        url = {'/' + episode["anime_id"] + '/1'}
+                        url={ showEpisodeName ? `/${episode["anime_id"]}?from-episode=${episode["latest_episode_id"]}` : '/' + episode["anime_id"] + '/1' }
                         cover = {episode["anime_cover_image_url"]}
                         episodeName = {episode["latest_episode_name"]}
                     />
                 ) }
-            </div>
-        : <NoResults /> }
+            </div> }
+        { status == "searching" && page != 1 ? <NoResults NoHeight={ true } /> : null }
         </>
     )
 }

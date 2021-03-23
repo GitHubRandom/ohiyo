@@ -5,7 +5,7 @@ const Navigation = ({ updateMenu, selected, shown }) => {
     return (
         <nav className={ shown ? "main-menu shown" : "main-menu hidden" }>
             <section className="logo-section">
-
+                <div id="main-logo" className="logo">AnimeSlayer</div>
             </section>
             <section className="menu-section">
                 <NavLink onClick={ () => updateMenu(!shown) } className={ selected == "home" ? "menu-item selected" : "menu-item"} to="/"><span className="mdi mdi-home"></span>الرئيسية</NavLink>

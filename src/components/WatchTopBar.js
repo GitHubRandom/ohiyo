@@ -3,11 +3,14 @@ import { useEffect } from "react"
 const WatchTopBar = ({ showEpisodeButton, episodeName, animeTitle }) => {
 
     useEffect(() => {
+        if (episodeName && animeTitle) {
+            document.title = `${ animeTitle } - ${episodeName}`
+        }
         window.onscroll = () => {
             var button = document.getElementsByClassName("floating-button")[0]
             if (button && window.innerWidth > 600 && window.pageYOffset < 60) {
                 button.style.position = "unset"
-            } else {
+            } else if (button) {
                 button.style.position = "fixed"
             }
         }
@@ -20,7 +23,7 @@ const WatchTopBar = ({ showEpisodeButton, episodeName, animeTitle }) => {
                 { episodeName ? <p className="top-bar-episode-name">{ episodeName }</p> : <div className="episode-name-placeholder loading"></div> }
             </div>
             { showEpisodeButton ?
-            <div className="floating-button" onClick={ () => document.getElementById("episodes-popup").style.display = "flex" }><span className="mdi mdi-cards-variant"></span>
+            <div id="episodes-button" className="floating-button"><span className="mdi mdi-cards-variant"></span>
             الحلقات
             </div> : null }
         </div>

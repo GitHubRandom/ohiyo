@@ -1,19 +1,17 @@
 import { useEffect, useState } from "react"
-import Episode from "./Episode"
 import VideoPlayer from './VideoPlayer'
-import tippy from 'tippy.js'
-import 'tippy.js/dist/tippy.css'
 import { Link } from "react-router-dom/cjs/react-router-dom.min"
 
 // Possible API key from tune.pk : 777750fea4d3bd585bf47dc1873619fc
 
 const supportedServers = [ "OU", "MF", "UP" ]
 
-const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber }) => {
+const EpisodePlayer = ({ fromEpisodeId, episode, setEpisodeName, episodesList, animeId, episodeNumber }) => {
 
     const [ episodeSources, updateSources ] = useState({})
     const [ currentSource, updateCurrent ] = useState([])
     const [ introInterval, updateIntroInterval ] = useState([])
+    const [ fetchStatus, updateStatus ] = useState([])
 
     function getServers(sources) {
         // Remove backslashes in sources list
@@ -30,6 +28,10 @@ const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber })
                     ...oldEpisodeSources,
                     TP: item
                 }))
+                if (!currentUpdated) {
+                    updateCurrent(["TP", item])
+                    currentUpdated = true
+                }
                 return
             }
             if (item.includes("vidlox")) {
@@ -37,6 +39,10 @@ const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber })
                     ...oldEpisodeSources,
                     VL: item
                 }))
+                if (!currentUpdated) {
+                    updateCurrent(["VL", item])
+                    currentUpdated = true
+                }
                 return
             }
             if (item.includes("fembed")) {
@@ -45,6 +51,10 @@ const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber })
                     ...oldEpisodeSources,
                     FD: item
                 }))
+                if (!currentUpdated) {
+                    updateCurrent(["FD", item])
+                    currentUpdated = true
+                }
                 return
             }
             if (item.includes("mixdrop")) {
@@ -52,6 +62,10 @@ const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber })
                     ...oldEpisodeSources,
                     MP: item
                 }))
+                if (!currentUpdated) {
+                    updateCurrent(["MP", item])
+                    currentUpdated = true
+                }
                 return
             }
             if (item.includes("jawcloud")) {
@@ -59,6 +73,10 @@ const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber })
                     ...oldEpisodeSources,
                     JC: item
                 }))
+                if (!currentUpdated) {
+                    updateCurrent(["JC", item])
+                    currentUpdated = true
+                }
                 return
             }
             if (item.includes("ok.ru") || item.includes("fembed")) {
@@ -72,7 +90,7 @@ const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber })
             if (!item.includes("uptostream")) {
                 item = "https://cors.bridged.cc/" + item
             }
-            fetch(item, {
+            const promise = fetch(item, {
                 method: method,
                 headers: new Headers(headers),
             })
@@ -86,7 +104,7 @@ const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber })
             .then((data) => {
                 var ds = decodeServers(item,data)
                 if (ds.length !== 0 && ds !== [undefined,undefined]) {
-                    if (!currentUpdated) {
+                    if (!currentUpdated || !supportedServers.includes(currentUpdated[0]) || ds[0] == "OU") {
                         updateCurrent(ds);
                         currentUpdated = true
                     }
@@ -96,19 +114,28 @@ const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber })
                     }))
                 }
             })
+            updateStatus(oldStatus => oldStatus.concat([promise]))
         })
     }
 
-    // TODO: VERY IMPORTANT ! Move every fetch data ops to Watch component !
-
     useEffect(() => {
         const controller = new AbortController()
-        const signal = controller.signal        
-        if (episodesList.length != 0) {
-            var episode = episodesList[episodeNumber - 1]
-            setEpisodeName(episode["episode_name"])
-            updateIntroInterval([episode["skip_from"], episode["skip_to"]])
-            fetch("https://cors.bridged.cc/" + encodeURI(episode["episode_urls"][1]["episode_url"]), { signal: signal })
+        if (fromEpisodeId && Object.keys(episode).length) {
+            var ep = episode
+            setEpisodeName(ep["episode_name"])
+            updateIntroInterval([ep["skip_from"], ep["skip_to"]])
+            fetch("https://cors.bridged.cc/" + encodeURI(ep["episode_urls"][1]["episode_url"]), { signal: controller.signal })
+            .then((response) => { 
+                response.text().then((sources) => {
+                    getServers(sources)
+                })
+            })    
+        } else if (!fromEpisodeId && episodesList.length) {
+            console.log(episodesList)
+            var ep = episodesList[episodeNumber - 1]
+            setEpisodeName(ep["episode_name"])
+            updateIntroInterval([ep["skip_from"], ep["skip_to"]])
+            fetch("https://cors.bridged.cc/" + encodeURI(ep["episode_urls"][1]["episode_url"]), { signal: controller.signal })
             .then((response) => { 
                 response.text().then((sources) => {
                     getServers(sources)
@@ -116,15 +143,13 @@ const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber })
             })
         }
         return () => {
-            try { controller.abort() } catch (error) {}
+            if (controller) {
+                try { controller.abort() } catch (error) {}
+            }
             updateCurrent([])
             updateSources({})    
         }
     }, [episodeNumber,episodesList])
-
-    useEffect(() => {
-        tippy("[data-tippy-content]")
-    })
 
     return (
         <section className="anime-watch">
@@ -168,7 +193,6 @@ const EpisodePlayer = ({ setEpisodeName, episodesList, animeId, episodeNumber })
 
     function decodeServers(s,data) {
         if (s.includes("uptostream")) {
-            console.log(data)
             var source = data["data"]["sources"]
             source = source.replace("\\/=+$\\/", "/=+$/")
             source = source.split("window").join("this")
