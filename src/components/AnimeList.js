@@ -24,15 +24,6 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }) => {
     const [ page, updatePage ] = useState(1)
     const [ lastHeight, updateLastHeight ] = useState(0)
 
-    useEffect(() => {
-        tippy("[data-tippy-content]", {
-            plugins: [ followCursor ],
-            followCursor: "initial",
-            arrow: false,
-            delay: [1000,0]
-        })
-    })
-
     function fetchData(resetPage) {
         const controller = new AbortController()
         if (resetPage) {
