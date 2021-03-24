@@ -17,7 +17,7 @@ const EpisodePlayer = ({ fromEpisodeId, episode, setEpisodeName, episodesList, a
         // Remove backslashes in sources list
         var s = sources.replace(/\\/g, "").slice(2,-2).split("\",\"")
         var currentUpdated = false
-        s.forEach((item) => {
+        s.forEach((item,index) => {
             var headers = { 'User-Agent': navigator.userAgent }
             var method = 'GET'
             item = item.replace("http://", "https://")
@@ -90,12 +90,12 @@ const EpisodePlayer = ({ fromEpisodeId, episode, setEpisodeName, episodesList, a
             if (!item.includes("uptostream")) {
                 item = "https://cors.bridged.cc/" + item
             }
-            const promise = fetch(item, {
+            fetch(item, {
                 method: method,
                 headers: new Headers(headers),
             })
             .then((response) => {
-                if (item.includes("ok.ru") || item.includes("uptostream") || item.includes("tune.pk")) {
+                if (item.includes("ok.ru") || item.includes("uptostream")) {
                     return response.json()
                 } else {
                     return response.text()
@@ -114,7 +114,6 @@ const EpisodePlayer = ({ fromEpisodeId, episode, setEpisodeName, episodesList, a
                     }))
                 }
             })
-            updateStatus(oldStatus => oldStatus.concat([promise]))
         })
     }
 

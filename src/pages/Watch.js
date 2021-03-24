@@ -5,10 +5,8 @@ import EpisodePlayer from "../components/EpisodePlayer"
 import WatchTopBar from "../components/WatchTopBar"
 import tippy from 'tippy.js'
 import RelatedContent from "../components/RelatedContent"
-
-const ANIME_DETAILS_URL = "https://cors.bridged.cc/https://anslayer.com/anime/public/anime/get-anime-details?anime_id={id}&fetch_episodes=No&more_info=Yes"
-const CLIENT_ID = "web-app"
-const CLIENT_SECRET = "90b63e11b9b4634f124df024516id495ab749c6b"
+import WatchNavigation from "../components/WatchNavigation"
+import Navigation from "../components/Navigation"
 
 const Watch = ({ fromEpisode }) => {
     const { aId, eNum } = useParams()
@@ -17,11 +15,11 @@ const Watch = ({ fromEpisode }) => {
     const [ episodeName, updateName ] = useState("")
     const [ episodesList, updateList ] = useState([])
     const [ relatedContent, updateRelated ] = useState([])
+    const [ sideMenu, updateSideMenu ] = useState(false)
 
     useEffect(() => {
-        window.scrollTo(0,0)
-        tippy("[data-tippy-content]")    
-    })
+        window.scrollTo(0,60)
+    }, [aId,eNum])
     
     useEffect(() => {
         if (fromEpisode) {
@@ -38,7 +36,6 @@ const Watch = ({ fromEpisode }) => {
             })
             .then((response) => { return response.json() })
             .then((data) => {
-                console.log(data)
                 if (data && data["response"] && data["response"]["data"]) {
                     var response = data["response"]["data"]
                     var episode = response[0]
@@ -66,13 +63,31 @@ const Watch = ({ fromEpisode }) => {
         }
     }, [aId])
 
+    const setMenus = () => {
+        if (window.innerWidth <= 1065) {
+            updateSideMenu(true)    
+        } else {
+            updateSideMenu(false)
+        }
+    }
+
+    useEffect(() => {
+        setMenus()
+        window.onresize = () => setMenus()
+    },[])
+
     return (
+        <>
+        <WatchNavigation shrink={ sideMenu } />
+        { sideMenu ? 
+        <Navigation trigger="#hamburger-menu" selected="none" shown={ false } /> : null }
         <div className="watch-page">
             <WatchTopBar showEpisodeButton={ episodesList.length > 1 } episodeName={ episodeName } animeTitle={ animeTitle } />
             <EpisodePlayer fromEpisodeId={ fromEpisode ? true : false } episode={ episode } episodesList={ episodesList } setEpisodeName={ (episodeName) => updateName(episodeName) } animeId={ aId } episodeNumber={ eNum ? eNum : episode["episode_number"] } />
             <AnimeDetails episodeNumber={ eNum } episodesList={ episodesList } setRelated={ (related) => updateRelated(related) } setTitle={ (animeTitle) => updateTitle(animeTitle) } animeId={ aId } />
             <RelatedContent related={ relatedContent } />
         </div>
+        </>
     )
 }
 

@@ -8,7 +8,7 @@ const WatchTopBar = ({ showEpisodeButton, episodeName, animeTitle }) => {
         }
         window.onscroll = () => {
             var button = document.getElementsByClassName("floating-button")[0]
-            if (button && window.innerWidth > 600 && window.pageYOffset < 60) {
+            if (button && window.innerWidth > 600 && window.pageYOffset < 100) {
                 button.style.position = "unset"
             } else if (button) {
                 button.style.position = "fixed"

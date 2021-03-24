@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom/cjs/react-router-dom.min"
+import tippy from "tippy.js"
 import ExpandableText from "./ExpandableText"
 import Popup from "./Popup"
 
@@ -36,6 +37,7 @@ const source = {
 const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }) => {
 
     const [ animeDetails, updateDetails ] = useState({})
+    const [ ratingSource, updateRateSource ] = useState("mal")
 
     useEffect(() => {
         var url = new URL(ANIME_DETAILS_URL)
@@ -58,8 +60,28 @@ const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }) => {
         }
     }, [animeId])
 
+    useEffect(() => {
+        tippy(".anime-details-score", {
+            //trigger: "mouseenter focus click",
+            content: (ref) => {
+                return ref.dataset.tippy
+            },
+            onTrigger(instance) {
+                instance.setContent(instance.reference.dataset.tippy)
+            }
+        })
+    })
+
     function dismissPopup() {
         document.getElementsByClassName("popup")[0].style.display = "none"
+    }
+
+    function toggleRatingSource() {
+        if (ratingSource == "mal") {
+            updateRateSource("arabic")
+        } else {
+            updateRateSource("mal")
+        }
     }
 
     function render() {
@@ -77,8 +99,22 @@ const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }) => {
                             className: "anime-details-cover"
                         } : {
                             className: "anime-details-cover loading"
-                        } }>{ ready && animeDetails && mal ? <span data-tippy-content="تقييم MAL" className="anime-details-score"><span className="mdi mdi-star"></span>{ mal["score"] }</span> : null}</div>
-                        { ready && animeDetails && mal && mal["trailer_url"] ? 
+                        } }>
+                        { ready && ratingSource == "mal" && mal && mal["score"] ?
+                            <span onClick={ () => toggleRatingSource() } id="mal-rating" data-tippy="تقييم MAL" className="anime-details-score">
+                                <span className="mdi mdi-star"></span>
+                                { mal["score"] }
+                            </span> : 
+                            <>
+                            { ready && ratingSource == "arabic" && animeDetails["anime_rating"] ? 
+                                <span onClick={ () => toggleRatingSource() } id="arabic-rating" data-tippy="التقييم العربي" className="anime-details-score">
+                                    <span className="mdi mdi-star"></span>
+                                    { animeDetails["anime_rating"] }
+                                </span> : null
+                            }</>
+                        }
+                        </div>
+                        { ready && mal && mal["trailer_url"] ? 
                         <button id="trailer-button" className="anime-details-trailer"><span className="mdi mdi-play"></span>العرض الدعائي</button> : null }
                     </div>
                     { ready ? 
