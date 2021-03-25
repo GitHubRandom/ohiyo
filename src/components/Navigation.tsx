@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react"
 import { NavLink } from "react-router-dom"
 
-const Navigation = ({ trigger, selected, shown }) => {
+interface INavigation {
+    trigger: string,
+    selected: string,
+    shown: boolean
+}
+
+const Navigation = ({ trigger, selected, shown }: INavigation) => {
 
     const [ isShown, updateShown ] = useState(shown)
 
@@ -16,11 +22,11 @@ const Navigation = ({ trigger, selected, shown }) => {
          */
         if (trigger) {
             if (trigger.startsWith("#")) {
-                document.getElementById(trigger.slice(1)).addEventListener("click", () => {
+                document.getElementById(trigger.slice(1))?.addEventListener("click", () => {
                     toggleMenu()
                 })
             } else if (trigger.startsWith(".")) {
-                document.getElementsByClassName(trigger.slice(1)).array.forEach(element => {
+                Array.from(document.getElementsByClassName(trigger.slice(1))).forEach(element => {
                     element.addEventListener("click", () => {
                         toggleMenu()
                     })

@@ -1,6 +1,12 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, FunctionComponent } from "react"
 
-const Popup = ({ children, trigger, id, title }) => {
+interface IPopup {
+    trigger: string,
+    id: string,
+    title: string
+}
+
+const Popup: FunctionComponent<IPopup> = ({ children, trigger, id, title }) => {
 
     const [ visible, updateVisibility ] = useState(false)
 
@@ -11,16 +17,16 @@ const Popup = ({ children, trigger, id, title }) => {
          */
         if (trigger) {
             if (trigger.startsWith("#")) {
-                document.getElementById(trigger.slice(1)).addEventListener("click", () => {
-                    var popup = document.getElementById(id)
+                document.getElementById(trigger.slice(1))?.addEventListener("click", () => {
+                    var popup = document.getElementById(id) as HTMLElement
                     popup.style.display = "flex"
                     popup.focus()
                     updateVisibility(true)
                 })
             } else if (trigger.startsWith(".")) {
-                document.getElementsByClassName(trigger.slice(1)).array.forEach(element => {
+                Array.from(document.getElementsByClassName(trigger.slice(1))).forEach(element => {
                     element.addEventListener("click", () => {
-                        var popup = document.getElementById(id)
+                        var popup = document.getElementById(id) as HTMLElement
                         popup.style.display = "flex"
                         popup.focus()
                         updateVisibility(true)
@@ -35,7 +41,7 @@ const Popup = ({ children, trigger, id, title }) => {
             <div className="popup-container">
                 <div className="popup-header">
                     <h2 className="popup-title">{ title }</h2>
-                    <div className="popup-close" onClick={ () => { document.getElementById(id).style.display = "none"; updateVisibility(false) } }>إغلاق</div>
+                    <div className="popup-close" onClick={ () => { (document.getElementById(id) as HTMLElement).style.display = "none"; updateVisibility(false) } }>إغلاق</div>
                 </div>
                 { visible ? children : null }
             </div>

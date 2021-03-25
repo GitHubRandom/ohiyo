@@ -1,15 +1,22 @@
 import React, { useEffect,useState } from 'react'
-import Episode from '../components/Episode'
+import Episode from './Episode'
 import tippy, { followCursor } from 'tippy.js'
 
 const ENDPOINT = "https://cors.bridged.cc/https://anslayer.com/anime/public/animes/get-published-animes"
-var params = {
+var params: Record<string,any> = {
     _limit: 30,
     _order_by: "latest_first",
     just_info: "Yes"
 }
 
-const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }) => {
+interface TAnimeList {
+    showEpisodeName: boolean,
+    searchMode: boolean,
+    className: string,
+    searchTerm?: string
+}
+
+const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: TAnimeList) => {
 
     const [ content, updateContent ] = useState([])
 
@@ -24,7 +31,7 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }) => {
     const [ page, updatePage ] = useState(1)
     const [ lastHeight, updateLastHeight ] = useState(0)
 
-    function fetchData(resetPage) {
+    function fetchData(resetPage: boolean) {
         const controller = new AbortController()
         if (resetPage) {
             updateContent([])
@@ -50,7 +57,7 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }) => {
             headers: new Headers({
                 "Client-Id": process.env.REACT_APP_CLIENT_ID,
                 "Client-Secret": process.env.REACT_APP_CLIENT_SECRET,
-            }), signal: controller.signal
+            } as HeadersInit), signal: controller.signal
         })
         .then((response) => {
             return response.json()
@@ -95,15 +102,16 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }) => {
          * element. @Ritzy
          */
         window.onscroll = () => {
-            if (status == "success" && window.pageYOffset > window.scrollMaxY - 30 && window.pageYOffset > lastHeight + 200) {
-                updateLastHeight(window.scrollMaxY)
+            let scroll = document.documentElement.scrollHeight - document.documentElement.clientHeight
+            if (status == "success" && window.pageYOffset > scroll - 30 && window.pageYOffset > lastHeight + 200) {
+                updateLastHeight(scroll)
                 updatePage((page) => page + 1)
             }
         }
     })
 
-    function NoResults({ NoHeight }) {
-        var className = NoHeight ? "error-message no-height" : "error-message"
+    function NoResults({ noHeight }: { noHeight: boolean }) {
+        var className = noHeight ? "error-message no-height" : "error-message"
         if (status == "searching") {
             return <div className={ className }><span className="mdi mdi-loading mdi-spin"></span><p>جاري العمل</p></div>
         } else if (status == "no-results") {
@@ -115,7 +123,7 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }) => {
 
     return (
         <>
-        { status != "success" && (page == 1) ? <NoResults /> : 
+        { status != "success" && (page == 1) ? <NoResults noHeight={ false } /> : 
             <div className={ className }>
                 { content.map((episode,index) => 
                     <Episode key = { index }
@@ -127,7 +135,7 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }) => {
                     />
                 ) }
             </div> }
-        { status == "searching" && page != 1 ? <NoResults NoHeight={ true } /> : null }
+        { status == "searching" && page != 1 ? <NoResults noHeight={ true } /> : null }
         </>
     )
 }

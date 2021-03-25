@@ -1,6 +1,14 @@
 import { Link } from "react-router-dom"
 
-const Episode = (props) => {
+interface TEpisode {
+    url: string,
+    cover: string,
+    showEpisodeName: boolean,
+    episodeName?: string,
+    animeName: string
+}
+
+const Episode = (props: TEpisode) => {
     return (
         <Link to={ props.url } className="content">
             <div style={{ backgroundImage: 'url(' + props.cover + ')' }} className="anime-cover">

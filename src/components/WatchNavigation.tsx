@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom"
 
-const WatchNavigation = ({ shrink }) => {
+const WatchNavigation = ({ shrink }: { shrink: boolean }) => {
     return (
         <nav className={ shrink ? "watch-menu shrink" : "watch-menu" }>
             <section className="logo-section">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom/cjs/react-router-dom.min"
+import { Link } from "react-router-dom"
 import tippy from "tippy.js"
 import ExpandableText from "./ExpandableText"
 import Popup from "./Popup"
@@ -8,7 +8,7 @@ const ANIME_DETAILS_URL = "https://cors.bridged.cc/https://anslayer.com/anime/pu
 const CLIENT_ID = "web-app"
 const CLIENT_SECRET = "90b63e11b9b4634f124df024516id495ab749c6b"
 
-const type = {
+const animeTypes: Record<string,string> = {
     "OVA": "اوفا",
     "ONA": "اونا",
     "TV": "مسلسل",
@@ -16,7 +16,7 @@ const type = {
     "Movie": "فلم"
 }
 
-const source = {
+const source: Record<string,string> = {
     // TODO: An object with all possible values of anime source
     "4-koma manga": "مانجا 4-كوما",
     "Digital manga": "مانجا رقمية",
@@ -34,16 +34,23 @@ const source = {
     "Light novel": "رواية خفيفة"
 }
 
-const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }) => {
+interface TAnimeDetails {
+    setRelated: (related: Array<Record<string,any>>) => void,
+    episodesList: Array<Record<string,any>>,
+    setTitle: (title: string) => void,
+    animeId: string
+}
 
-    const [ animeDetails, updateDetails ] = useState({})
-    const [ ratingSource, updateRateSource ] = useState("mal")
+const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }: TAnimeDetails) => {
+
+    const [ animeDetails, updateDetails ] = useState<Record<string,any>>({})
+    const [ ratingSource, updateRateSource ] = useState<"mal" | "arabic">("mal")
 
     useEffect(() => {
         var url = new URL(ANIME_DETAILS_URL)
         var params = { anime_id: animeId.toString(), fetch_episodes: "No", more_info: "Yes" }
         url.search = new URLSearchParams(params).toString()
-        fetch(url, {headers: new Headers({
+        fetch(url.toString(), {headers: new Headers({
             "Client-Id": CLIENT_ID,
             "Client-Secret": CLIENT_SECRET,
         })})
@@ -60,20 +67,19 @@ const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }) => {
         }
     }, [animeId])
 
+    /*
+    TODO: Restore tippy
     useEffect(() => {
-        tippy(".anime-details-score", {
+        tippy(document.getElementsByClassName(".anime-details-scrore"), {
             //trigger: "mouseenter focus click",
             content: (ref) => {
-                return ref.dataset.tippy
-            },
-            onTrigger(instance) {
-                instance.setContent(instance.reference.dataset.tippy)
+                return ref instanceof HTMLElement ? ref.dataset.tippy : ""
             }
         })
-    })
+    })*/
 
     function dismissPopup() {
-        document.getElementsByClassName("popup")[0].style.display = "none"
+        (document.getElementsByClassName("popup")[0] as HTMLElement).style.display = "none"
     }
 
     function toggleRatingSource() {
@@ -127,7 +133,7 @@ const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }) => {
                         <p className="anime-details-misc">
 
                             { animeDetails["anime_type"] ?
-                                <><strong>النوع : </strong>{ animeDetails["anime_type"] in type ? type[animeDetails["anime_type"]] : "غير معروف" }<br /></> 
+                                <><strong>النوع : </strong>{ animeDetails["anime_type"] in animeTypes ? animeTypes[animeDetails["anime_type"]] : "غير معروف" }<br /></> 
                             : null }
 
                             { animeDetails["anime_status"] ?

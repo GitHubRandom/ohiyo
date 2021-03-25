@@ -1,6 +1,13 @@
 import { useState } from "react";
 
-const ExpandableText = ({ className, expandText, hideText, text }) => {
+interface IExpandableText {
+    className: string,
+    expandText: string,
+    hideText: string,
+    text: string
+}
+
+const ExpandableText = ({ className, expandText, hideText, text }: IExpandableText) => {
 
     const [ expanded, toggleCollapse ] = useState(false)
 
@@ -22,7 +29,7 @@ const ExpandableText = ({ className, expandText, hideText, text }) => {
     )
 }
 
-function shorten(str, maxLen, separator = ' ') {
+function shorten(str: string, maxLen: number, separator = ' ') {
     if (!str) return ''
     if (str.length <= maxLen) return str;
     return str.substr(0, str.lastIndexOf(separator, maxLen));

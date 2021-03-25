@@ -1,13 +1,19 @@
 import { useEffect } from "react"
 
-const WatchTopBar = ({ showEpisodeButton, episodeName, animeTitle }) => {
+interface IWatchTopBar {
+    showEpisodeButton: boolean,
+    episodeName: string,
+    animeTitle: string
+}
+
+const WatchTopBar = ({ showEpisodeButton, episodeName, animeTitle }: IWatchTopBar) => {
 
     useEffect(() => {
         if (episodeName && animeTitle) {
             document.title = `${ animeTitle } - ${episodeName}`
         }
         window.onscroll = () => {
-            var button = document.getElementsByClassName("floating-button")[0]
+            var button = document.getElementsByClassName("floating-button")[0] as HTMLElement
             if (button && window.innerWidth > 600 && window.pageYOffset < 100) {
                 button.style.position = "unset"
             } else if (button) {

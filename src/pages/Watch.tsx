@@ -8,14 +8,14 @@ import RelatedContent from "../components/RelatedContent"
 import WatchNavigation from "../components/WatchNavigation"
 import Navigation from "../components/Navigation"
 
-const Watch = ({ fromEpisode }) => {
-    const { aId, eNum } = useParams()
-    const [ episode, updateEpisode ] = useState({})
-    const [ animeTitle, updateTitle ] = useState("")
-    const [ episodeName, updateName ] = useState("")
-    const [ episodesList, updateList ] = useState([])
-    const [ relatedContent, updateRelated ] = useState([])
-    const [ sideMenu, updateSideMenu ] = useState(false)
+const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
+    const { aId, eNum } = useParams<{ aId: string, eNum: string | undefined }>()
+    const [ episode, updateEpisode ] = useState<Record<string,any>>({})
+    const [ animeTitle, updateTitle ] = useState<string>("")
+    const [ episodeName, updateName ] = useState<string>("")
+    const [ episodesList, updateList ] = useState<Record<string,any>[]>([])
+    const [ relatedContent, updateRelated ] = useState<Record<string,any>[]>([])
+    const [ sideMenu, updateSideMenu ] = useState<boolean>(false)
 
     useEffect(() => {
         window.scrollTo(0,60)
@@ -32,7 +32,7 @@ const Watch = ({ fromEpisode }) => {
                 headers: new Headers({
                     "Client-Id": process.env.REACT_APP_CLIENT_ID,
                     "Client-Secret": process.env.REACT_APP_CLIENT_SECRET
-                })
+                } as HeadersInit)
             })
             .then((response) => { return response.json() })
             .then((data) => {
@@ -49,7 +49,7 @@ const Watch = ({ fromEpisode }) => {
         fetch('https://cors.bridged.cc/https://anslayer.com/anime/public/episodes/get-episodes?json=%7B"more_info":"Yes","anime_id":' + aId + '%7D', {headers: new Headers({
             "Client-Id": process.env.REACT_APP_CLIENT_ID,
             "Client-Secret": process.env.REACT_APP_CLIENT_SECRET
-        }), signal: signal})
+        } as HeadersInit), signal: signal})
         .then((response) => { return response.json() })
         .then((data) => {
             updateList(data["response"]["data"])
@@ -83,8 +83,8 @@ const Watch = ({ fromEpisode }) => {
         <Navigation trigger="#hamburger-menu" selected="none" shown={ false } /> : null }
         <div className="watch-page">
             <WatchTopBar showEpisodeButton={ episodesList.length > 1 } episodeName={ episodeName } animeTitle={ animeTitle } />
-            <EpisodePlayer fromEpisodeId={ fromEpisode ? true : false } episode={ episode } episodesList={ episodesList } setEpisodeName={ (episodeName) => updateName(episodeName) } animeId={ aId } episodeNumber={ eNum ? eNum : episode["episode_number"] } />
-            <AnimeDetails episodeNumber={ eNum } episodesList={ episodesList } setRelated={ (related) => updateRelated(related) } setTitle={ (animeTitle) => updateTitle(animeTitle) } animeId={ aId } />
+            <EpisodePlayer fromEpisode={ fromEpisode ? true : false } episode={ episode } episodesList={ episodesList } setEpisodeName={ (episodeName) => updateName(episodeName) } animeId={ aId } episodeNumber={ eNum ? eNum : episode["episode_number"] } />
+            <AnimeDetails episodesList={ episodesList } setRelated={ (related: Record<string,any>[]) => updateRelated(related) } setTitle={ (animeTitle) => updateTitle(animeTitle) } animeId={ aId } />
             <RelatedContent related={ relatedContent } />
         </div>
         </>
