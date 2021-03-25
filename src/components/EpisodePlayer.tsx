@@ -151,7 +151,7 @@ const EpisodePlayer = ({ fromEpisode, episode, setEpisodeName, episodesList, ani
             })
         }
         return () => {
-            if (controller) {
+            if (controller && !controller.signal.aborted) {
                 try { controller.abort() } catch (error) {}
             }
             updateCurrent(["",""])
@@ -200,10 +200,13 @@ const EpisodePlayer = ({ fromEpisode, episode, setEpisodeName, episodesList, ani
     )
 
     function decodeHTML(s:string, data:string): [string,Record<string,string>[]] {
+        console.log(s)
+        console.log(data)
         if (s.includes("mediafire")) {
             // Search for the download button href (yeah i know too simple)
             var regex = /href="(https?:\/\/download(?:\d{0,9}){4}\.mediafire\.com.*?\.mp4)/
             var matches = data.match(regex)
+            console.log(matches)
             if (matches) {
                 return ["MF", [{ src: matches[1], size: "720" }]]
             }

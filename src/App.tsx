@@ -19,7 +19,7 @@ const App = () => {
     }    
 
     const GetNavigation = ({ selected }: { selected: string }) => {
-        return <Navigation trigger="#hamburger-menu" shown={ false } selected={selected} />
+        return <Navigation trigger="#hamburger-menu" shown={ false } selected={ selected } />
     }
 
     const Router = () => {

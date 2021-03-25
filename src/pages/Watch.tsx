@@ -55,7 +55,7 @@ const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
             updateList(data["response"]["data"])
         })
         return () => {
-            try { controller.abort() } catch (error) {}
+            try { if (!controller.signal.aborted) controller.abort() } catch (error) {}
             updateTitle("")
             updateName("")
             updateRelated([])

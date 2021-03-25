@@ -9,16 +9,16 @@ var params: Record<string,any> = {
     just_info: "Yes"
 }
 
-interface TAnimeList {
+interface IAnimeList {
     showEpisodeName: boolean,
     searchMode: boolean,
     className: string,
     searchTerm?: string
 }
 
-const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: TAnimeList) => {
+const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: IAnimeList) => {
 
-    const [ content, updateContent ] = useState([])
+    const [ content, updateContent ] = useState<Record<string,any>[]>([])
 
     /**
      * searching: still searching
@@ -27,9 +27,9 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: TAnim
      * success: search finished with positive results
      * @Ritzy
      */
-    const [ status, updateStatus ] = useState("searching")
-    const [ page, updatePage ] = useState(1)
-    const [ lastHeight, updateLastHeight ] = useState(0)
+    const [ status, updateStatus ] = useState<"searching" | "no-results" | "success" | "error">("searching")
+    const [ page, updatePage ] = useState<number>(1)
+    const [ lastHeight, updateLastHeight ] = useState<number>(0)
 
     function fetchData(resetPage: boolean) {
         const controller = new AbortController()
@@ -78,7 +78,7 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: TAnim
             updateContent([])
             updateStatus("error")
         })
-        return () => { if (controller) controller.abort() }
+        return () => { if (controller && !controller.signal.aborted) controller.abort() }
     }
 
     useEffect(() => {
@@ -101,13 +101,13 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: TAnim
          * Also I added 200px offset for the loading
          * element. @Ritzy
          */
-        window.onscroll = () => {
+        window.addEventListener("scroll touchmove", () => {
             let scroll = document.documentElement.scrollHeight - document.documentElement.clientHeight
             if (status == "success" && window.pageYOffset > scroll - 30 && window.pageYOffset > lastHeight + 200) {
                 updateLastHeight(scroll)
                 updatePage((page) => page + 1)
             }
-        }
+        })
     })
 
     function NoResults({ noHeight }: { noHeight: boolean }) {
@@ -125,7 +125,7 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: TAnim
         <>
         { status != "success" && (page == 1) ? <NoResults noHeight={ false } /> : 
             <div className={ className }>
-                { content.map((episode,index) => 
+                { content.map((episode: Record<string,any>, index: number) => 
                     <Episode key = { index }
                         showEpisodeName = { showEpisodeName }
                         animeName = {episode["anime_name"]}

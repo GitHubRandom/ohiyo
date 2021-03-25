@@ -9,7 +9,7 @@ interface INavigation {
 
 const Navigation = ({ trigger, selected, shown }: INavigation) => {
 
-    const [ isShown, updateShown ] = useState(shown)
+    const [ isShown, updateShown ] = useState<boolean>(shown)
 
     const toggleMenu = () => {
         updateShown(state => !state)
