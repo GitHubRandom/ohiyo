@@ -21,7 +21,7 @@ const WatchTopBar = ({ showEpisodeButton, episodeName, animeTitle }: IWatchTopBa
             if (button && window.innerWidth > 600 && window.pageYOffset < 100) {
                 button.style.position = "unset"
             } else if (button) {
-                button.style.position = "absolute"
+                button.style.position = "fixed"
             }
         })
     })

@@ -665,7 +665,7 @@ body {
 
 @media only screen and (max-width: 1065px) {
     .main-menu {
-        position: absolute;
+        position: fixed;
         background-color: var(--primary-color);
         justify-content: start;
         z-index: 3;
