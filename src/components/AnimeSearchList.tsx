@@ -104,15 +104,22 @@ const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm }:
          * Also I added 200px offset for the loading
          * element. @Ritzy
          */
-        window.addEventListener("scroll", () => {
-            let scroll = document.documentElement.scrollHeight - document.documentElement.clientHeight
-            if (status == "success" && window.pageYOffset > scroll - 30 && window.pageYOffset > lastHeight + 200) {
-                updateLastHeight(scroll)
+        
+        let observer = new IntersectionObserver((entries) => {
+            if (status == "success" && entries[0] && entries[0].isIntersecting && window.pageYOffset > lastHeight + 200) {
+                updateLastHeight(window.pageYOffset)
                 let oldPage = page
                 oldPage++ 
-                updatePage(oldPage)
+                updatePage(oldPage)    
             }
         })
+        if (document.querySelector(".bottom-detector")) {
+            observer.observe(document.querySelector(".bottom-detector") as Element)
+        }
+
+        return () => {
+            observer.disconnect()
+        }
     })
 
     function NoResults({ noHeight }: { noHeight: boolean }) {
@@ -128,9 +135,10 @@ const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm }:
 
     return (
         <>
-        { status != "success" && (page == 1) ? <NoResults noHeight={ false } /> : 
+        { status != "success" && (page == 1) ? <NoResults noHeight={ false } /> :  
             <ContentList showEpisodeName={ showEpisodeName } contentList={ content } className={ className } /> }
         { status == "searching" && page != 1 ? <NoResults noHeight={ true } /> : null }
+        <div className="bottom-detector"></div>
         </>
     )
 }
