@@ -1,4 +1,4 @@
-import AnimeList from "../components/AnimeList"
+import AnimeSearchList from "../components/AnimeSearchList"
 import { useEffect } from "react"
 
 const Home = () => {
@@ -8,9 +8,9 @@ const Home = () => {
     })
 
     return (
-        <div className="home-page">
+        <div id="home-page" className="content-page">
             <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>حلقات جديدة</h2>
-            <AnimeList className="content-list" showEpisodeName={ true } searchMode={ false } />
+            <AnimeSearchList className="content-list" showEpisodeName={ true } searchMode={ false } />
         </div>
     )
 }

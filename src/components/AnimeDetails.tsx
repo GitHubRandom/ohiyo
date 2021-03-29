@@ -38,10 +38,11 @@ interface TAnimeDetails {
     setRelated: (related: Array<Record<string,any>>) => void,
     episodesList: Array<Record<string,any>>,
     setTitle: (title: string) => void,
-    animeId: string
+    animeId: string,
+    setSoon: () => void
 }
 
-const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }: TAnimeDetails) => {
+const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: TAnimeDetails) => {
 
     const [ animeDetails, updateDetails ] = useState<Record<string,any>>({})
     const [ ratingSource, updateRateSource ] = useState<"mal" | "arabic">("mal")
@@ -61,6 +62,9 @@ const AnimeDetails = ({ setRelated, episodesList, setTitle, animeId }: TAnimeDet
             updateDetails(data["response"])
             setTitle(data["response"]["anime_name"])
             setRelated(data["response"]["related_animes"]["data"])
+            if (data["response"]["anime_status"] == "Not Yet Aired") {
+                setSoon()
+            }
         })
         return () => {
             updateDetails({})

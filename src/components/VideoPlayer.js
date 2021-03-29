@@ -11,7 +11,11 @@ class VideoPlayer extends React.Component {
             fullscreen: {
                 container: ".anime-video-player"
             },
-            ratio: "16:9"
+            ratio: "16:9",
+            keyboard: {
+                focused: false,
+                global: true
+            }
         })
         this.player.source = this.props.sources
         if (this.props.introInterval.length != 0 && this.props.introInterval != undefined) {
@@ -27,7 +31,6 @@ class VideoPlayer extends React.Component {
     }
 
     componentDidUpdate() {
-        // TODO: Fix this shit !!
         this.player.source = this.props.sources
         if (this.props.introInterval != undefined && this.props.introInterval.length != 0) {
             var introSeconds = [toSeconds(this.props.introInterval[0]), toSeconds(this.props.introInterval[1])]
@@ -54,12 +57,6 @@ class VideoPlayer extends React.Component {
     render() {
         return (
             <div className="anime-video-player">
-                {/**
-                <div className="anime-episodes-list">
-                    { this.props.episodesList.map((episode,index) => {
-                        return <a key={ index } href={ "/" + this.props.animeId + "/" + episode["episode_number"] } className={ index == this.props.episodeNumber - 1 ? "anime-episode selected" : "anime-episode" }>{ episode["episode_name"] }</a>
-                    })}
-                </div>**/}
                 <video id="main-content" rel="noreferrer" playsInline controls className='player plyr'>
                 </video> 
                 <button onClick={ this.skipIntro.bind(this) } style={{ display: "none" }} type="button" id="episode-skip-intro">

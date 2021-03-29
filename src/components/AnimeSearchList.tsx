@@ -1,6 +1,7 @@
 import React, { useEffect,useState } from 'react'
 import Episode from './Episode'
 import tippy, { followCursor } from 'tippy.js'
+import ContentList from './ContentList'
 
 const ENDPOINT = "https://cors.bridged.cc/https://anslayer.com/anime/public/animes/get-published-animes"
 var params: Record<string,any> = {
@@ -16,7 +17,7 @@ interface IAnimeList {
     searchTerm?: string
 }
 
-const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: IAnimeList) => {
+const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm }: IAnimeList) => {
 
     const [ content, updateContent ] = useState<Record<string,any>[]>([])
 
@@ -32,6 +33,7 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: IAnim
     const [ lastHeight, updateLastHeight ] = useState<number>(0)
 
     function fetchData(resetPage: boolean) {
+        updateStatus("searching")
         const controller = new AbortController()
         if (resetPage) {
             updateContent([])
@@ -51,7 +53,6 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: IAnim
             if (params["anime_name"]) delete params["anime_name"]
         }    
         var endpoint = ENDPOINT + "?json=" + encodeURI(JSON.stringify(params))
-        updateStatus("searching")
 
         fetch(endpoint, { 
             headers: new Headers({
@@ -59,10 +60,10 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: IAnim
                 "Client-Secret": process.env.REACT_APP_CLIENT_SECRET,
             } as HeadersInit), signal: controller.signal
         })
-        .then((response) => {
+        .then(response => {
             return response.json()
         })
-        .then((data) => {
+        .then(data => {
             if (data && data["response"] && !Array.isArray(data["response"])) {
                 updateContent((oldData) => oldData.concat(data["response"]["data"]))
                 updateStatus("success")
@@ -73,7 +74,7 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: IAnim
                 updateStatus("no-results")
             }
         })
-        .catch((error) => {
+        .catch(error => {
             if (error.name === "AbortError") return
             updateContent([])
             updateStatus("error")
@@ -88,7 +89,9 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: IAnim
     }, [searchTerm])
 
     useEffect(() => {
-        return fetchData(false)
+        if (page > 1 || !searchMode) {
+            return fetchData(false)
+        }
     }, [page])
 
     useEffect(() => {
@@ -101,11 +104,13 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: IAnim
          * Also I added 200px offset for the loading
          * element. @Ritzy
          */
-        window.addEventListener("scroll touchmove", () => {
+        window.addEventListener("scroll", () => {
             let scroll = document.documentElement.scrollHeight - document.documentElement.clientHeight
             if (status == "success" && window.pageYOffset > scroll - 30 && window.pageYOffset > lastHeight + 200) {
                 updateLastHeight(scroll)
-                updatePage((page) => page + 1)
+                let oldPage = page
+                oldPage++ 
+                updatePage(oldPage)
             }
         })
     })
@@ -124,20 +129,10 @@ const AnimeList = ({ showEpisodeName, searchMode, className, searchTerm }: IAnim
     return (
         <>
         { status != "success" && (page == 1) ? <NoResults noHeight={ false } /> : 
-            <div className={ className }>
-                { content.map((episode: Record<string,any>, index: number) => 
-                    <Episode key = { index }
-                        showEpisodeName = { showEpisodeName }
-                        animeName = {episode["anime_name"]}
-                        url={ showEpisodeName ? `/${episode["anime_id"]}?from-episode=${episode["latest_episode_id"]}` : '/' + episode["anime_id"] + '/1' }
-                        cover = {episode["anime_cover_image_url"]}
-                        episodeName = {episode["latest_episode_name"]}
-                    />
-                ) }
-            </div> }
+            <ContentList showEpisodeName={ showEpisodeName } contentList={ content } className={ className } /> }
         { status == "searching" && page != 1 ? <NoResults noHeight={ true } /> : null }
         </>
     )
 }
 
-export default AnimeList
+export default AnimeSearchList

@@ -201,7 +201,7 @@ body {
     justify-content: space-between;
 }
 
-.home-page {
+.content-page {
     max-width: 865px;
     margin: 0 auto;
 }
@@ -428,7 +428,7 @@ body {
     border-radius: 5px;
     padding: 5px 10px;
     color: white;
-    background-color: #3d212d;
+    background-color: #151515;
     font-weight: bold;
     border: none;
 }
@@ -509,7 +509,7 @@ body {
 
 .tab-selection {
     border-radius: 5px;
-    display: flex;
+    display: inline-flex;
     overflow: hidden;
     margin-bottom: 10px;
     border: 1px solid var(--accent-color);
@@ -538,10 +538,10 @@ body {
 
 .tab {
     padding: 5px 10px;
-    width: 50%;
     text-align: center;
     color: var(--accent-color);
     cursor: pointer;
+    user-select: none;
 }
 
 #anime-cover-loading {
@@ -562,13 +562,24 @@ body {
     padding-bottom: 56.25%;
 }
 
-.iframe-video {
+.iframe-video,
+.soon-screen {
     position: absolute !important;
     top: 0;
     right: 0;
     width: 100%;
     height: 100% !important;
     border: none;
+}
+
+.soon-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25pt;
+    font-weight: bold;
+    color: #272727;
+    border: 2px solid #272727;
 }
 
 .popup {
@@ -737,6 +748,10 @@ body {
     .anime-details-cover {
         height: 190px;
         width: 135px;
+    }
+
+    .anime-episode-name {
+        font-size: 7pt;
     }
 
     .anime-title {

@@ -12,83 +12,67 @@ interface TEpisodePlayer {
     setEpisodeName: (title: string) => void,
     episodesList: Record<string,any>[],
     animeId: string,
-    episodeNumber: string
+    episodeNumber: string,
+    soon: boolean
 }
 
-const EpisodePlayer = ({ fromEpisode, episode, setEpisodeName, episodesList, animeId, episodeNumber }: TEpisodePlayer) => {
+const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesList, animeId, episodeNumber }: TEpisodePlayer) => {
 
     type quality = Array<Record<string,string>>
 
     const [ episodeSources, updateSources ] = useState<Record<string,quality | string>>({})
     const [ currentSource, updateCurrent ] = useState<[string,string | Record<string,string>[]]>(["",""])
     const [ introInterval, updateIntroInterval ] = useState<[string,string]>(["",""])
+    const [ status, updateStatus ] = useState<string[]>([])
+
+    function setStatus(status: string, index: number) {
+        updateStatus(oldStatus => {
+            oldStatus.splice(index, 1, status)
+            return oldStatus
+        })
+    }
 
     function getServers(sources: string) {
         // Remove backslashes in sources list
         let s = sources.replace(/\\/g, "").slice(2,-2).split("\",\"")
         let currentUpdated = false
+
+        updateStatus(Array(s.length).fill("pending"))
+
+        function setUnsupportedServer(server: string, result: string, index: number) {
+            updateSources(oldEpisodeSources => ({
+                ...oldEpisodeSources,
+                [server]: result
+            }))
+            if (!currentUpdated) {
+                updateCurrent([server, result])
+                currentUpdated = true
+            }
+            setStatus("parsed", index)
+        }
+
         s.forEach((item,index) => {
-            var headers = { 'User-Agent': navigator.userAgent }
-            var method = 'GET'
             item = item.replace("http://", "https://")
-            if (item.includes("tune.pk")) {
-                let sliced = item.slice(item.indexOf("video/") + 6)
-                item = "https://embed.tune.pk/play/" + sliced.substring(0, sliced.indexOf("/"))
-                updateSources(oldEpisodeSources => ({
-                    ...oldEpisodeSources,
-                    TP: item
-                }))
-                if (!currentUpdated) {
-                    updateCurrent(["TP", item])
-                    currentUpdated = true
-                }
-                return
+            switch (true) {
+                case item.includes("tune.pk"):
+                    let sliced = item.slice(item.indexOf("video/") + 6)
+                    item = "https://embed.tune.pk/play/" + sliced.substring(0, sliced.indexOf("/"))
+                    setUnsupportedServer("TP", item, index)
+                    return    
+                case item.includes("vidlox"):
+                    setUnsupportedServer("VL", item, index); return
+                case item.includes("fembed"):
+                    item = item.replace("api/source", "v")
+                    setUnsupportedServer("FD", item, index); return
+                case item.includes("mixdrop"):
+                    setUnsupportedServer("MP", item, index); return
+                case item.includes("jawcloud"):
+                    setUnsupportedServer("JC", item, index); return
+                default:
+                    break;
             }
-            if (item.includes("vidlox")) {
-                updateSources(oldEpisodeSources => ({
-                    ...oldEpisodeSources,
-                    VL: item
-                }))
-                if (!currentUpdated) {
-                    updateCurrent(["VL", item])
-                    currentUpdated = true
-                }
-                return
-            }
-            if (item.includes("fembed")) {
-                item = item.replace("api/source", "v")
-                updateSources(oldEpisodeSources => ({
-                    ...oldEpisodeSources,
-                    FD: item
-                }))
-                if (!currentUpdated) {
-                    updateCurrent(["FD", item])
-                    currentUpdated = true
-                }
-                return
-            }
-            if (item.includes("mixdrop")) {
-                updateSources(oldEpisodeSources => ({
-                    ...oldEpisodeSources,
-                    MP: item
-                }))
-                if (!currentUpdated) {
-                    updateCurrent(["MP", item])
-                    currentUpdated = true
-                }
-                return
-            }
-            if (item.includes("jawcloud")) {
-                updateSources(oldEpisodeSources => ({
-                    ...oldEpisodeSources,
-                    JC: item
-                }))
-                if (!currentUpdated) {
-                    updateCurrent(["JC", item])
-                    currentUpdated = true
-                }
-                return
-            }
+            let headers = { 'User-Agent': navigator.userAgent }
+            let method = 'GET'
             if (item.includes("ok.ru") || item.includes("fembed")) {
                 method = 'POST'
             }
@@ -122,6 +106,9 @@ const EpisodePlayer = ({ fromEpisode, episode, setEpisodeName, episodesList, ani
                         ...oldEpisodeSources,
                         [ds[0]]: ds[1]
                     }))
+                    setStatus("parsed", index)
+                } else {
+                    setStatus("failed", index)
                 }
             })
         })
@@ -129,8 +116,13 @@ const EpisodePlayer = ({ fromEpisode, episode, setEpisodeName, episodesList, ani
 
     useEffect(() => {
         const controller = new AbortController()
+        let ep: Record<string,any> | undefined = undefined
         if (fromEpisode && Object.keys(episode).length) {
-            var ep = episode
+            ep = episode
+        } else if (!fromEpisode && episodesList.length) {
+            ep = episodesList[parseInt(episodeNumber) - 1]
+        }
+        if (ep !== undefined) {
             setEpisodeName(ep["episode_name"])
             updateIntroInterval([ep["skip_from"], ep["skip_to"]])
             fetch("https://cors.bridged.cc/" + encodeURI(ep["episode_urls"][1]["episode_url"]), { signal: controller.signal })
@@ -139,16 +131,6 @@ const EpisodePlayer = ({ fromEpisode, episode, setEpisodeName, episodesList, ani
                     getServers(sources)
                 })
             })    
-        } else if (!fromEpisode && episodesList.length) {
-            var ep = episodesList[parseInt(episodeNumber) - 1]
-            setEpisodeName(ep["episode_name"])
-            updateIntroInterval([ep["skip_from"], ep["skip_to"]])
-            fetch("https://cors.bridged.cc/" + encodeURI(ep["episode_urls"][1]["episode_url"]), { signal: controller.signal })
-            .then((response) => { 
-                response.text().then((sources) => {
-                    getServers(sources)
-                })
-            })
         }
         return () => {
             if (controller && !controller.signal.aborted) {
@@ -159,16 +141,34 @@ const EpisodePlayer = ({ fromEpisode, episode, setEpisodeName, episodesList, ani
         }
     }, [episodeNumber,episodesList])
 
+    useEffect(() => {
+        if (soon) {
+            setEpisodeName("قريبا")
+        }
+    }, [soon])
+
     return (
         <section className="anime-watch">
-            { supportedServers.includes(currentSource[0]) ? 
-            <VideoPlayer 
-                introInterval = { introInterval }
-                sources = {{ 
-                    type: 'video',
-                    sources: currentSource[0] != "" ? currentSource[1] : {}
-                }} />
-            : <div className={ Object.keys(episodeSources).length ? "iframe-video-player" : "iframe-video-player loading" }><iframe allowFullScreen={ true } className="iframe-video" src={ currentSource[1] as string } /></div> }
+            { !soon ? 
+            <>
+                { supportedServers.includes(currentSource[0]) ? 
+                <VideoPlayer 
+                    introInterval = { introInterval }
+                    sources = {{
+                        type: 'video',
+                        sources: currentSource[0] != "" ? currentSource[1] : {}
+                    }} />
+                : <div className={ Object.keys(episodeSources).length ? "iframe-video-player" : "iframe-video-player loading" }>
+                    { !status.includes("pending") ?
+                        <iframe allowFullScreen={ true } className="iframe-video" src={ currentSource[1] as string } />
+                    : null }
+                </div> }
+            </>
+            : <div className="iframe-video-player">
+                <div className="soon-screen">
+                    هذا الأنمي سيبث قريبا
+                </div>
+            </div> }
                 
             <div className="player-settings">
                 { parseInt(episodeNumber) > 1 && episodesList.length != 0 ? 
@@ -177,8 +177,9 @@ const EpisodePlayer = ({ fromEpisode, episode, setEpisodeName, episodesList, ani
                     : 
                     <a id="previous" className="player-episode-skip disabled"><span className="mdi mdi-chevron-right"></span>الحلقة السابقة</a> 
                 }
+                { !soon ?
                 <div className="server-settings">
-                    { Object.keys(episodeSources).length != 0 ?
+                    { Object.keys(episodeSources).length ?
                         <select name="server" className="selection" id="server-select" onChange={ (e) => updateCurrent([ e.target.value, episodeSources[e.target.value] ]) } value={ currentSource[0] }>
                             {
                                 Object.keys(episodeSources).map((key) => {
@@ -188,7 +189,7 @@ const EpisodePlayer = ({ fromEpisode, episode, setEpisodeName, episodesList, ani
                         </select>
                         : <span className="servers-loading-message"><span className="mdi mdi-loading mdi-spin"></span>جاري العمل على الخوادم</span>
                     }
-                </div>
+                </div> : null }
                 { parseInt(episodeNumber) < episodesList.length ? 
                     <Link data-tippy-content={ episodesList[parseInt(episodeNumber)]["episode_name"] } id="next" to={ "/" + animeId + "/" + (parseInt(episodeNumber) + 1).toString() }
                         className="player-episode-skip">الحلقة القادمة<span className="mdi mdi-chevron-left mdi-left"></span></Link>
@@ -206,7 +207,6 @@ const EpisodePlayer = ({ fromEpisode, episode, setEpisodeName, episodesList, ani
             // Search for the download button href (yeah i know too simple)
             var regex = /href="(https?:\/\/download(?:\d{0,9}){4}\.mediafire\.com.*?\.mp4)/
             var matches = data.match(regex)
-            console.log(matches)
             if (matches) {
                 return ["MF", [{ src: matches[1], size: "720" }]]
             }

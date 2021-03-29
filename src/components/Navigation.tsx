@@ -43,7 +43,7 @@ const Navigation = ({ trigger, selected, shown }: INavigation) => {
             <section className="menu-section">
                 <NavLink onClick={ () => toggleMenu() } className={ selected == "home" ? "menu-item selected" : "menu-item"} to="/"><span className="mdi mdi-home"></span>الرئيسة</NavLink>
                 <NavLink onClick={ () => toggleMenu() } className={ selected == "list-all" ? "menu-item selected" : "menu-item"} to="/all"><span className="mdi mdi-format-list-text mdi-flip-h"></span>قائمة الأنمي</NavLink>
-                <NavLink onClick={ () => toggleMenu() } className={ selected == "favorite" ? "menu-item selected" : "menu-item"} to="#"><span className="mdi mdi-star"></span>أنمياتي المفضلة</NavLink>
+                <NavLink onClick={ () => toggleMenu() } className={ selected == "library" ? "menu-item selected" : "menu-item"} to="/library"><span className="mdi mdi-bookshelf"></span>مكتبتي</NavLink>
             </section>
             <div onClick={ () => updateShown(_ => false) } className="main-menu-close">
                 <span className="mdi mdi-close mdi-nm"></span>

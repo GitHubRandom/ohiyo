@@ -7,16 +7,13 @@ import Watch from './pages/Watch';
 import All from './pages/All'
 import { useLocation } from 'react-router-dom';
 import 'tippy.js/dist/tippy.css'
+import Library from './pages/Library';
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search)
 }
 
 const App = () => {
-
-    type NavigationProps = {
-        
-    }    
 
     const GetNavigation = ({ selected }: { selected: string }) => {
         return <Navigation trigger="#hamburger-menu" shown={ false } selected={ selected } />
@@ -36,6 +33,12 @@ const App = () => {
                     <GetNavigation selected="list-all" />
                     <div className="menu-content">
                         <All />
+                    </div>
+                </Route>
+                <Route exact path="/library">
+                    <GetNavigation selected="library" />
+                    <div className="menu-content">
+                        <Library />
                     </div>
                 </Route>
                 <Route exact path="/:aId">
