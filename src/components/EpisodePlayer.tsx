@@ -201,8 +201,6 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
     )
 
     function decodeHTML(s:string, data:string): [string,Record<string,string>[]] {
-        console.log(s)
-        console.log(data)
         if (s.includes("mediafire")) {
             // Search for the download button href (yeah i know too simple)
             var regex = /href="(https?:\/\/download(?:\d{0,9}){4}\.mediafire\.com.*?\.mp4)/

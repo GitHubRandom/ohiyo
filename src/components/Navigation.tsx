@@ -21,16 +21,13 @@ const Navigation = ({ trigger, selected, shown }: INavigation) => {
          * to make side menu appears (or disappear). @Ritzy
          */
         if (trigger) {
-            if (trigger.startsWith("#")) {
-                document.getElementById(trigger.slice(1))?.addEventListener("click", () => {
-                    toggleMenu()
-                })
-            } else if (trigger.startsWith(".")) {
-                Array.from(document.getElementsByClassName(trigger.slice(1))).forEach(element => {
+            let elements = document.querySelectorAll(trigger)
+            if (elements.length) {
+                elements.forEach(element => {
                     element.addEventListener("click", () => {
                         toggleMenu()
                     })
-                });
+                })
             }
         }
     })    

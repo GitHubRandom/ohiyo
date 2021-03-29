@@ -86,7 +86,7 @@ const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
         <>
             <WatchNavigation shrink={sideMenu} />
             { sideMenu ?
-                <Navigation trigger="#hamburger-menu" selected="none" shown={false} /> : null}
+                <Navigation trigger={sideMenu ? "#hamburger-menu" : ""} selected="none" shown={false} /> : null}
             <div className="watch-page">
                 <WatchTopBar showEpisodeButton={episodesList.length > 1} episodeName={episodeName} animeTitle={animeTitle} />
                 <EpisodePlayer soon={soon} fromEpisode={fromEpisode ? true : false} episode={episode} episodesList={episodesList} setEpisodeName={(episodeName) => updateName(episodeName)} animeId={aId} episodeNumber={eNum ? eNum : episode["episode_number"]} />
