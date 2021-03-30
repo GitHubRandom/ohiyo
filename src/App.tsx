@@ -25,31 +25,21 @@ const App = () => {
             <Switch>
                 <Route exact path="/">
                     <GetNavigation selected="home" />
-                    <div className="menu-content">
-                        <Home />
-                    </div>
+                    <Home />
                 </Route>
                 <Route exact path="/all">
                     <GetNavigation selected="list-all" />
-                    <div className="menu-content">
-                        <All />
-                    </div>
+                    <All />
                 </Route>
                 <Route exact path="/library">
                     <GetNavigation selected="library" />
-                    <div className="menu-content">
-                        <Library />
-                    </div>
+                    <Library />
                 </Route>
                 <Route exact path="/:aId">
-                    <div className="menu-content">
-                        <Watch fromEpisode={ query.get("from-episode") } />
-                    </div>
+                    <Watch fromEpisode={ query.get("from-episode") } />
                 </Route>
                 <Route exact path="/:aId/:eNum">
-                    <div className="menu-content">
-                        <Watch fromEpisode="" />
-                    </div>
+                    <Watch fromEpisode="" />
                 </Route>
             </Switch>
         )

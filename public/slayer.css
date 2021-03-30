@@ -78,6 +78,7 @@ body {
 
 .watch-menu.shrink {
     margin: 0;
+    width: unset;
 }
 
 .logo-section {

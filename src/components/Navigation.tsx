@@ -10,9 +10,14 @@ interface INavigation {
 const Navigation = ({ trigger, selected, shown }: INavigation) => {
 
     const [ isShown, updateShown ] = useState<boolean>(shown)
+    const [ triggeredAssigned, setAssigned ] = useState<boolean>(false)
 
-    const toggleMenu = () => {
-        updateShown(state => !state)
+    const closeMenu = () => {
+        updateShown(false)
+    }
+
+    const openMenu = () => {
+        updateShown(true)
     }
 
     useEffect(() => {
@@ -20,12 +25,13 @@ const Navigation = ({ trigger, selected, shown }: INavigation) => {
          * Add click listeners to selected triggers
          * to make side menu appears (or disappear). @Ritzy
          */
-        if (trigger) {
+        if (trigger && !triggeredAssigned) {
             let elements = document.querySelectorAll(trigger)
             if (elements.length) {
+                setAssigned(true)
                 elements.forEach(element => {
                     element.addEventListener("click", () => {
-                        toggleMenu()
+                        openMenu()
                     })
                 })
             }
@@ -38,11 +44,11 @@ const Navigation = ({ trigger, selected, shown }: INavigation) => {
                 <div id="main-logo" className="logo">AnimeSlayer</div>
             </section>
             <section className="menu-section">
-                <NavLink onClick={ () => toggleMenu() } className={ selected == "home" ? "menu-item selected" : "menu-item"} to="/"><span className="mdi mdi-home"></span>الرئيسة</NavLink>
-                <NavLink onClick={ () => toggleMenu() } className={ selected == "list-all" ? "menu-item selected" : "menu-item"} to="/all"><span className="mdi mdi-format-list-text mdi-flip-h"></span>قائمة الأنمي</NavLink>
-                <NavLink onClick={ () => toggleMenu() } className={ selected == "library" ? "menu-item selected" : "menu-item"} to="/library"><span className="mdi mdi-bookshelf"></span>مكتبتي</NavLink>
+                <NavLink onClick={ () => closeMenu() } className={ selected == "home" ? "menu-item selected" : "menu-item"} to="/"><span className="mdi mdi-home"></span>الرئيسة</NavLink>
+                <NavLink onClick={ () => closeMenu() } className={ selected == "list-all" ? "menu-item selected" : "menu-item"} to="/all"><span className="mdi mdi-format-list-text mdi-flip-h"></span>قائمة الأنمي</NavLink>
+                <NavLink onClick={ () => closeMenu() } className={ selected == "library" ? "menu-item selected" : "menu-item"} to="/library"><span className="mdi mdi-bookshelf"></span>مكتبتي</NavLink>
             </section>
-            <div onClick={ () => updateShown(_ => false) } className="main-menu-close">
+            <div onClick={ () => closeMenu() } className="main-menu-close">
                 <span className="mdi mdi-close mdi-nm"></span>
             </div>
         </nav>

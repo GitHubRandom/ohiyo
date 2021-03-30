@@ -21,10 +21,12 @@ const Library = () => {
     const [ selected, updateSelected ] = useState<string>("history")
 
     return (
-        <div id="library-page" className="content-page">
-            <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>مكتبتي</h2>
-            <div className="library-items">
-                <TabIndicator setTab={ (tab) => updateSelected(tab) } items={ libraryMenu } selected={ selected } />
+        <div id="library" className="menu-content">
+            <div id="library-page" className="content-page">
+                <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>مكتبتي</h2>
+                <div className="library-items">
+                    <TabIndicator setTab={ (tab) => updateSelected(tab) } items={ libraryMenu } selected={ selected } />
+                </div>
             </div>
         </div>
     )
