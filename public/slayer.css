@@ -127,7 +127,7 @@ body {
 }
 
 .main-menu section {
-    position: absolute;
+    position: fixed;
 }
 
 .logo-section {
@@ -673,6 +673,9 @@ body {
         width: 275px;
         border-left: 1px solid #1c1c1c;
         top: 0;
+    }
+    .main-menu section {
+        position: absolute;
     }
     #hamburger-menu {
         display: inline;
