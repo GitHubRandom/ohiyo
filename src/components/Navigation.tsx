@@ -10,7 +10,6 @@ interface INavigation {
 const Navigation = ({ trigger, selected, shown }: INavigation) => {
 
     const [ isShown, updateShown ] = useState<boolean>(shown)
-    const [ triggeredAssigned, setAssigned ] = useState<boolean>(false)
 
     const closeMenu = () => {
         updateShown(false)
@@ -25,14 +24,16 @@ const Navigation = ({ trigger, selected, shown }: INavigation) => {
          * Add click listeners to selected triggers
          * to make side menu appears (or disappear). @Ritzy
          */
-        if (trigger && !triggeredAssigned) {
+        if (trigger) {
             let elements = document.querySelectorAll(trigger)
             if (elements.length) {
-                setAssigned(true)
                 elements.forEach(element => {
-                    element.addEventListener("click", () => {
-                        openMenu()
-                    })
+                    if (element.getAttribute("data-attached-click") === "true") {
+                        element.addEventListener("click", () => {
+                            openMenu()
+                        })
+                        element.setAttribute("data-attached-click", "true")
+                    }
                 })
             }
         }
