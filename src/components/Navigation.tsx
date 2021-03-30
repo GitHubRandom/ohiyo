@@ -28,7 +28,7 @@ const Navigation = ({ trigger, selected, shown }: INavigation) => {
             let elements = document.querySelectorAll(trigger)
             if (elements.length) {
                 elements.forEach(element => {
-                    if (element.getAttribute("data-attached-click") === "true") {
+                    if (!element.getAttribute("data-attched-click") || element.getAttribute("data-attached-click") !== "true") {
                         element.addEventListener("click", () => {
                             openMenu()
                         })
