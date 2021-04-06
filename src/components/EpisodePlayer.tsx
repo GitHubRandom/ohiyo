@@ -2,8 +2,6 @@ import { useEffect, useState } from "react"
 import VideoPlayer from './VideoPlayer'
 import { Link } from "react-router-dom"
 
-// Possible API key from tune.pk : 777750fea4d3bd585bf47dc1873619fc
-
 const supportedServers = [ "OU", "MF", "UP" ]
 
 interface TEpisodePlayer {
@@ -98,6 +96,7 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
             .then((data) => {
                 let ds = item.includes("ok.ru") || item.includes("uptostream") ? decodeServers(item,data) : decodeHTML(item,data)
                 if (ds[0].length && ds[1].length) {
+                    // Prioritize OU server or supported servers if OU is not available
                     updateCurrent(oldCurrent => {
                         if (!currentUpdated || !supportedServers.includes(oldCurrent[0]) || ds[0] == "OU") {
                             currentUpdated = true
