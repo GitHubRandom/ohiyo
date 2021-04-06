@@ -141,7 +141,7 @@ const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: 
 
                             { animeDetails["anime_genres"] ?
                                 <><strong>الصنف : </strong>{ animeDetails["anime_genres"].split(",").map((genre: string, index:number, genres: string[]) => {
-                                    return <Link to="#" key={ index } className="genre">{ genre.trim() }{ index != genres.length - 1 ? "، " : null }</Link>
+                                    return <><Link to="#" key={ index } className="genre">{ genre.trim() }</Link>{ index != genres.length - 1 ? "، " : null }</>
                                 })} <br /></> : null
                             }
 
