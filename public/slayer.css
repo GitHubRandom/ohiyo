@@ -1,25 +1,21 @@
-@font-face {
-    font-family: 'Frutiger';
-    src: url('/static/anime/frutiger/FrutigerLTArabic45Light.woff') format('woff');
-    font-weight: 200;
-}   
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 @font-face {
-    font-family: 'Frutiger';
-    src: url('/static/anime/frutiger/FrutigerLTArabic55Roman.woff') format('woff');
+    font-family: "Noto Sans Arabic UI";
+    src: url('./fonts/Noto_Sans_Arabic_UI_Regular.ttf');
+    font-weight: regular;
+}
+
+@font-face {
+    font-family: "Noto Sans Arabic UI";
+    src: url('./fonts/Noto_Sans_Arabic_UI_Bold.ttf');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "Ninja Naruto";
+    src: url('./fonts/Ninja_Naruto.ttf');
     font-weight: 400;
-}   
-
-@font-face {
-    font-family: 'Frutiger';
-    src: url('/static/anime/frutiger/FrutigerLTArabic65Bold.woff') format('woff');
-    font-weight: 800;
-}   
-
-@font-face {
-    font-family: 'Frutiger';
-    src: url('/static/anime/frutiger/frutigerltarabic75black.woff') format('woff');
-    font-weight: 900;
 }
 
 a {
@@ -252,7 +248,7 @@ body {
     border-radius: 5px;
     position: absolute;
     font-size: 10pt;
-    font-weight: 800;
+    font-weight: bold;
 }
 
 .watch-page {
