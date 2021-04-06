@@ -17,7 +17,6 @@ const animeTypes: Record<string,string> = {
 }
 
 const source: Record<string,string> = {
-    // TODO: An object with all possible values of anime source
     "4-koma manga": "مانجا 4-كوما",
     "Digital manga": "مانجا رقمية",
     "Picture book": "كتاب مصور",
@@ -71,16 +70,9 @@ const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: 
         }
     }, [animeId])
 
-    /*
-    TODO: Restore tippy
     useEffect(() => {
-        tippy(document.getElementsByClassName(".anime-details-scrore"), {
-            //trigger: "mouseenter focus click",
-            content: (ref) => {
-                return ref instanceof HTMLElement ? ref.dataset.tippy : ""
-            }
-        })
-    })*/
+        tippy("[data-tippy-content]")
+    })
 
     function dismissPopup() {
         (document.getElementsByClassName("popup")[0] as HTMLElement).style.display = "none"
@@ -110,18 +102,15 @@ const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: 
                         } : {
                             className: "anime-details-cover loading"
                         } }>
-                        { ready && ratingSource == "mal" && mal && mal["score"] ?
-                            <span onClick={ () => toggleRatingSource() } id="mal-rating" data-tippy="تقييم MAL" className="anime-details-score">
+                        { ready && mal && mal["score"] ?
+                            <><span onClick={ () => toggleRatingSource() } id="mal-rating" data-tippy-content="تقييم MAL" className={ ratingSource == "mal" ? "anime-details-score" : "anime-details-score hidden" }>
                                 <span className="mdi mdi-star"></span>
                                 { mal["score"] }
-                            </span> : 
-                            <>
-                            { ready && ratingSource == "arabic" && animeDetails["anime_rating"] ? 
-                                <span onClick={ () => toggleRatingSource() } id="arabic-rating" data-tippy="التقييم العربي" className="anime-details-score">
+                            </span>
+                            <span onClick={ () => toggleRatingSource() } id="arabic-rating" data-tippy-content="التقييم العربي" className={ ratingSource == "arabic" ? "anime-details-score" : "anime-details-score hidden" }>
                                     <span className="mdi mdi-star"></span>
                                     { animeDetails["anime_rating"] }
-                                </span> : null
-                            }</>
+                            </span></> : null
                         }
                         </div>
                         { ready && mal && mal["trailer_url"] ? 

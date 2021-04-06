@@ -312,7 +312,8 @@ body {
 }
 
 .more-text,
-.link {
+.link,
+.genre:hover {
     color: var(--accent-color);
     cursor: pointer;
     border-bottom: 1px dotted var(--accent-color);
@@ -375,6 +376,10 @@ body {
     font-size: 10pt;
     border-radius: 50px;
     user-select: none;
+}
+
+.anime-details-score.hidden {
+    display: none;
 }
 
 .anime-details-score .mdi {
