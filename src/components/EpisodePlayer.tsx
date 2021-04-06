@@ -98,10 +98,13 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
             .then((data) => {
                 let ds = item.includes("ok.ru") || item.includes("uptostream") ? decodeServers(item,data) : decodeHTML(item,data)
                 if (ds[0].length && ds[1].length) {
-                    if (!currentUpdated || !supportedServers.includes(currentSource[0]) || ds[0] == "OU") {
-                        updateCurrent(ds);
-                        currentUpdated = true
-                    }
+                    updateCurrent(oldCurrent => {
+                        if (!currentUpdated || !supportedServers.includes(oldCurrent[0]) || ds[0] == "OU") {
+                            currentUpdated = true
+                            return ds
+                        }
+                        return oldCurrent
+                    });
                     updateSources(oldEpisodeSources => ({
                         ...oldEpisodeSources,
                         [ds[0]]: ds[1]
