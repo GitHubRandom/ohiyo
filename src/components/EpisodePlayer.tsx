@@ -18,7 +18,7 @@ interface TEpisodePlayer {
 
 const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesList, animeId, episodeNumber }: TEpisodePlayer) => {
 
-    type quality = Array<Record<string,string>>
+    type quality = Record<string,string>[]
 
     const [ episodeSources, updateSources ] = useState<Record<string,quality | string>>({})
     const [ currentSource, updateCurrent ] = useState<[string,string | Record<string,string>[]]>(["",""])
@@ -57,7 +57,7 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
                 case item.includes("tune.pk"):
                     let sliced = item.slice(item.indexOf("video/") + 6)
                     item = "https://embed.tune.pk/play/" + sliced.substring(0, sliced.indexOf("/"))
-                    setUnsupportedServer("TP", item, index)
+                    setUnsupportedServer("TP", sliced.substring(0, sliced.indexOf("/")), index)
                     return    
                 case item.includes("vidlox"):
                     setUnsupportedServer("VL", item, index); return
@@ -159,9 +159,10 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
                         sources: currentSource[0] != "" ? currentSource[1] : {}
                     }} />
                 : <div className={ Object.keys(episodeSources).length ? "iframe-video-player" : "iframe-video-player loading" }>
-                    { !status.includes("pending") ?
+                    { currentSource[0] != "TP" ? // tune.pk requires a new code for embed player (very annoying)
                         <iframe allowFullScreen={ true } className="iframe-video" src={ currentSource[1] as string } />
-                    : null }
+                    : <><div className="open-stream-player" id={ `open-stream-player-${currentSource[1]}` }></div>
+                        <script src={ `https://tune.pk/js/open/embed.js?vid=${currentSource[1]}` }></script></> }
                 </div> }
             </>
             : <div className="iframe-video-player">

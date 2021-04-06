@@ -8,9 +8,10 @@ class VideoPlayer extends React.Component {
         this.player = new Plyr('#main-content', {
             title: this.props.title,
             controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'download', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
-            fullscreen: {
+            /*fullscreen: {
                 container: ".anime-video-player"
-            },
+            },*/
+            ratio: "16:9",
             keyboard: {
                 focused: false,
                 global: true

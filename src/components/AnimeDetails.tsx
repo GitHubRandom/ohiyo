@@ -154,6 +154,12 @@ const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: 
                             <><strong>المصدر : </strong>{ mal["source"] in source ? source[mal["source"]] : "غير معروف" }<br /></>
                             : null }
 
+                            { animeDetails["anime_genres"] ?
+                                <><strong>الصنف : </strong>{ animeDetails["anime_genres"].split(",").map((genre: string, index:number, genres: string[]) => {
+                                    return <Link to="#" className="genre">{ genre.trim() }{ index != genres.length - 1 ? "، " : null }</Link>
+                                })} <br /></> : null
+                            }
+
                             { mal && mal["episodes"] ?
                                 <><strong>عدد الحلقات : </strong> { mal["episodes"] }</>
                             : null }

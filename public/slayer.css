@@ -1,14 +1,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 @font-face {
+    font-family: "Ilisarniq";
+    font-weight: regular;
+    src: url('./fonts/Ilisarniq/Ilisarniq-Regular.otf') format('opentype');
+}
+
+@font-face {
+    font-family: "Ilisarniq";
+    src: url('./fonts/Ilisarniq/Ilisarniq-Demi.otf') format('opentype');
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: "Ilisarniq";
+    src: url('./fonts/Ilisarniq/Ilisarniq-Light.otf') format('opentype');
+    font-weight: 200;
+}
+
+@font-face {
+    font-family: "Ilisarniq";
+    font-weight: bold;
+    src: url('./fonts/Ilisarniq/Ilisarniq-Bold.otf') format('opentype');
+}
+
+@font-face {
     font-family: "Noto Sans Arabic UI";
-    src: url('./fonts/Noto_Sans_Arabic_UI_Regular.ttf');
+    src: url('./fonts/Noto Sans/Noto_Sans_Arabic_UI_Regular.ttf');
     font-weight: regular;
 }
 
 @font-face {
     font-family: "Noto Sans Arabic UI";
-    src: url('./fonts/Noto_Sans_Arabic_UI_Bold.ttf');
+    src: url('./fonts/Noto Sans/Noto_Sans_Arabic_UI_Bold.ttf');
     font-weight: bold;
 }
 
@@ -24,7 +48,7 @@ a {
 
 * {
     box-sizing: border-box;
-    font-family: "Noto Sans Arabic UI", "Roboto", sans-serif;
+    font-family: "Noto Sans Arabic UI", Ilisarniq, sans-serif;
     outline: none;
     box-sizing: border-box;
     line-height: 1.2;
@@ -287,10 +311,15 @@ body {
     font-weight: bold;
 }
 
-.more-text {
+.more-text,
+.link {
     color: var(--accent-color);
     cursor: pointer;
     border-bottom: 1px dotted var(--accent-color);
+}
+
+.genre {
+    color: var(--accent-color)
 }
 
 .anime-details {
