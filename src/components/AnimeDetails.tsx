@@ -118,10 +118,6 @@ const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: 
                     </div>
                     { ready ? 
                     <div className="anime-meta">
-                        {/**<div className="anime-details-categories">
-                            <span className="anime-details-rating"><span className="mdi mdi-star"></span>{ animeDetails["anime_rating"] }</span>
-                            { animeDetails["anime_genres"] ? animeDetails["anime_genres"].split(',').map((genre, index) => <span key={ index } className="anime-details-category">{ genre }</span>) : <></> }
-                        </div>**/}
                         <ExpandableText expandText="معرفة المزيد" hideText="اخفاء" text={ animeDetails["anime_description"] } className="anime-details-synopsis" />
                         <p className="anime-details-misc">
 
@@ -145,7 +141,7 @@ const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: 
 
                             { animeDetails["anime_genres"] ?
                                 <><strong>الصنف : </strong>{ animeDetails["anime_genres"].split(",").map((genre: string, index:number, genres: string[]) => {
-                                    return <Link to="#" className="genre">{ genre.trim() }{ index != genres.length - 1 ? "، " : null }</Link>
+                                    return <Link to="#" key={ index } className="genre">{ genre.trim() }{ index != genres.length - 1 ? "، " : null }</Link>
                                 })} <br /></> : null
                             }
 
