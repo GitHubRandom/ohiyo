@@ -5,7 +5,7 @@ const Home = () => {
 
     useEffect(() => {
         document.title = "الرئيسة"
-    })
+    },[])
 
     return (
         <div id="home" className="menu-content">

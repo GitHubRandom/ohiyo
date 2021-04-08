@@ -7,7 +7,7 @@ const All = () => {
 
     useEffect(() => {
         document.title = "قائمة الأنمي"
-    })
+    },[])
 
     return (
         <div id="all" className="menu-content">
