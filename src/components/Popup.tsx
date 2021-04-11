@@ -36,6 +36,14 @@ const Popup: FunctionComponent<IPopup> = ({ children, trigger, id, title }) => {
         }
     })
 
+    useEffect(() => {
+        if (visible) {
+            (document.querySelector("body") as HTMLElement).style.overflow = "hidden"
+        } else {
+            (document.querySelector("body") as HTMLElement).style.overflow = "unset"
+        }
+    }, [visible])
+
     return (
         <div id={id} className="popup">
             <div className="popup-container">

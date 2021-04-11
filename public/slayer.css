@@ -220,6 +220,55 @@ body {
 .anime-list-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+}
+
+.anime-search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#anime-filter-button {
+    padding: 5px;
+    border-radius: 5px;
+}
+
+#anime-filter-button:hover {
+    background-color: #222222;
+}
+
+.anime-filters {
+    overflow-y: scroll;
+    max-width: 450px;
+    max-height: 60vh;
+}
+
+.anime-filter-checkbox label {
+    user-select: none;
+    padding: 5px 10px;
+    border-radius: 50px;
+    display: block;
+    background-color: #222222;
+    transition: background-color 0.125s ease-in-out;
+}
+
+.anime-filter-checkbox {
+    margin: 5px 5px;
+}
+
+.anime-filter-checkbox input {
+    display: none;
+}
+
+.anime-filter-checkbox input:checked + label {
+    background-color: var(--accent-color);
+    color: black;
+}
+
+.anime-filter-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .content-page {
@@ -755,6 +804,9 @@ body {
 
     #anime-search {
         width: 100%;
+    }
+
+    .anime-search-container {
         margin-bottom: 10px;
     }
 

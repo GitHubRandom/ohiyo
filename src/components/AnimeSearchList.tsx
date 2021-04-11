@@ -4,7 +4,7 @@ import tippy, { followCursor } from 'tippy.js'
 import ContentList from './ContentList'
 
 const ENDPOINT = "https://cors.bridged.cc/https://anslayer.com/anime/public/animes/get-published-animes"
-var params: Record<string,any> = {
+const PARAMS: Record<string,any> = {
     _limit: 30,
     _order_by: "latest_first",
     just_info: "Yes"
@@ -14,10 +14,11 @@ interface IAnimeList {
     showEpisodeName: boolean,
     searchMode: boolean,
     className: string,
-    searchTerm?: string
+    searchTerm?: string,
+    filters?: Record<string,string[]>
 }
 
-const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm }: IAnimeList) => {
+const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm, filters }: IAnimeList) => {
 
     const [ content, updateContent ] = useState<Record<string,any>[]>([])
 
@@ -33,17 +34,36 @@ const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm }:
     const [ lastHeight, updateLastHeight ] = useState<number>(0)
 
     function fetchData(resetPage: boolean) {
+        var params = {...PARAMS}
+        console.log(params)
         updateStatus("searching")
         const controller = new AbortController()
         if (resetPage) {
+            // Reset the page to one & empties the list
             updateContent([])
             updatePage(1)
             updateLastHeight(0)
         }
         params["_offset"] = (page - 1) * 30
-        if (searchTerm && searchTerm.length != 0) {
+
+        // Filtering options
+        let isFiltered = false
+        console.log(filters)
+        if (filters) {
+            for (var option in filters) {
+                if (filters[option].length) {
+                    option == "anime_genres" ? params["anime_genre_ids"] = filters[option].join(",") : params[option] = filters[option].join(",")
+                    isFiltered = true
+                }
+            }
+        }
+
+        // Set to filtering mode if there in serachMode or there is custom filters
+        if (searchTerm && searchTerm.length || isFiltered) {
             params["list_type"] = "filter"
-            params["anime_name"] = searchTerm
+            if (searchTerm && searchTerm.length) {
+                params["anime_name"] = searchTerm
+            }
         } else {
             if (searchMode) {
                 params["list_type"] = "anime_list"
@@ -52,6 +72,7 @@ const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm }:
             }
             if (params["anime_name"]) delete params["anime_name"]
         }    
+
         var endpoint = ENDPOINT + "?json=" + encodeURI(JSON.stringify(params))
 
         fetch(endpoint, { 
@@ -83,10 +104,10 @@ const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm }:
     }
 
     useEffect(() => {
-        if (searchMode) {
+        if (searchMode || filters) {
             return fetchData(true)
         }
-    }, [searchTerm])
+    }, [searchTerm,filters])
 
     useEffect(() => {
         if (page > 1 || !searchMode) {

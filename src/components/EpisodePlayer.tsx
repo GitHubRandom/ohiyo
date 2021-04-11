@@ -23,13 +23,22 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
     const [ introInterval, updateIntroInterval ] = useState<[string,string]>(["",""])
     const [ status, updateStatus ] = useState<string[]>([])
 
+    /**
+     * This sets the status of fetching for the episode source URLs
+     * @param status status of fetching (pending | failed | parsed)
+     * @param index index of updated element
+     */
     function setStatus(status: string, index: number) {
         updateStatus(oldStatus => {
             oldStatus.splice(index, 1, status)
-            return oldStatus
+            return [...oldStatus]
         })
     }
 
+    /**
+     * This function splits the different sources and decodes them
+     * @param sources An stringified array of the different sources (string)
+     */
     function getServers(sources: string) {
         // Remove backslashes in sources list
         let s = sources.replace(/\\/g, "").slice(2,-2).split("\",\"")
@@ -203,6 +212,12 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
         </section>
     )
 
+    /**
+     * This function decodes HTML to extract video sources
+     * @param s Server URL (string)
+     * @param data HTML response (string)
+     * @returns An array with server code & object of different qualities URLs
+     */
     function decodeHTML(s:string, data:string): [string,Record<string,string>[]] {
         if (s.includes("mediafire")) {
             // Search for the download button href (yeah i know too simple)
@@ -216,6 +231,12 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
         return ["",[]]
     }
 
+    /**
+     * This function decodes JSON to extract video sources
+     * @param s Server URL (string)
+     * @param data Response of the request (JSON Object)
+     * @returns An array with server code & object of different qualities URLs
+     */
     function decodeServers(s:string, data:Record<string,any>): [string,Array<Record<string,string>>] {
         if (s.includes("uptostream")) {
             var source = data["data"]["sources"]
@@ -249,18 +270,18 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
 }
 
 /**
- * 
- * Fembed: Redirector are tricky
- * Mixdrop: 403 Forbidden due to Referer missing and IP lock
- * Jawcloud: 403 Forbidden IP lock
+ * This function extracts the video sources hidden in an obfuscated JS code (Uptostream for example)
+ * @param source The code to be "evaled"
+ * @returns The sources after evaluating the code
  */
-
 function evalSources(source: string) {
     var sources = new Function(source + "return sources;")
     return sources()
 }
 
-// Code to decode packed JS code 
+/**
+ * This is an object utility for p,a,c,k,e,d JS code
+ */
 var P_A_C_K_E_R = {
     detect: function (str: string) {
         return P_A_C_K_E_R._starts_with(str.toLowerCase().replace(/ +/g, ''), 'eval(function(') ||
