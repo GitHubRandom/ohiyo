@@ -35,7 +35,6 @@ const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm, f
 
     function fetchData(resetPage: boolean) {
         var params = {...PARAMS}
-        console.log(params)
         updateStatus("searching")
         const controller = new AbortController()
         if (resetPage) {
@@ -48,7 +47,6 @@ const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm, f
 
         // Filtering options
         let isFiltered = false
-        console.log(filters)
         if (filters) {
             for (var option in filters) {
                 if (filters[option].length) {
