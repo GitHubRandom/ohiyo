@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { Redirect, useParams } from "react-router-dom"
 import AnimeDetails from "../components/AnimeDetails"
 import EpisodePlayer from "../components/EpisodePlayer"
 import WatchTopBar from "../components/WatchTopBar"
@@ -83,17 +83,23 @@ const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
     }, [])
 
     return (
-        <div id="watch" className="menu-content">
-            <WatchNavigation shrink={sideMenu} />
-            {sideMenu ?
-                <Navigation trigger={sideMenu ? "#hamburger-menu" : ""} selected="none" shown={false} /> : null }
-            <div className="watch-page">
-                <WatchTopBar showEpisodeButton={episodesList.length > 1} episodeName={episodeName} animeTitle={animeTitle} />
-                <EpisodePlayer soon={soon} fromEpisode={fromEpisode ? true : false} episode={episode} episodesList={episodesList} setEpisodeName={(episodeName) => updateName(episodeName)} animeId={aId} episodeNumber={eNum ? eNum : episode["episode_number"]} />
-                <AnimeDetails setSoon={() => updateSoon(true)} episodesList={episodesList} setRelated={(related: Record<string, any>[]) => updateRelated(related)} setTitle={(animeTitle) => updateTitle(animeTitle)} animeId={aId} />
-                <RelatedContent related={relatedContent} />
-            </div>
-        </div>
+        <>
+            { !eNum && !fromEpisode ? 
+                <Redirect to={ `/${aId}/1` } />
+                : 
+                <div id="watch" className="menu-content">
+                    <WatchNavigation shrink={sideMenu} />
+                    {sideMenu ?
+                        <Navigation trigger={sideMenu ? "#hamburger-menu" : ""} selected="none" shown={false} /> : null }
+                    <div className="watch-page">
+                        <WatchTopBar showEpisodeButton={episodesList.length > 1} episodeName={episodeName} animeTitle={animeTitle} />
+                        <EpisodePlayer soon={soon} fromEpisode={fromEpisode ? true : false} episode={episode} episodesList={episodesList} setEpisodeName={(episodeName) => updateName(episodeName)} animeId={aId} episodeNumber={eNum ? eNum : episode["episode_number"]} />
+                        <AnimeDetails setSoon={() => updateSoon(true)} episodesList={episodesList} setRelated={(related: Record<string, any>[]) => updateRelated(related)} setTitle={(animeTitle) => updateTitle(animeTitle)} animeId={aId} />
+                        <RelatedContent related={relatedContent} />
+                    </div>
+                </div>
+            }
+        </>
     )
 }
 
