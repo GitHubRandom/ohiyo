@@ -29,7 +29,7 @@ const App = () => {
                 </Route>
                 <Route exact path="/all">
                     <GetNavigation selected="list-all" />
-                    <All />
+                    <All filter={ query } />
                 </Route>
                 <Route exact path="/library">
                     <GetNavigation selected="library" />

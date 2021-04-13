@@ -362,13 +362,13 @@ body {
 
 .more-text,
 .link,
-.genre:hover {
+.stealth-link:hover {
     color: var(--accent-color);
     cursor: pointer;
     border-bottom: 1px dotted var(--accent-color);
 }
 
-.genre {
+.stealth-link {
     color: var(--accent-color)
 }
 

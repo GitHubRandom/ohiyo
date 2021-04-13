@@ -6,7 +6,7 @@ import tippy from 'tippy.js'
 
 const FILTER_OPTIONS_ENDPOINT = "https://cors.bridged.cc/anslayer.com/anime/public/animes/get-anime-dropdowns"
 
-const All = () => {
+const All = ({ filter }: { filter: URLSearchParams }) => {
 
     const [ searchTerm, updateSearch ] = useState<string>("")
     const [ filterOptions, updateFilterOptions ] = useState<Record<string,any>>({})
@@ -31,7 +31,18 @@ const All = () => {
                 Object.keys(data["response"]).forEach(option => {
                     emptyFilters = {...emptyFilters, [option]: []}
                 })
-                updateFilters(emptyFilters)
+                updateFilters(oldFilters => {
+                    /**
+                     * Here we have to check if queried filters are supported
+                     * then merge them if so
+                     */
+                    for (let [name, value] of filter.entries()) {
+                        if (name in data["response"]) {
+                            oldFilters = { ...oldFilters, [name]: value.split(",") }
+                        }
+                    }
+                    return {...emptyFilters, ...oldFilters}
+                })
             }
         })
     },[])
@@ -69,7 +80,7 @@ const All = () => {
                         <div className="anime-filters">
                             <div id="studio" className="anime-filter-section">
                                 <h3 className="anime-filter-header">
-                                    حسب الاستوديو
+                                    الاستوديو
                                 </h3>
                                 <div className="anime-filter-checkboxes">
                                     { filterOptions["anime_studio_ids"]["data"].map((filterOption: Record<string,string>) => {
@@ -87,7 +98,7 @@ const All = () => {
                             </div>
                             <div id="genre" className="anime-filter-section">
                                 <h3 className="anime-filter-header">
-                                    حسب النوع
+                                    النوع
                                 </h3>
                                 <div className="anime-filter-checkboxes">
                                     { filterOptions["anime_genres"]["data"].map((filterOption: Record<string,string>) => {
@@ -98,6 +109,24 @@ const All = () => {
                                                     name={ filterOption.option }
                                                     id={ "genre-" + filterOption.value } />
                                                 <label htmlFor={ "genre-" + filterOption.value }>{ filterOption.option }</label>
+                                            </div>
+                                        )
+                                    }) }
+                                </div>
+                            </div>
+                            <div id="release-year" className="anime-filter-section">
+                                <h3 className="anime-filter-header">
+                                    تاريخ الصدور
+                                </h3>
+                                <div className="anime-filter-checkboxes">
+                                    { filterOptions["anime_release_years"]["data"].map((filterOption: Record<string,string>) => {
+                                        return (
+                                            <div key={ "year-" + filterOption.value } className="anime-filter-checkbox">
+                                                <input checked={ filters.anime_release_years && filters.anime_release_years.includes(filterOption.value) } onChange={ (e) => changeFilter("anime_release_years", filterOption.value, !e.target.checked) }
+                                                    type="checkbox"
+                                                    name={ filterOption.option }
+                                                    id={ "year-" + filterOption.value } />
+                                                <label htmlFor={ "year-" + filterOption.value }>{ filterOption.option }</label>
                                             </div>
                                         )
                                     }) }

@@ -42,7 +42,7 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
     function getServers(sources: string) {
         // Remove backslashes in sources list
         let s = sources.replace(/\\/g, "").slice(2,-2).split("\",\"")
-        let currentUpdated = false
+        let currentUpdated = false // A boolean to know if there is current server selected or not
 
         updateStatus(Array(s.length).fill("pending"))
 

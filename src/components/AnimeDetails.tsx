@@ -8,6 +8,7 @@ const ANIME_DETAILS_URL = "https://cors.bridged.cc/https://anslayer.com/anime/pu
 const CLIENT_ID = "web-app"
 const CLIENT_SECRET = "90b63e11b9b4634f124df024516id495ab749c6b"
 
+// Expected data response values scrapped from AnimeSlayer.apk :)
 const animeTypes: Record<string,string> = {
     "OVA": "اوفا",
     "ONA": "اونا",
@@ -128,8 +129,9 @@ const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: 
                             { animeDetails["anime_status"] ?
                                 <><strong>الحالة : </strong>{ animeDetails["anime_status"] != "Currently Airing" ? "مكتمل" : "غير مكتمل" }<br /></>
                             : null }
-
-                            <strong>الاستوديو : </strong>{ mal ? mal["anime_studios"] : null }<br />
+                            { mal ?
+                                <><strong>الاستوديو : </strong><Link to={ `/all?anime_studio_ids=${mal["anime_studio_ids"]}` } className="stealth-link">{ mal["anime_studios"] }</Link><br /></>
+                            : null }
                             
                             { animeDetails["anime_age_rating"] ?
                             <><strong>الفئة العمرية : </strong>{ animeDetails["anime_age_rating"] != "All" ? animeDetails["anime_age_rating"] : "للجميع" }<br /></>
@@ -141,7 +143,7 @@ const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: 
 
                             { animeDetails["anime_genres"] ?
                                 <><strong>الصنف : </strong>{ animeDetails["anime_genres"].split(",").map((genre: string, index:number, genres: string[]) => {
-                                    return <><Link to="#" key={ index } className="genre">{ genre.trim() }</Link>{ index != genres.length - 1 ? "، " : null }</>
+                                    return <><Link to={ `/all?anime_genres=${animeDetails["anime_genre_ids"].split(",")[index].trim()}` } key={ index } className="stealth-link">{ genre.trim() }</Link>{ index != genres.length - 1 ? "، " : null }</>
                                 })} <br /></> : null
                             }
 
