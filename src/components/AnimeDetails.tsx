@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import tippy from "tippy.js"
 import ExpandableText from "./ExpandableText"
 import Popup from "./Popup"
 
@@ -70,10 +69,6 @@ const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: 
             updateDetails({})
         }
     }, [animeId])
-
-    useEffect(() => {
-        tippy("[data-tippy-content]")
-    })
 
     function dismissPopup() {
         (document.getElementsByClassName("popup")[0] as HTMLElement).style.display = "none"

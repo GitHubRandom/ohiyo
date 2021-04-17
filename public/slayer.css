@@ -635,6 +635,10 @@ body {
     overflow: hidden;
 }
 
+.anime-video-player > .plyr {
+    height: 100% !important;
+}
+
 .iframe-video-player {
     position: relative;
     border-radius: 5px;

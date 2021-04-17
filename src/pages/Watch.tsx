@@ -82,6 +82,10 @@ const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
         window.addEventListener("resize", () => setMenus())
     }, [])
 
+    useEffect(() => {
+        tippy("[data-tippy-content]")
+    })
+
     return (
         <>
             { !eNum && !fromEpisode ? 
