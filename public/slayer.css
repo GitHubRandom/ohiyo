@@ -629,10 +629,19 @@ body {
     color: #3b3b3b;
 }
 
-.anime-video-player {
+.anime-video-player:not(:fullscreen) {
     position: relative;
     border-radius: 5px;
     overflow: hidden;
+    padding-bottom: 56.25%;
+}
+
+.anime-video-player:not(:fullscreen) > .plyr {
+    position: absolute !important;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
 }
 
 .anime-video-player > .plyr {
