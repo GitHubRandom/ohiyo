@@ -11,7 +11,7 @@ class VideoPlayer extends React.Component {
             fullscreen: {
                 container: ".anime-video-player"
             },
-            ratio: "16:9",
+            //ratio: "16:9",
             keyboard: {
                 focused: false,
                 global: true
