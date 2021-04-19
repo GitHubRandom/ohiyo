@@ -56,7 +56,7 @@ const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm, f
             }
         }
 
-        // Set to filtering mode if there in serachMode or there is custom filters
+        // Set to filtering mode if in serachMode or there is custom filters
         if (searchTerm && searchTerm.length || isFiltered) {
             params["list_type"] = "filter"
             if (searchTerm && searchTerm.length) {

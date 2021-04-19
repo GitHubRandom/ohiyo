@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Redirect, useParams } from "react-router-dom"
+import { Redirect, useHistory, useParams } from "react-router-dom"
 import AnimeDetails from "../components/AnimeDetails"
 import EpisodePlayer from "../components/EpisodePlayer"
 import WatchTopBar from "../components/WatchTopBar"
@@ -9,6 +9,7 @@ import WatchNavigation from "../components/WatchNavigation"
 import Navigation from "../components/Navigation"
 
 const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
+    var history = useHistory()
     const { aId, eNum } = useParams<{ aId: string, eNum: string | undefined }>()
     const [episode, updateEpisode] = useState<Record<string, any>>({})
     const [animeTitle, updateTitle] = useState<string>("")
@@ -41,7 +42,7 @@ const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
                         var response = data["response"]["data"]
                         var episode = response[0]
                         updateEpisode(episode)
-                        window.history.replaceState(null, "", window.location.protocol + "//" + window.location.host + "/" + aId + "/" + episode["episode_number"])
+                        history.replace({ pathname: "/" + aId + "/" + episode["episode_number"] })
                     }
                 })
         }

@@ -3,11 +3,14 @@ import React, { useEffect, useState } from 'react'
 import Popup from '../components/Popup'
 import { stringify } from 'node:querystring'
 import tippy from 'tippy.js'
+import { useHistory, useLocation } from 'react-router'
 
 const FILTER_OPTIONS_ENDPOINT = "https://cors.bridged.cc/anslayer.com/anime/public/animes/get-anime-dropdowns"
 
 const All = ({ filter }: { filter: URLSearchParams }) => {
 
+    var history = useHistory()
+    const location = useLocation()
     const [ searchTerm, updateSearch ] = useState<string>("")
     const [ filterOptions, updateFilterOptions ] = useState<Record<string,any>>({})
     const [ filters, updateFilters ] = useState<Record<string,any>>({})
@@ -46,6 +49,16 @@ const All = ({ filter }: { filter: URLSearchParams }) => {
             }
         })
     },[])
+
+    useEffect(() => {
+        let query: string[] = []
+        Object.keys(filters).forEach(option => filters[option].length ? query.push(`${option}=${filters[option].join(',')}`) : null )
+        console.log(query)
+        history.replace({
+            pathname: "/all",
+            search: `?${query.join('&')}`
+        })
+    }, [filters])
 
     /**
      * This function changes the search filters
