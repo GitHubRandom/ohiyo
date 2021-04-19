@@ -51,9 +51,9 @@ const All = ({ filter }: { filter: URLSearchParams }) => {
     },[])
 
     useEffect(() => {
+        // Updates URL with filter parameters
         let query: string[] = []
         Object.keys(filters).forEach(option => filters[option].length ? query.push(`${option}=${filters[option].join(',')}`) : null )
-        console.log(query)
         history.replace({
             pathname: "/all",
             search: `?${query.join('&')}`
