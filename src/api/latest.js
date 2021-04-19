@@ -1,4 +1,3 @@
-export default (req, res) => {
-    res.statusCode = 200
-    res.send({ message: "Hello World !" })
+exports.handler = async (event, context, callback) => { 
+    callback(null, {statusCode: 200, body: "Hello !"})
 }

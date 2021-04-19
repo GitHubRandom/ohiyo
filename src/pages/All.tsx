@@ -1,7 +1,6 @@
 import AnimeSearchList from '../components/AnimeSearchList'
 import React, { useEffect, useState } from 'react'
 import Popup from '../components/Popup'
-import { stringify } from 'node:querystring'
 import tippy from 'tippy.js'
 import { useHistory, useLocation } from 'react-router'
 

@@ -9,6 +9,7 @@ import { useLocation } from 'react-router-dom';
 import 'tippy.js/dist/tippy.css'
 import Library from './pages/Library';
 import FourOFour from './pages/FourOFour';
+import Test from './pages/Test';
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search)
@@ -27,6 +28,9 @@ const App = () => {
                 <Route exact path="/">
                     <GetNavigation selected="home" />
                     <Home />
+                </Route>
+                <Route exact path="/test">
+                    <Test />
                 </Route>
                 <Route exact path="/all">
                     <GetNavigation selected="list-all" />
