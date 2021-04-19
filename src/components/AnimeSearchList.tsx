@@ -3,7 +3,7 @@ import Episode from './Episode'
 import tippy, { followCursor } from 'tippy.js'
 import ContentList from './ContentList'
 
-const ENDPOINT = "http://localhost:8888/.netlify/functions/latest"
+const ENDPOINT = "/.netlify/functions/latest"
 const PARAMS: Record<string,any> = {
     _limit: 30,
     _order_by: "latest_first",

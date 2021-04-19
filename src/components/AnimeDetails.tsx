@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import ExpandableText from "./ExpandableText"
 import Popup from "./Popup"
 
-const ENDPOINT = "http://localhost:8888/.netlify/functions/details"
+const ENDPOINT = "/.netlify/functions/details"
 const CLIENT_ID = "web-app"
 const CLIENT_SECRET = "90b63e11b9b4634f124df024516id495ab749c6b"
 

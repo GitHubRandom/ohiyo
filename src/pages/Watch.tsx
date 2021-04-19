@@ -8,7 +8,7 @@ import RelatedContent from "../components/RelatedContent"
 import WatchNavigation from "../components/WatchNavigation"
 import Navigation from "../components/Navigation"
 
-const ENDPOINT = "http://localhost:8888/.netlify/functions/latest"
+const ENDPOINT = "/.netlify/functions/latest"
 
 const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
     var history = useHistory()
