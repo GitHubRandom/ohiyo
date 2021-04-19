@@ -1,18 +1,17 @@
 const fetch = require("node-fetch")
 
-const FETCH_ANIME_ENDPOINT = "https://anslayer.com/anime/public/animes/get-published-animes"
-const EPISODES_ENDPOINT = "https://anslayer.com/anime/public/episodes/get-episodes"
+const ANIME_DETAILS_ENDPOINT = "https://anslayer.com/anime/public/anime/get-anime-details"
 
-exports.handler = async (event, context) => { 
+exports.handler = async (event,_) => { 
     console.log(event)
     let data
     try {
-        let endpoint = FETCH_ANIME_ENDPOINT
-        if (event.queryStringParameters.mode && event.queryStringParameters.mode == "episodes") {
-            endpoint = EPISODES_ENDPOINT
+        let endpoint = ANIME_DETAILS_ENDPOINT
+        if (event.queryStringParameters) {
+            endpoint += "?" + new URLSearchParams(event.queryStringParameters).toString()
         }
         console.log(endpoint)
-        let request = await fetch(endpoint + "?json=" + event.queryStringParameters.json, { 
+        let request = await fetch(endpoint, { 
             headers: {
                 "Client-Id": process.env.REACT_APP_CLIENT_ID,
                 "Client-Secret": process.env.REACT_APP_CLIENT_SECRET,

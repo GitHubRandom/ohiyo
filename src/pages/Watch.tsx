@@ -8,6 +8,8 @@ import RelatedContent from "../components/RelatedContent"
 import WatchNavigation from "../components/WatchNavigation"
 import Navigation from "../components/Navigation"
 
+const ENDPOINT = "http://localhost:8888/.netlify/functions/latest"
+
 const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
     var history = useHistory()
     const { aId, eNum } = useParams<{ aId: string, eNum: string | undefined }>()
@@ -30,7 +32,7 @@ const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
                 anime_id: aId,
                 episode_id: fromEpisode
             }
-            fetch(encodeURI(`https://cors.bridged.cc/https://anslayer.com/anime/public/episodes/get-episodes?json=${JSON.stringify(params)}`), {
+            fetch(encodeURI(`${ENDPOINT}?mode=episodes&json=${JSON.stringify(params)}`), {
                 headers: new Headers({
                     "Client-Id": process.env.REACT_APP_CLIENT_ID,
                     "Client-Secret": process.env.REACT_APP_CLIENT_SECRET
@@ -48,7 +50,7 @@ const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
         }
         const controller = new AbortController()
         const signal = controller.signal
-        fetch('https://cors.bridged.cc/https://anslayer.com/anime/public/episodes/get-episodes?json=%7B"more_info":"Yes","anime_id":' + aId + '%7D', {
+        fetch(ENDPOINT + '?mode=episodes&json=%7B"more_info":"Yes","anime_id":' + aId + '%7D', {
             headers: new Headers({
                 "Client-Id": process.env.REACT_APP_CLIENT_ID,
                 "Client-Secret": process.env.REACT_APP_CLIENT_SECRET

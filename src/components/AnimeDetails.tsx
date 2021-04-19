@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import ExpandableText from "./ExpandableText"
 import Popup from "./Popup"
 
-const ANIME_DETAILS_URL = "https://cors.bridged.cc/https://anslayer.com/anime/public/anime/get-anime-details"
+const ENDPOINT = "http://localhost:8888/.netlify/functions/details"
 const CLIENT_ID = "web-app"
 const CLIENT_SECRET = "90b63e11b9b4634f124df024516id495ab749c6b"
 
@@ -47,7 +47,7 @@ const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: 
     const [ ratingSource, updateRateSource ] = useState<"mal" | "arabic">("mal")
 
     useEffect(() => {
-        var url = new URL(ANIME_DETAILS_URL)
+        var url = new URL(ENDPOINT)
         var params = { anime_id: animeId.toString(), fetch_episodes: "No", more_info: "Yes" }
         url.search = new URLSearchParams(params).toString()
         fetch(url.toString(), {headers: new Headers({

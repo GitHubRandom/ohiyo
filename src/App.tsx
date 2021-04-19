@@ -1,6 +1,4 @@
-import React, { useState } from 'react'
-import { BrowserRouter, Link, Route, Switch } from 'react-router-dom';
-import PropTypes from 'prop-types'
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Navigation from './components/Navigation'
 import Home from './pages/Home'
 import Watch from './pages/Watch';
@@ -9,7 +7,6 @@ import { useLocation } from 'react-router-dom';
 import 'tippy.js/dist/tippy.css'
 import Library from './pages/Library';
 import FourOFour from './pages/FourOFour';
-import Test from './pages/Test';
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search)
@@ -29,9 +26,6 @@ const App = () => {
                     <GetNavigation selected="home" />
                     <Home />
                 </Route>
-                <Route exact path="/test">
-                    <Test />
-                </Route>
                 <Route exact path="/all">
                     <GetNavigation selected="list-all" />
                     <All filter={ query } />
@@ -48,6 +42,9 @@ const App = () => {
                 </Route>
                 <Route exact path="/:aId/:eNum">
                     <Watch fromEpisode="" />
+                </Route>
+                <Route>
+                    <Redirect to="/error/404" />
                 </Route>
             </Switch>
         )

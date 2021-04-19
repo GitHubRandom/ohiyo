@@ -3,7 +3,7 @@ import Episode from './Episode'
 import tippy, { followCursor } from 'tippy.js'
 import ContentList from './ContentList'
 
-const ENDPOINT = "https://cors.bridged.cc/https://anslayer.com/anime/public/animes/get-published-animes"
+const ENDPOINT = "http://localhost:8888/.netlify/functions/latest"
 const PARAMS: Record<string,any> = {
     _limit: 30,
     _order_by: "latest_first",
@@ -74,10 +74,7 @@ const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm, f
         var endpoint = ENDPOINT + "?json=" + encodeURI(JSON.stringify(params))
 
         fetch(endpoint, { 
-            headers: new Headers({
-                "Client-Id": process.env.REACT_APP_CLIENT_ID,
-                "Client-Secret": process.env.REACT_APP_CLIENT_SECRET,
-            } as HeadersInit), signal: controller.signal
+            signal: controller.signal
         })
         .then(response => {
             return response.json()
