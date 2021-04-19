@@ -13,7 +13,7 @@ exports.handler = async (event, context) => {
         var data = await request.json()
         return {
             status: 200,
-            body: data
+            body: JSON.stringify(data)
         }
     } catch (error) {
         return {
