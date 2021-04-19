@@ -4,8 +4,6 @@ import ExpandableText from "./ExpandableText"
 import Popup from "./Popup"
 
 const ENDPOINT = "/.netlify/functions/details"
-const CLIENT_ID = "web-app"
-const CLIENT_SECRET = "90b63e11b9b4634f124df024516id495ab749c6b"
 
 // Expected data response values scrapped from AnimeSlayer.apk :)
 const animeTypes: Record<string,string> = {
@@ -47,13 +45,9 @@ const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: 
     const [ ratingSource, updateRateSource ] = useState<"mal" | "arabic">("mal")
 
     useEffect(() => {
-        var url = new URL(ENDPOINT)
         var params = { anime_id: animeId.toString(), fetch_episodes: "No", more_info: "Yes" }
-        url.search = new URLSearchParams(params).toString()
-        fetch(url.toString(), {headers: new Headers({
-            "Client-Id": CLIENT_ID,
-            "Client-Secret": CLIENT_SECRET,
-        })})
+        var search = new URLSearchParams(params).toString()
+        fetch(ENDPOINT + "?" + search)
         .then((response) => {
             return response.json()
         })
