@@ -756,6 +756,44 @@ body {
     cursor: pointer;
 }
 
+.fourofour-container h1 {
+    font-size: 60pt;
+    color: var(--accent-color);
+}
+
+.fourofour-container * {
+    margin: 0;
+}
+
+.fourofour-container a {
+    margin-top: 25px;
+    padding: 5px 15px;
+    border-radius: 5px;
+    background-color: #131313;
+    color: white;
+}
+
+.fourofour-watermark {
+    color: #202020;
+    font-family: "Ninja Naruto";
+    font-size: 16pt;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.fourofour-container {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 @media only screen and (max-width: 1065px) {
     .main-menu {
         position: fixed;

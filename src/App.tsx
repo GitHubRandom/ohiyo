@@ -8,6 +8,7 @@ import All from './pages/All'
 import { useLocation } from 'react-router-dom';
 import 'tippy.js/dist/tippy.css'
 import Library from './pages/Library';
+import FourOFour from './pages/FourOFour';
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search)
@@ -34,6 +35,9 @@ const App = () => {
                 <Route exact path="/library">
                     <GetNavigation selected="library" />
                     <Library />
+                </Route>
+                <Route exact path="/error/404">
+                    <FourOFour />
                 </Route>
                 <Route exact path="/:aId">
                     <Watch fromEpisode={ query.get("from-episode") } />
