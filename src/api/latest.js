@@ -5,14 +5,19 @@ const EPISODES_ENDPOINT = "https://anslayer.com/anime/public/episodes/get-episod
 
 exports.handler = async (event, context) => { 
     console.log(event)
-    console.log(context)
+    console.log(event.queryStringParameters["x-from"])
+    if (!event.headers["x-from"] || event.headers["x-from"] != "Netlify-Redirect" || ( event.headers['referer'] && event.headers['referer'].includes("bridged.cc") )) {
+        return {
+            statusCode: 401,
+            body: "401 Unauthorized"
+        }
+    }
     let data
     try {
         let endpoint = FETCH_ANIME_ENDPOINT
         if (event.queryStringParameters.mode && event.queryStringParameters.mode == "episodes") {
             endpoint = EPISODES_ENDPOINT
         }
-        console.log(endpoint)
         let request = await fetch(endpoint + "?json=" + event.queryStringParameters.json, { 
             headers: {
                 "Client-Id": process.env.REACT_APP_CLIENT_ID,
@@ -20,7 +25,6 @@ exports.handler = async (event, context) => {
             }
         })
         data = await request.json()
-        console.log(data)
     } catch (error) {
         return {
             statusCode: 500,

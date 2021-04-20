@@ -4,6 +4,12 @@ const DROPDOWNS_ENDPOINT = "https://anslayer.com/anime/public/animes/get-anime-d
 
 exports.handler = async (event,_) => { 
     console.log(event)
+    if (!event.headers["x-from"] || event.headers["x-from"] != "Netlify-Redirect" || ( event.headers['referer'] && event.headers['referer'].includes("bridged.cc") )) {
+        return {
+            statusCode: 401,
+            body: "401 Unauthorized"
+        }
+    }
     let data
     try {
         let endpoint = DROPDOWNS_ENDPOINT
