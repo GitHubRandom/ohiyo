@@ -134,6 +134,9 @@ body {
     justify-content: center;
     align-items: center;
     transition: right 0.125s ease-out;
+    position: sticky;
+    top: 0;
+    border-left: 1px solid #111111;
 }
 
 .menu-section span {
