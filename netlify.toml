@@ -1,2 +1,17 @@
 [functions]
   directory = "src/api"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = true
+  signed = "REDIRECT_TOKEN"
+
+  [redirects.headers]
+    X-From = "Netlify-Redirect"
+  
+[[redirects]]
+  from = "/*"
+  to = "index.html"
+  status = 200

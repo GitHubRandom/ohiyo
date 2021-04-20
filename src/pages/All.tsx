@@ -4,12 +4,11 @@ import Popup from '../components/Popup'
 import tippy from 'tippy.js'
 import { useHistory, useLocation } from 'react-router'
 
-const FILTER_OPTIONS_ENDPOINT = "https://cors.bridged.cc/anslayer.com/anime/public/animes/get-anime-dropdowns"
+const FILTER_OPTIONS_ENDPOINT = "/api/dropdowns"
 
 const All = ({ filter }: { filter: URLSearchParams }) => {
 
     var history = useHistory()
-    const location = useLocation()
     const [ searchTerm, updateSearch ] = useState<string>("")
     const [ filterOptions, updateFilterOptions ] = useState<Record<string,any>>({})
     const [ filters, updateFilters ] = useState<Record<string,any>>({})
@@ -20,12 +19,8 @@ const All = ({ filter }: { filter: URLSearchParams }) => {
     },[])
 
     useEffect(() => {
-        fetch(FILTER_OPTIONS_ENDPOINT, {
-            headers: new Headers({
-                "Client-Id": process.env.REACT_APP_CLIENT_ID,
-                "Client-Secret": process.env.REACT_APP_CLIENT_SECRET
-            } as HeadersInit)
-        }).then(response => response.json())
+        fetch(FILTER_OPTIONS_ENDPOINT)
+        .then(response => response.json())
         .then(data => {
             if (data["response"]) {
                 updateFilterOptions(data["response"])

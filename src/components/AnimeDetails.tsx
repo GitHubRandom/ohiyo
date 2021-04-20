@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import ExpandableText from "./ExpandableText"
 import Popup from "./Popup"
 
-const ENDPOINT = "/.netlify/functions/details"
+const ENDPOINT = "/api/details"
 
 // Expected data response values scrapped from AnimeSlayer.apk :)
 const animeTypes: Record<string,string> = {
