@@ -6,7 +6,10 @@ const EPISODES_ENDPOINT = "https://anslayer.com/anime/public/episodes/get-episod
 exports.handler = async (event, context) => { 
     console.log(event)
     console.log(event.queryStringParameters["x-from"])
-    if (!event.headers["x-from"] || event.headers["x-from"] != "Netlify-Redirect" || ( event.headers['referer'] && event.headers['referer'].includes("bridged.cc") )) {
+    if (!event.headers["x-from"] ||
+        event.headers["x-from"] != "Netlify-Redirect" ||
+        ( event.headers['referer'] && event.headers['referer'].includes("bridged.cc") ) ||
+        ( event.headers['Sec-Fetch-Site'] && event.headers['Sec-Fetch-Site'] == "cross-site" )) {
         return {
             statusCode: 401,
             body: "401 Unauthorized"

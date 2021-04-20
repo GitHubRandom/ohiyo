@@ -4,7 +4,10 @@ const DROPDOWNS_ENDPOINT = "https://anslayer.com/anime/public/animes/get-anime-d
 
 exports.handler = async (event,_) => { 
     console.log(event)
-    if (!event.headers["x-from"] || event.headers["x-from"] != "Netlify-Redirect" || ( event.headers['referer'] && event.headers['referer'].includes("bridged.cc") )) {
+    if (!event.headers["x-from"] ||
+        event.headers["x-from"] != "Netlify-Redirect" ||
+        ( event.headers['referer'] && event.headers['referer'].includes("bridged.cc") ) ||
+        ( event.headers['Sec-Fetch-Site'] && event.headers['Sec-Fetch-Site'] == "cross-site" )) {
         return {
             statusCode: 401,
             body: "401 Unauthorized"
