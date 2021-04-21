@@ -194,8 +194,8 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
                     { Object.keys(episodeSources).length ?
                         <select name="server" className="selection" id="server-select" onChange={ (e) => updateCurrent([ e.target.value, episodeSources[e.target.value] ]) } value={ currentSource[0] }>
                             {
-                                Object.keys(episodeSources).map((key) => {
-                                    return <option key={ key } value={ key } id={ key }>{ key }{ supportedServers.includes(key) ? " - المشغل السريع" : " - مشغل خارجي"}</option>
+                                Object.keys(episodeSources).map((key, index) => {
+                                    return <option key={ key } value={ key } id={ key }>{ "Server " + (index + 1).toString() }{ supportedServers.includes(key) ? " - المشغل المحلي" : " - مشغل خارجي"}</option>
                                 })
                             }
                         </select>
