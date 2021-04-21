@@ -5,7 +5,9 @@ const EPISODES_ENDPOINT = "https://anslayer.com/anime/public/episodes/get-episod
 
 exports.handler = async (event, context) => { 
     console.log(event)
-    if (!event.headers["x-from"] ||
+    if (event.headers["origin"] ||
+        event.headers["x-requested-with"] ||
+        !event.headers["x-from"] ||
         event.headers["x-from"] != "Netlify-Redirect" ||
         ( event.headers['referer'] && event.headers['referer'].includes("bridged.cc") ) ||
         ( event.headers['sec-fetch-site'] && event.headers['sec-fetch-site'] == "cross-site" )) {

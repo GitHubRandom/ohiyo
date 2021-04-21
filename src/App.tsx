@@ -37,10 +37,10 @@ const App = () => {
                 <Route exact path="/error/404">
                     <FourOFour />
                 </Route>
-                <Route exact path="/:aId">
+                <Route exact path="/:aId(\d+)">
                     <Watch fromEpisode={ query.get("from-episode") } />
                 </Route>
-                <Route exact path="/:aId/:eNum">
+                <Route exact path="/:aId(\d+)/:eNum(\d+)">
                     <Watch fromEpisode="" />
                 </Route>
                 <Route>

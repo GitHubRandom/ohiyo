@@ -38,15 +38,21 @@ const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
                     "Client-Secret": process.env.REACT_APP_CLIENT_SECRET
                 } as HeadersInit)
             })
-                .then((response) => { return response.json() })
-                .then((data) => {
-                    if (data && data["response"] && data["response"]["data"]) {
+            .then((response) => { return response.json() })
+            .then((data) => {
+                if (data) {
+                    if (data["status"] && data["status"] == 404 ) {
+                        history.push({ pathname: "/error/404" })
+                        return
+                    }
+                    if (data["response"] && data["response"]["data"]) {
                         var response = data["response"]["data"]
                         var episode = response[0]
                         updateEpisode(episode)
                         history.replace({ pathname: "/" + aId + "/" + episode["episode_number"] })
                     }
-                })
+                }
+            })
         }
         const controller = new AbortController()
         const signal = controller.signal
@@ -58,8 +64,14 @@ const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
         })
         .then((response) => { return response.json() })
         .then((data) => {
-            if (data && data["response"] && data["response"]["data"]) {
-                updateList(data["response"]["data"])
+            if (data) {
+                if (data["status"] && data["status"] == 404 ) {
+                    history.push({ pathname: "/error/404" })
+                    return
+                }
+                if (data["response"] && data["response"]["data"]) {
+                    updateList(data["response"]["data"])
+                }
             }
         })
         return () => {

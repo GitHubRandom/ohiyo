@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
 import ExpandableText from "./ExpandableText"
 import Popup from "./Popup"
 
@@ -41,6 +41,7 @@ interface TAnimeDetails {
 
 const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: TAnimeDetails) => {
 
+    const history = useHistory()
     const [ animeDetails, updateDetails ] = useState<Record<string,any>>({})
     const [ ratingSource, updateRateSource ] = useState<"mal" | "arabic">("mal")
 
@@ -52,11 +53,19 @@ const AnimeDetails = ({ setSoon, setRelated, episodesList, setTitle, animeId }: 
             return response.json()
         })
         .then((data) => {
-            updateDetails(data["response"])
-            setTitle(data["response"]["anime_name"])
-            setRelated(data["response"]["related_animes"]["data"])
-            if (data["response"]["anime_status"] == "Not Yet Aired") {
-                setSoon()
+            if (data) {
+                if (data["status"] && data["status"] == 404 ) {
+                    history.push({ pathname: "/error/404" })
+                    return
+                }
+                if (data["response"]) {
+                    updateDetails(data["response"])
+                    if (data["response"]["anime_name"]) setTitle(data["response"]["anime_name"])
+                    if (data["response"]["related_animes"] && data["response"]["related_animes"]["data"]) {
+                        setRelated(data["response"]["related_animes"]["data"])
+                    }
+                    if (data["response"]["anime_status"] && data["response"]["anime_status"] == "Not Yet Aired" ) setSoon()
+                }
             }
         })
         return () => {
