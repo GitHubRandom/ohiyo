@@ -6,7 +6,7 @@ const FourOFour = () => {
             <h1>四百四</h1>
             <p>لا توجد صفحة في هذا الرابط</p>
             <NavLink to="/"><span className="mdi mdi-home"></span>الصفحة الرئيسة</NavLink>
-            <div className="fourofour-watermark">AnimeSlayer</div>
+            <div className="fourofour-watermark">Animayhem</div>
         </div>
     )
 }

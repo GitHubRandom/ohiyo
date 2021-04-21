@@ -42,7 +42,7 @@ const Navigation = ({ trigger, selected, shown }: INavigation) => {
     return (
         <nav className={ isShown ? "main-menu shown" : "main-menu hidden" }>
             <section className="logo-section">
-                <div id="main-logo" className="logo">AnimeSlayer</div>
+                <div id="main-logo" className="logo">Animayhem</div>
             </section>
             <section className="menu-section">
                 <NavLink onClick={ () => closeMenu() } className={ selected == "home" ? "menu-item selected" : "menu-item"} to="/"><span className="mdi mdi-home"></span>الرئيسة</NavLink>

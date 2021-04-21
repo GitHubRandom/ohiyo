@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import VideoPlayer from './VideoPlayer'
 import { Link } from "react-router-dom"
 
-const supportedServers = [ "OU", "MF", "UP" ]
+const supportedServers = [ "OU", "MF", "UP", "MP" ]
 
 interface TEpisodePlayer {
     fromEpisode: boolean,
@@ -71,8 +71,8 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
                 case item.includes("fembed"):
                     item = item.replace("api/source", "v")
                     setUnsupportedServer("FD", item, index); return
-                case item.includes("mixdrop"):
-                    setUnsupportedServer("MP", item, index); return
+                //case item.includes("mixdrop"):
+                    //setUnsupportedServer("MP", item, index); return
                 case item.includes("jawcloud"):
                     setUnsupportedServer("JC", item, index); return
                 default:
@@ -226,7 +226,20 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
             if (matches) {
                 return ["MF", [{ src: matches[1], size: "720" }]]
             }
-            return ["",[]]
+        } else if (s.includes("mixdrop")) {
+            console.log(data)
+            var myRegEx = /\s+?(eval\(function\(p,a,c,k,e,d\).+)\s+?/;
+            var matches = data.match(myRegEx)
+            console.log(matches)
+            if (matches && matches[0]) {
+                var unpacked = P_A_C_K_E_R.unpack(matches[0]);
+                var linkMatch = unpacked.match(/wurl=\"([^\"]+)/)
+                console.log(linkMatch)
+                if (linkMatch) {
+                    var link = "https:" + linkMatch[1].replace('\\', '');
+                    return ["MP", [{ src: link, size: "720" }]]
+                }
+            }
         }
         return ["",[]]
     }

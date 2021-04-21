@@ -5,7 +5,7 @@ const WatchNavigation = ({ shrink }: { shrink: boolean }) => {
         <nav className={ shrink ? "watch-menu shrink" : "watch-menu" }>
             <section className="logo-section">
                 { shrink ? <span id="hamburger-menu" className="mdi mdi-menu"></span> : null }
-                <div id="main-logo" className="logo">AnimeSlayer</div>
+                <div id="main-logo" className="logo">Animayhem</div>
             </section>
             { !shrink ?
             <section className="menu-section">
