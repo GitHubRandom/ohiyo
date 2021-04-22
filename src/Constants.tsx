@@ -33,7 +33,7 @@ const MENU_ENTRIES: IMenuEntry[] = [
         title: "مكتبتي",
         path: "/library",
         icon: "mdi-bookshelf",
-        visible: true
+        visible: false
     }
 ]
 
