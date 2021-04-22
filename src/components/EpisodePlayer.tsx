@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import VideoPlayer from './VideoPlayer'
 import { Link } from "react-router-dom"
 
-const supportedServers = [ "OU", "MF", "UP", "MP" ]
+const supportedServers = [ "OU", "MF", "UP" ]
 
 interface TEpisodePlayer {
     fromEpisode: boolean,
@@ -71,8 +71,8 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
                 case item.includes("fembed"):
                     item = item.replace("api/source", "v")
                     setUnsupportedServer("FD", item, index); return
-                //case item.includes("mixdrop"):
-                    //setUnsupportedServer("MP", item, index); return
+                case item.includes("mixdrop"):
+                    setUnsupportedServer("MP", item, index); return
                 case item.includes("jawcloud"):
                     setUnsupportedServer("JC", item, index); return
                 default:
@@ -162,18 +162,20 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
         <section className="anime-watch">
             { !soon ? 
             <>
-                { supportedServers.includes(currentSource[0]) ? 
+                { supportedServers.includes(currentSource[0]) && !status.includes("pending") ? 
                 <VideoPlayer 
                     introInterval = { introInterval }
                     sources = {{
                         type: 'video',
                         sources: currentSource[0] != "" ? currentSource[1] : {}
                     }} />
-                : <div className={ Object.keys(episodeSources).length ? "iframe-video-player" : "iframe-video-player loading" }>
-                    { currentSource[0] != "TP" ? // tune.pk requires a new code for embed player (very annoying)
-                        <iframe allowFullScreen={ true } className="iframe-video" src={ currentSource[1] as string } />
-                    : <><div className="open-stream-player" id={ `open-stream-player-${currentSource[1]}` }></div>
-                        <script src={ `https://tune.pk/js/open/embed.js?vid=${currentSource[1]}` }></script></> }
+                : <div className={ Object.keys(episodeSources).length && !status.includes("pending") ? "iframe-video-player" : "iframe-video-player loading" }>
+                    { !status.includes("pending") ? <>
+                        { currentSource[0] != "TP" ? // tune.pk requires a new code for embed player (very annoying)
+                            <iframe allowFullScreen={ true } className="iframe-video" src={ currentSource[1] as string } />
+                        : <><div className="open-stream-player" id={ `open-stream-player-${currentSource[1]}` }></div>
+                            <script src={ `https://tune.pk/js/open/embed.js?vid=${currentSource[1]}` }></script></> }</>
+                    : null }
                 </div> }
             </>
             : <div className="iframe-video-player">
@@ -191,7 +193,7 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
                 }
                 { !soon ?
                 <div className="server-settings">
-                    { Object.keys(episodeSources).length ?
+                    { Object.keys(episodeSources).length && !status.includes("pending") ?
                         <select name="server" className="selection" id="server-select" onChange={ (e) => updateCurrent([ e.target.value, episodeSources[e.target.value] ]) } value={ currentSource[0] }>
                             {
                                 Object.keys(episodeSources).map((key, index) => {
