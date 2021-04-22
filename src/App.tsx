@@ -7,6 +7,7 @@ import { useLocation } from 'react-router-dom';
 import 'tippy.js/dist/tippy.css'
 import Library from './pages/Library';
 import FourOFour from './pages/FourOFour';
+import Ranked from './pages/Ranked';
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search)
@@ -33,6 +34,10 @@ const App = () => {
                 <Route exact path="/library">
                     <GetNavigation selected="library" />
                     <Library />
+                </Route>
+                <Route exact path="/ranked">
+                    <GetNavigation selected="ranked" />
+                    <Ranked />
                 </Route>
                 <Route exact path="/error/404">
                     <FourOFour />

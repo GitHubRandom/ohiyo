@@ -16,9 +16,10 @@ interface IAnimeList {
     className: string,
     searchTerm?: string,
     filters?: Record<string,string[]>
+    topAnime?: true
 }
 
-const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm, filters }: IAnimeList) => {
+const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm, filters, topAnime }: IAnimeList) => {
 
     const [ content, updateContent ] = useState<Record<string,any>[]>([])
 
@@ -66,7 +67,11 @@ const AnimeSearchList = ({ showEpisodeName, searchMode, className, searchTerm, f
             if (searchMode) {
                 params["list_type"] = "anime_list"
             } else {
-                params["list_type"] = "latest_updated_episode_new"
+                if (topAnime) {
+                    params["list_type"] = "top_anime_mal"
+                } else {
+                    params["list_type"] = "latest_updated_episode_new"
+                }
             }
             if (params["anime_name"]) delete params["anime_name"]
         }    
