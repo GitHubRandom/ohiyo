@@ -227,14 +227,11 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, setEpisodeName, episodesLis
                 return ["MF", [{ src: matches[1], size: "720" }]]
             }
         } else if (s.includes("mixdrop")) {
-            console.log(data)
             var myRegEx = /\s+?(eval\(function\(p,a,c,k,e,d\).+)\s+?/;
             var matches = data.match(myRegEx)
-            console.log(matches)
             if (matches && matches[0]) {
                 var unpacked = P_A_C_K_E_R.unpack(matches[0]);
                 var linkMatch = unpacked.match(/wurl=\"([^\"]+)/)
-                console.log(linkMatch)
                 if (linkMatch) {
                     var link = "https:" + linkMatch[1].replace('\\', '');
                     return ["MP", [{ src: link, size: "720" }]]
