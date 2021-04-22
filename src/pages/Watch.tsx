@@ -84,19 +84,6 @@ const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
         }
     }, [aId])
 
-    const setMenus = () => {
-        if (window.innerWidth <= 1065) {
-            updateSideMenu(true)
-        } else {
-            updateSideMenu(false)
-        }
-    }
-
-    useEffect(() => {
-        setMenus()
-        window.addEventListener("resize", () => setMenus())
-    }, [])
-
     useEffect(() => {
         tippy("[data-tippy-content]")
     })
@@ -107,9 +94,8 @@ const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
                 <Redirect to={ `/${aId}/1` } />
                 : 
                 <div id="watch" className="menu-content">
-                    <WatchNavigation shrink={sideMenu} />
-                    {sideMenu ?
-                        <Navigation trigger={sideMenu ? "#hamburger-menu" : ""} selected="none" shown={false} /> : null }
+                    <WatchNavigation />
+                    <Navigation trigger="#hamburger-menu" secondary={ true } selected="none" shown={false} />
                     <div className="watch-page">
                         <WatchTopBar showEpisodeButton={episodesList.length > 1} episodeName={episodeName} animeTitle={animeTitle} />
                         <EpisodePlayer soon={soon} fromEpisode={fromEpisode ? true : false} episode={episode} episodesList={episodesList} setEpisodeName={(episodeName) => updateName(episodeName)} animeId={aId} episodeNumber={eNum ? eNum : episode["episode_number"]} />

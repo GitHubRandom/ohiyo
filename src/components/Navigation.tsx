@@ -4,10 +4,11 @@ import { NavLink } from "react-router-dom"
 interface INavigation {
     trigger: string,
     selected: string,
-    shown: boolean
+    shown: boolean,
+    secondary?: boolean
 }
 
-const Navigation = ({ trigger, selected, shown }: INavigation) => {
+const Navigation = ({ trigger, selected, shown, secondary }: INavigation) => {
 
     const [ isShown, updateShown ] = useState<boolean>(shown)
 
@@ -25,11 +26,14 @@ const Navigation = ({ trigger, selected, shown }: INavigation) => {
          * to make side menu appears (or disappear). @Ritzy
          */
         if (trigger) {
+            console.log(trigger)
             let elements = document.querySelectorAll(trigger)
             if (elements.length) {
                 elements.forEach(element => {
-                    if (!element.getAttribute("data-attched-click") || element.getAttribute("data-attached-click") !== "true") {
+                    console.log(element)
+                    if (!element.getAttribute("data-attached-click") || element.getAttribute("data-attached-click") !== "true") {
                         element.addEventListener("click", () => {
+                            console.log("Open !")
                             openMenu()
                         })
                         element.setAttribute("data-attached-click", "true")
@@ -40,7 +44,8 @@ const Navigation = ({ trigger, selected, shown }: INavigation) => {
     })    
 
     return (
-        <nav className={ isShown ? "main-menu shown" : "main-menu hidden" }>
+        // Secondary class name means that there is a top navigation and the side menu is secondary
+        <nav className={ secondary ? (isShown ? "main-menu shown secondary" : "main-menu hidden secondary") : (isShown ? "main-menu shown" : "main-menu hidden") }>
             <section className="logo-section">
                 <div id="main-logo" className="logo">Animayhem</div>
             </section>

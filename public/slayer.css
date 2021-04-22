@@ -96,11 +96,6 @@ body {
     margin: 0 auto;
 }
 
-.watch-menu.shrink {
-    margin: 0;
-    width: unset;
-}
-
 .logo-section {
     display: flex;
     justify-content: center;
@@ -137,6 +132,10 @@ body {
     position: sticky;
     top: 0;
     border-left: 1px solid #111111;
+}
+
+.main-menu.secondary {
+    display: none;
 }
 
 .menu-section span {
@@ -807,6 +806,9 @@ body {
         border-left: 1px solid #1c1c1c;
         top: 0;
     }
+    .main-menu.secondary {
+        display: flex;
+    }
     .main-menu section {
         position: absolute;
     }
@@ -828,6 +830,13 @@ body {
     }
     .watch-page {
         display: block;
+    }
+    .watch-menu {
+        margin: 0;
+        width: unset;    
+    }
+    .watch-menu .menu-section {
+        display: none;
     }
     .anime-details-info {
         display: flex;

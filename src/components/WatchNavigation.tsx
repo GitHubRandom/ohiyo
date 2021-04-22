@@ -1,19 +1,18 @@
 import { NavLink } from "react-router-dom"
 
-const WatchNavigation = ({ shrink }: { shrink: boolean }) => {
+const WatchNavigation = () => {
     return (
-        <nav className={ shrink ? "watch-menu shrink" : "watch-menu" }>
+        <nav className={ "watch-menu" }>
             <section className="logo-section">
-                { shrink ? <span id="hamburger-menu" className="mdi mdi-menu"></span> : null }
+                <span id="hamburger-menu" className="mdi mdi-menu"></span>
                 <div id="main-logo" className="logo">Animayhem</div>
             </section>
-            { !shrink ?
             <section className="menu-section">
                 <NavLink className="menu-item" to="/"><span className="mdi mdi-home"></span>الرئيسة</NavLink>
                 <NavLink className="menu-item" to="/all"><span className="mdi mdi-format-list-text mdi-flip-h"></span>قائمة الأنمي</NavLink>
                 <NavLink className="menu-item" to="/ranked"><span className="mdi mdi-chevron-triple-up"></span>تصنيف الأنمي</NavLink>
                 <NavLink className="menu-item" to="/library"><span className="mdi mdi-bookshelf"></span>مكتبتي</NavLink>
-            </section> : null }
+            </section>
         </nav>
     )
 }
