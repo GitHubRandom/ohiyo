@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { NavLink } from "react-router-dom"
+import { MENU_ENTRIES } from "../Constants"
 
 interface INavigation {
     trigger: string,
@@ -50,10 +51,9 @@ const Navigation = ({ trigger, selected, shown, secondary }: INavigation) => {
                 <div id="main-logo" className="logo">Animayhem</div>
             </section>
             <section className="menu-section">
-                <NavLink onClick={ () => closeMenu() } className={ selected == "home" ? "menu-item selected" : "menu-item"} to="/"><span className="mdi mdi-home"></span>الرئيسة</NavLink>
-                <NavLink onClick={ () => closeMenu() } className={ selected == "list-all" ? "menu-item selected" : "menu-item"} to="/all"><span className="mdi mdi-format-list-text mdi-flip-h"></span>قائمة الأنمي</NavLink>
-                <NavLink onClick={ () => closeMenu() } className={ selected == "ranked" ? "menu-item selected" : "menu-item"} to="/ranked"><span className="mdi mdi-chevron-triple-up"></span>تصنيف الأنمي</NavLink>
-                <NavLink onClick={ () => closeMenu() } className={ selected == "library" ? "menu-item selected" : "menu-item"} to="/library"><span className="mdi mdi-bookshelf"></span>مكتبتي</NavLink>
+                { MENU_ENTRIES.filter(entry => entry.visible).map(entry => {
+                    return <NavLink onClick={ () => closeMenu() } className={ selected == entry.id ? "menu-item selected" : "menu-item"} to={ entry.path }><span className={ "mdi " + entry.icon }></span>{ entry.title }</NavLink>
+                }) }
             </section>
             <div onClick={ () => closeMenu() } className="main-menu-close">
                 <span className="mdi mdi-close mdi-nm"></span>
