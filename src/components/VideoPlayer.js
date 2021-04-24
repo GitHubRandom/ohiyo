@@ -47,6 +47,7 @@ class VideoPlayer extends React.Component {
     skipIntro() {
         if (this.props.introInterval != undefined && this.props.introInterval.length != 0) {
             this.player.currentTime = toSeconds(this.props.introInterval[1])
+            document.getElementById('episode-skip-intro').style.display = 'none'
         }
     }
 
