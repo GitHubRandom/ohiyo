@@ -10,7 +10,7 @@ const WatchNavigation = () => {
             </section>
             <section className="menu-section">
                 { MENU_ENTRIES.filter(entry => entry.visible).map(entry => {
-                    return <NavLink className="menu-item" to={ entry.path }><span className={ "mdi " + entry.icon }></span>{ entry.title }</NavLink>
+                    return <NavLink key={ entry.id } className="menu-item" to={ entry.path }><span className={ "mdi " + entry.icon }></span>{ entry.title }</NavLink>
                 }) }
             </section>
         </nav>

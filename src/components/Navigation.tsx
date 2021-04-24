@@ -27,14 +27,11 @@ const Navigation = ({ trigger, selected, shown, secondary }: INavigation) => {
          * to make side menu appears (or disappear). @Ritzy
          */
         if (trigger) {
-            console.log(trigger)
             let elements = document.querySelectorAll(trigger)
             if (elements.length) {
                 elements.forEach(element => {
-                    console.log(element)
                     if (!element.getAttribute("data-attached-click") || element.getAttribute("data-attached-click") !== "true") {
                         element.addEventListener("click", () => {
-                            console.log("Open !")
                             openMenu()
                         })
                         element.setAttribute("data-attached-click", "true")
@@ -52,7 +49,7 @@ const Navigation = ({ trigger, selected, shown, secondary }: INavigation) => {
             </section>
             <section className="menu-section">
                 { MENU_ENTRIES.filter(entry => entry.visible).map(entry => {
-                    return <NavLink onClick={ () => closeMenu() } className={ selected == entry.id ? "menu-item selected" : "menu-item"} to={ entry.path }><span className={ "mdi " + entry.icon }></span>{ entry.title }</NavLink>
+                    return <NavLink key={ entry.id } onClick={ () => closeMenu() } className={ selected == entry.id ? "menu-item selected" : "menu-item"} to={ entry.path }><span className={ "mdi " + entry.icon }></span>{ entry.title }</NavLink>
                 }) }
             </section>
             <div onClick={ () => closeMenu() } className="main-menu-close">
