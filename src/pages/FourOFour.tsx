@@ -1,6 +1,12 @@
+import { useEffect } from "react"
 import { NavLink } from "react-router-dom"
 
 const FourOFour = () => {
+
+    useEffect(() => {
+        document.title = "Error 404 - Animahyem"
+    }, [])
+
     return (
         <div className="fourofour-container">
             <h1>四百四</h1>
