@@ -57,10 +57,7 @@ const Watch = ({ fromEpisode }: { fromEpisode: string | null }) => {
         const controller = new AbortController()
         const signal = controller.signal
         fetch(ENDPOINT + '?mode=episodes&json=%7B"more_info":"Yes","anime_id":' + aId + '%7D', {
-            headers: new Headers({
-                "Client-Id": process.env.REACT_APP_CLIENT_ID,
-                "Client-Secret": process.env.REACT_APP_CLIENT_SECRET
-            } as HeadersInit), signal: signal
+            signal: signal
         })
         .then((response) => { return response.json() })
         .then((data) => {
