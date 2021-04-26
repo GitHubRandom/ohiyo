@@ -2,6 +2,7 @@ import '../styles/slayer.css'
 import NProgress from 'nprogress';
 import Router from 'next/router';
 import "../styles/nprogress.css";
+import 'tippy.js/dist/tippy.css'
 
 function MyApp({ Component, pageProps }) {
 

@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@tippyjs/react": "^4.2.5",
     "next": "10.1.3",
     "nprogress": "^0.2.0",
     "plyr-react": "^3.0.8",

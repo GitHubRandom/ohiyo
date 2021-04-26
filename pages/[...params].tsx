@@ -8,6 +8,7 @@ import WatchNavigation from '../components/WatchNavigation'
 import Head from 'next/head'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import tippy from 'tippy.js'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     console.log(context)
@@ -74,6 +75,10 @@ const Watch = ({ details, episodes, episode, soon, episodeNumber, episodeName })
     useEffect(() => {
         window.scrollTo(0, 60)
     }, [episodeName])
+
+    useEffect(() => {
+        tippy("[data-tippy-content]")
+    })
 
     return (
         <>
