@@ -13,7 +13,7 @@ const ContentList = ({ className, contentList, showEpisodeName }: IContentList) 
                 return <Episode key = { index }
                     showEpisodeName = { showEpisodeName }
                     animeName = {episode["anime_name"]}
-                    url={ showEpisodeName ? `/${episode["anime_id"]}?from-episode=${episode["latest_episode_id"]}` : '/' + episode["anime_id"] + '/1' }
+                    url={ showEpisodeName ? `/watch/${episode["anime_id"]}?from-episode=${episode["latest_episode_id"]}` : '/watch/' + episode["anime_id"] + '/1' }
                     cover = {episode["anime_cover_image_url"]}
                     episodeName = {episode["latest_episode_name"]} />
             }) }

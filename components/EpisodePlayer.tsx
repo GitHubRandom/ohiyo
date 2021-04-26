@@ -178,7 +178,7 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, episodesList, animeId, epis
                 
             <div className="player-settings">
                 { parseInt(episodeNumber) > 1 && episodesList.length != 0 ? 
-                    <Link href={ "/" + animeId + "/" + (parseInt(episodeNumber) - 1).toString() }>
+                    <Link href={ "/watch/" + animeId + "/" + (parseInt(episodeNumber) - 1).toString() }>
                         <a data-tippy-content={ episodesList[(parseInt(episodeNumber) - 2)]["episode_name"] } id="previous" className="player-episode-skip">
                             <span className="mdi mdi-chevron-right"></span>
                             الحلقة السابقة
@@ -201,7 +201,7 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, episodesList, animeId, epis
                     }
                 </div> : null }
                 { parseInt(episodeNumber) < episodesList.length ? 
-                    <Link href={ "/" + animeId + "/" + (parseInt(episodeNumber) + 1).toString() }>
+                    <Link href={ "/watch/" + animeId + "/" + (parseInt(episodeNumber) + 1).toString() }>
                         <a data-tippy-content={ episodesList[parseInt(episodeNumber)]["episode_name"] } id="next" className="player-episode-skip">
                             الحلقة القادمة
                             <span className="mdi mdi-chevron-left mdi-left"></span>
