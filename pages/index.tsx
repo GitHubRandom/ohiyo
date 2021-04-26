@@ -25,8 +25,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     const res = await fetch(`https://anslayer.com/anime/public/animes/get-published-animes?json=${JSON.stringify(params)}`, {
         headers: new Headers({
-            "Client-Id": "web-app",
-            "Client-Secret": "90b63e11b9b4634f124df024516id495ab749c6b"
+            "Client-Id": process.env.CLIENT_ID,
+            "Client-Secret": process.env.CLIENT_SECRET
         })
     })
     if (res.ok) {

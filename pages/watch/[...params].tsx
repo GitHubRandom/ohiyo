@@ -14,8 +14,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.log(context)
     const animeId = context.query.params[0]
     const headers = new Headers({
-        "Client-Id": "web-app",
-        "Client-Secret": "90b63e11b9b4634f124df024516id495ab749c6b"
+        "Client-Id": process.env.CLIENT_ID,
+        "Client-Secret": process.env.CLIENT_SECRET
     })
     const detailsFetch = await fetch(`https://anslayer.com/anime/public/anime/get-anime-details?anime_id=${animeId}&fetch_episodes=No&more_info=Yes`, { headers })
     const detailsData = await detailsFetch.json()
@@ -75,6 +75,13 @@ const Watch = ({ details, episodes, episode, soon, episodeNumber, episodeName })
     useEffect(() => {
         window.scrollTo(0, 60)
     }, [episodeName])
+
+    useEffect(() => {
+        // Replace the current URL with "/anime_id/episode_number" if it's from episode_id
+        if (episode) {
+            router.replace(`/watch/${details.anime_id}/${episode.episode_number}`, undefined, { scroll: false })
+        }
+    }, [episode])
 
     useEffect(() => {
         tippy("[data-tippy-content]")
