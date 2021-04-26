@@ -122,7 +122,7 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
                 <Popup id="episodes-popup" trigger="#episodes-button" title="الحلقات">
                     <div className="popup-list">
                         { episodesList.map((episode,index) => {
-                            return <Link href={ "/watch/" + animeDetails.anime_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ episode["episode_name"] }</a></Link>
+                            return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ episode["episode_name"] }</a></Link>
                         }) }
                     </div>
                 </Popup> : null }

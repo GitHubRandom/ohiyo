@@ -91,6 +91,7 @@ const Watch = ({ details, episodes, episode, soon, episodeNumber, episodeName })
                 <meta property="og:description" content={ details.anime_description } />
                 <meta property="og:type" content={ details.anime_type == "Movie" ? "video.movie" : "video.episode" } />
                 <meta property="og:image" content={ details.anime_cover_image_url } />
+                { details.more_info_result && details.more_info_result.trailer_url ? <meta property="og:video" content={ details.more_info_result.trailer_url } /> : null }
             </Head>
             <div id="watch" className="menu-content">
                 <WatchNavigation />
