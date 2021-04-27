@@ -82,6 +82,7 @@ export default function Home({ newEpisodes, page }) {
         <>
             <Head>
                 <title>الرئيسة</title>
+                <meta name="keywords" content="anime,animayhem,anime slayer,translated,arabic,slayer,أنمي,مترجم,أنمي سلاير,أنمايهم"/>
                 <meta name="description" content="موقع لمشاهدة الأنمي المترجم بجودة عالية"/>
                 <meta property="og:title" content="Animayhem - أنمي مترجم"/>
                 <meta property="og:site_name" content="Animayhem"/>
