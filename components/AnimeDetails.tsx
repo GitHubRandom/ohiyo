@@ -40,11 +40,12 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
 
     const [ ratingSource, updateRateSource ] = useState<"mal" | "arabic">("mal")
     // Episodes order
-    const [ ascending, updateEpisodesOrder ] = useState<boolean>(false)
+    const [ ascending, updateEpisodesOrder ] = useState<boolean>(true)
 
-    useEffect(() => {
+    function reverseList() {
         episodesList = episodesList.reverse()
-    }, [ascending])
+        updateEpisodesOrder(!ascending)
+    }
 
     function dismissPopup() {
         (document.getElementsByClassName("popup")[0] as HTMLElement).style.display = "none"
@@ -135,11 +136,11 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
                 { ready && episodesList.length > 1 ?
                 <Popup id="episodes-popup" trigger="#episodes-button" title="الحلقات">
                     { ascending ?
-                        <div onClick={ () => toggleOrder() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
+                        <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
                             <span className="mdi mdi-sort-ascending"></span>تصاعدي
                         </div>
                     :
-                        <div onClick={ () => toggleOrder() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
+                        <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
                             <span className="mdi mdi-sort-descending"></span>تنازلي
                         </div>
                     }
