@@ -100,6 +100,13 @@ const All = ({ results, page }) => {
         <>
             <Head>
                 <title>قائمة الأنمي</title>
+                <meta name="keywords" content="anime,animayhem,all,list,anime list,anime slayer,translated,arabic,slayer,أنمي,مترجم,أنمي سلاير,لائحة الأنمي,أنمايهم"/>
+                <meta name="description" content="اختر الأنمي ضمن القائمة أو إبحث عن الأنمي"/>
+                <meta property="og:title" content="Animayhem - قائمة الأنمي"/>
+                <meta property="og:site_name" content="Animayhem"/>
+                <meta property="og:url" content="https://animayhem.ga/all" />
+                <meta property="og:description" content="اختر الأنمي ضمن القائمة أو إبحث عن الأنمي" />
+                <meta property="og:type" content="website" />
             </Head>
             <NavigationWrapper navTrigger="#hamburger-menu" contentId="all" selected="list-all">
                 <div id="all-page" className="content-page">
