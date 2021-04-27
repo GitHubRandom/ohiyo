@@ -10,15 +10,41 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import tippy from 'tippy.js'
 
+// From all of this I learned how shit is the Anime Slayer API. Just sayin'. @ritzy
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
+
     console.log(context)
-    const animeId = context.query.params[0]
+    const queryParams = context.query.params
+    const animeId = queryParams[0]
+
+    /**
+     * Make sure there is a from-episode query parameter if only animeId is specified
+     * Redirect to first episode otherwise
+     */
+    if (queryParams.length < 2 && !context.query["from-episode"]) {
+        context.res.writeHead(301, {
+            Location: `/watch/${animeId}/1`
+        })
+        context.res.end()
+        return
+    }
+
+    // Check if both parameters are strings & parameters do not exceed three
+    if (queryParams.length >= 3 ||
+        Number.isNaN(parseInt(queryParams[0])) ||
+        ( queryParams.length == 2 && Number.isNaN(parseInt(queryParams[1])) )
+    ) {
+        return {
+            notFound: true
+        }
+    }
+
     const headers = new Headers({
         "Client-Id": process.env.CLIENT_ID,
         "Client-Secret": process.env.CLIENT_SECRET
     })
     const detailsFetch = await fetch(`https://anslayer.com/anime/public/anime/get-anime-details?anime_id=${animeId}&fetch_episodes=No&more_info=Yes`, { headers })
-    const detailsData = await detailsFetch.json()
 
     const episodesFetch = await fetch(`https://anslayer.com/anime/public/episodes/get-episodes?json={"more_info": "Yes","anime_id":${animeId}}`, { headers })
     const episodesData = await episodesFetch.json()
@@ -26,9 +52,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Record<string,any> = {}
 
     if ( detailsFetch.ok ) {
+        const detailsData = await detailsFetch.json()
         props = {
             details: detailsData.response,
             soon: detailsData.response.anime_status && detailsData.response.anime_status == "Not Yet Aired"
+        }
+    } else if ( detailsFetch.status == 404 ) {
+        return {
+            notFound: true
         }
     }
 
@@ -43,7 +74,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     // Check if the request contains episode ID
-    if ( props.episodes.length && context.query.params.length == 1 && context.query["from-episode"] ) {
+    if ( props.episodes.length && queryParams.length == 1 && context.query["from-episode"] ) {
         const from = context.query["from-episode"]
         const episodeFetch = await fetch(`https://anslayer.com/anime/public/episodes/get-episodes?json={"more_info": "Yes","anime_id":${animeId},"episode_id":${from}}`, { headers })
         const episodeData = await episodeFetch.json()
@@ -56,8 +87,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 episodeName: episode.episode_name
             }    
         }
-    } else if ( props.episodes.length && context.query.params.length == 2) {
-        const eNum = context.query.params[1]
+    } else if ( props.episodes.length && queryParams.length == 2) {
+        const eNum = queryParams[1]
         props = {
             ...props,
             episodeNumber: eNum,
