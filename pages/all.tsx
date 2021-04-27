@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 import ContentList from '../components/ContentList'
+import Head from 'next/head'
 import NavigationWrapper from '../containers/NavigationWrapper'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -96,20 +97,25 @@ const All = ({ results, page }) => {
     }, [results])
 
     return (
-        <NavigationWrapper navTrigger="#hamburger-menu" contentId="all" selected="list-all">
-            <div id="all-page" className="content-page">
-                <div className="anime-list-header">
-                    <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>قائمة الأنمي</h2>
-                    <div className="anime-search-container">
-                        {// Object.keys(filterOptions).length ? <span id="anime-filter-button" data-tippy-content="التصنيف" className="mdi mdi-filter"></span> : null 
-                        }
-                        <input onInput={ (e: React.ChangeEvent<HTMLInputElement>) => updateSearch(e.target.value) } placeholder="البحث عن الأنمي" type="text" name="anime-search" id="anime-search"/>
+        <>
+            <Head>
+                <title>قائمة الأنمي</title>
+            </Head>
+            <NavigationWrapper navTrigger="#hamburger-menu" contentId="all" selected="list-all">
+                <div id="all-page" className="content-page">
+                    <div className="anime-list-header">
+                        <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>قائمة الأنمي</h2>
+                        <div className="anime-search-container">
+                            {// Object.keys(filterOptions).length ? <span id="anime-filter-button" data-tippy-content="التصنيف" className="mdi mdi-filter"></span> : null 
+                            }
+                            <input onInput={ (e: React.ChangeEvent<HTMLInputElement>) => updateSearch(e.target.value) } placeholder="البحث عن الأنمي" type="text" name="anime-search" id="anime-search"/>
+                        </div>
                     </div>
+                    <ContentList showEpisodeName={ false } className="content-list" contentList={ page == 1 ? results.data : result.data } />
+                    <div className="bottom-detector"></div>
                 </div>
-                <ContentList showEpisodeName={ false } className="content-list" contentList={ page == 1 ? results.data : result.data } />
-                <div className="bottom-detector"></div>
-            </div>
-        </NavigationWrapper>
+            </NavigationWrapper>
+        </>
     )
 }
 

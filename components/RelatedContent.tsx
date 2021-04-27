@@ -10,7 +10,7 @@ const RelatedContent = ({ related }: { related: Record<string,any>[] }) => {
                         { related.slice(0,5).map((content: Record<string,any>) => {
                             return <Episode key={ content["anime_id"] } showEpisodeName={ false }
                                         animeName={content["anime_name"]}
-                                        url={'/' + content["anime_id"] + '/1'}
+                                        url={'/watch/' + content["anime_id"] + '/1'}
                                         cover={content["anime_cover_image_url"]} />
                         }) }
                     </div>

@@ -110,7 +110,7 @@ const Watch = ({ details, episodes, episode, soon, episodeNumber, episodeName })
     useEffect(() => {
         // Replace the current URL with "/anime_id/episode_number" if it's from episode_id
         if (episode) {
-            router.replace(`/watch/${details.anime_id}/${episode.episode_number}`, undefined, { scroll: false })
+            router.replace(`/watch/${details.anime_id}/${episode.episode_number}`, undefined, { shallow: true, scroll: false })
         }
     }, [episode])
 

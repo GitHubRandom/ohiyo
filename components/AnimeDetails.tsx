@@ -39,6 +39,12 @@ interface TAnimeDetails {
 const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
 
     const [ ratingSource, updateRateSource ] = useState<"mal" | "arabic">("mal")
+    // Episodes order
+    const [ ascending, updateEpisodesOrder ] = useState<boolean>(false)
+
+    useEffect(() => {
+        episodesList = episodesList.reverse()
+    }, [ascending])
 
     function dismissPopup() {
         (document.getElementsByClassName("popup")[0] as HTMLElement).style.display = "none"
@@ -49,6 +55,14 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
             updateRateSource("arabic")
         } else {
             updateRateSource("mal")
+        }
+    }
+
+    function toggleOrder() {
+        if (ascending) {
+            updateEpisodesOrder(false)
+        } else {
+            updateEpisodesOrder(true)
         }
     }
 
@@ -120,10 +134,19 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
                 </div>
                 { ready && episodesList.length > 1 ?
                 <Popup id="episodes-popup" trigger="#episodes-button" title="الحلقات">
+                    { ascending ?
+                        <div onClick={ () => toggleOrder() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
+                            <span className="mdi mdi-sort-ascending"></span>تصاعدي
+                        </div>
+                    :
+                        <div onClick={ () => toggleOrder() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
+                            <span className="mdi mdi-sort-descending"></span>تنازلي
+                        </div>
+                    }
                     <div className="popup-list">
                         { episodesList.map((episode,index) => {
                             return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ episode["episode_name"] }</a></Link>
-                        }) }
+                        })}
                     </div>
                 </Popup> : null }
                 { ready && animeDetails && mal && mal["trailer_url"] ? 
