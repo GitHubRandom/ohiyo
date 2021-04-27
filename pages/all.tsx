@@ -8,6 +8,15 @@ import NavigationWrapper from '../containers/NavigationWrapper'
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Record<string,any> = {}
 
+    if (process.env.NODE_ENV == 'development') {
+        console.log(context)
+    }
+
+    const headers = new Headers({
+        "Client-Id": process.env.CLIENT_ID,
+        "Client-Secret": process.env.CLIENT_SECRET
+    })
+
     let params: Record<string,any> = {
         _offset: 0,
         _limit: 30,
@@ -28,15 +37,33 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         params.anime_name = context.query.search
     }
 
-    const res = await fetch(`https://anslayer.com/anime/public/animes/get-published-animes?json=${JSON.stringify(params)}`, {
-        headers: new Headers({
-            "Client-Id": process.env.CLIENT_ID,
-            "Client-Secret": process.env.CLIENT_SECRET
+    // Fetch filter options
+    const dropdownsFetch = await fetch("https://anslayer.com/anime/public/animes/get-anime-dropdowns", { headers })
+    if ( dropdownsFetch.ok ) {
+        const dropdowns = await dropdownsFetch.json()
+        props.dropdowns = dropdowns.response
+        Object.keys(context.query).forEach(key => {
+            if (key == "anime_genres") {
+                params.list_type != "filter" ? params.list_type = "filter" : null
+                params.anime_genre_ids = context.query.anime_genres
+                return
+            }
+            if (Object.keys(props.dropdowns).includes(key)) {
+                params.list_type != "filter" ? params.list_type = "filter" : null
+                params[key] = context.query[key]
+            }
         })
-    })
+    } else {
+        props.dropdowns = {}
+    }    
+
+    console.log(params)
+
+    const res = await fetch(`https://anslayer.com/anime/public/animes/get-published-animes?json=${JSON.stringify(params)}`, { headers })
 
     if (res.ok) {
         const data = await res.json()
+        console.log(data)
         if (data && data.response && !Array.isArray(data.response)) {
             props.results = {
                 status: "success",
@@ -60,7 +87,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 }
 
-const All = ({ results, page }) => {
+const All = ({ results, page, dropdowns }) => {
 
     const router = useRouter()
     const [ result, updateResult ] = useState<Record<string,any>>({
@@ -69,6 +96,28 @@ const All = ({ results, page }) => {
     })
     const [ refreshed, updateRefreshed ] = useState<boolean>(false)
     const [ currentPage, updateCurrent ] = useState<number>(1)
+    const filterOptions = {
+        ...dropdowns
+    }
+    const [ filters, updateFilters ] = useState<Record<string,any>>({})
+
+    /**
+     * This function changes the search filters
+     * @param filterOption the option to update (string)
+     * @param value the value to insert or delete (string)
+     * @param remove delete or insert the value (string)
+     */
+     const changeFilter = (filterOption: string, value: string, remove: boolean) => {
+        updateFilters(oldFilterOptions => {
+            if (!remove) {
+                oldFilterOptions[filterOption].push(value)
+            } else if (oldFilterOptions[filterOption].includes(value)) {
+                let index = oldFilterOptions[filterOption].indexOf(value)
+                oldFilterOptions[filterOption].splice(index, 1)
+            }
+            return {...oldFilterOptions}
+        })
+    }
 
     const updateSearch = (value: string) => {
         router.push({
@@ -79,6 +128,7 @@ const All = ({ results, page }) => {
 
     useEffect(() => {
         if (Object.keys(results).length) {
+            console.log(results)
             if ( results.status == "success" && page != currentPage ) {
                 updateResult(oldResults => {
                     return {
@@ -88,13 +138,41 @@ const All = ({ results, page }) => {
                     }
                 })
                 updateCurrent(page)
+                updateRefreshed(true)
             } else if ( results.status == "success" && page == 1 ) {
                 updateResult(results)
                 updateCurrent(1)
+                updateRefreshed(true)
             }
         }
-        updateRefreshed(true)
     }, [results])
+
+    useEffect(() => {
+        let observer = new IntersectionObserver((entries) => {
+            if (refreshed && entries[0] && entries[0].isIntersecting) {
+                updateRefreshed(false)
+                console.log(router.query.search)
+                if (router.query.search && router.query.search != "") {
+                    router.push({
+                        pathname: "/all",
+                        query: { page: page + 1, search: router.query.search }
+                    }, undefined, { scroll: false })
+                } else {
+                    router.push({
+                        pathname: "/all",
+                        query: { page: page + 1 }
+                    }, undefined, { scroll: false })
+                }
+            }
+        })
+        if (document.querySelector(".bottom-detector")) {
+            observer.observe(document.querySelector(".bottom-detector") as Element)
+        }
+
+        return () => {
+            observer.disconnect()
+        }
+    })
 
     return (
         <>
@@ -113,8 +191,7 @@ const All = ({ results, page }) => {
                     <div className="anime-list-header">
                         <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>قائمة الأنمي</h2>
                         <div className="anime-search-container">
-                            {// Object.keys(filterOptions).length ? <span id="anime-filter-button" data-tippy-content="التصنيف" className="mdi mdi-filter"></span> : null 
-                            }
+                            { Object.keys(filterOptions).length ? <span id="anime-filter-button" data-tippy-content="التصنيف" className="mdi mdi-filter"></span> : null }
                             <input onInput={ (e: React.ChangeEvent<HTMLInputElement>) => updateSearch(e.target.value) } placeholder="البحث عن الأنمي" type="text" name="anime-search" id="anime-search"/>
                         </div>
                     </div>

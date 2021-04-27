@@ -57,7 +57,6 @@ a {
 
 html {
     direction: rtl;
-    scroll-behavior: smooth;
 }
 
 span.mdi {

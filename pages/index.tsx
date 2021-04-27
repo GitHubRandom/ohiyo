@@ -31,7 +31,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     })
     if (res.ok) {
         const data = await res.json()
-        console.log(data)
         if (data && data.response && !Array.isArray(data.response)) {
             props.newEpisodes = data.response.data
         } else {
@@ -55,14 +54,14 @@ export default function Home({ newEpisodes, page }) {
     useEffect(() => {
         if (newEpisodes.length) {
             updateData(oldData => oldData.concat(newEpisodes))
+            updateRefreshed(true)
         }
-        updateRefreshed(true)
     }, [newEpisodes])
 
     useEffect(() => {
         let observer = new IntersectionObserver((entries) => {
-            if (entries[0] && entries[0].isIntersecting) {
-                updateRefreshed(true)
+            if (refreshed && entries[0] && entries[0].isIntersecting) {
+                updateRefreshed(false)
                 router.push({
                     pathname: "/",
                     query: { page: page + 1 }

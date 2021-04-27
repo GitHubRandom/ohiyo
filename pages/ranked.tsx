@@ -53,14 +53,14 @@ const Ranked = ({ ranking, page }) => {
     useEffect(() => {
         if (ranking.length) {
             updateData( oldData => oldData.concat(ranking) )
+            updateRefreshed(true)
         }
-        updateRefreshed(true)
     }, [ranking])
 
     useEffect(() => {
         let observer = new IntersectionObserver((entries) => {
-            if (entries[0] && entries[0].isIntersecting) {
-                updateRefreshed(true)
+            if (refreshed && entries[0] && entries[0].isIntersecting) {
+                updateRefreshed(false)
                 router.push({
                     pathname: "/ranked",
                     query: { page: page + 1 }
