@@ -151,18 +151,10 @@ const All = ({ results, page, dropdowns }) => {
         let observer = new IntersectionObserver((entries) => {
             if (refreshed && entries[0] && entries[0].isIntersecting) {
                 updateRefreshed(false)
-                console.log(router.query.search)
-                if (router.query.search && router.query.search != "") {
-                    router.push({
-                        pathname: "/all",
-                        query: { page: page + 1, search: router.query.search }
-                    }, undefined, { scroll: false })
-                } else {
-                    router.push({
-                        pathname: "/all",
-                        query: { page: page + 1 }
-                    }, undefined, { scroll: false })
-                }
+                router.push({
+                    pathname: "/all",
+                    query: { ...router.query, page: page + 1 }
+                }, undefined, { scroll: false })
             }
         })
         if (document.querySelector(".bottom-detector")) {
