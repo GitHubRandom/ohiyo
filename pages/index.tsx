@@ -82,6 +82,12 @@ export default function Home({ newEpisodes, page }) {
         <>
             <Head>
                 <title>الرئيسة</title>
+                <meta name="description" content="موقع لمشاهدة الأنمي المترجم بجودة عالية"/>
+                <meta property="og:title" content="Animayhem - أنمي مترجم"/>
+                <meta property="og:site_name" content="Animayhem"/>
+                <meta property="og:url" content="https://animayhem.ga" />
+                <meta property="og:description" content="موقع لمشاهدة الأنمي المترجم بجودة عالية" />
+                <meta property="og:type" content="website" />
             </Head>
             <NavigationWrapper navTrigger="#hamburger-menu" contentId="home" selected="home">
                 <div id="home-page" className="content-page">
