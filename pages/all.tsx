@@ -40,6 +40,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // Fetch filter options
     const dropdownsFetch = await fetch("https://anslayer.com/anime/public/animes/get-anime-dropdowns", { headers })
+    let filters: Record<string,any> = {}
     if ( dropdownsFetch.ok ) {
         const dropdowns = await dropdownsFetch.json()
         props.dropdowns = dropdowns.response
@@ -47,17 +48,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             if (key == "anime_genres") {
                 params.list_type != "filter" ? params.list_type = "filter" : null
                 params.anime_genre_ids = context.query.anime_genres
+                filters.anime_genre_ids = (context.query.anime_genres as string).split(',')
                 return
             }
             if (Object.keys(props.dropdowns).includes(key)) {
                 params.list_type != "filter" ? params.list_type = "filter" : null
                 params[key] = context.query[key]
+                filters[key] = (context.query[key] as string).split(',')
             }
         })
     } else {
         props.dropdowns = {}
     }    
 
+    props.queryFilters = filters
     console.log(params)
 
     const res = await fetch(`https://anslayer.com/anime/public/animes/get-published-animes?json=${JSON.stringify(params)}`, { headers })
@@ -88,7 +92,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 }
 
-const All = ({ results, page, dropdowns }) => {
+const All = ({ results, page, dropdowns, queryFilters }) => {
 
     const router = useRouter()
     const [ result, updateResult ] = useState<Record<string,any>>({
@@ -100,26 +104,23 @@ const All = ({ results, page, dropdowns }) => {
     const filterOptions = {
         ...dropdowns
     }
-    const [ filters, updateFilters ] = useState<Record<string,any>>({})
-
-    useEffect(() => {
-        Object.keys(filterOptions).forEach(key => {
-            updateFilters(oldFilters => {
-                return {
-                    ...oldFilters, [key]: []
-                } 
-            })
+    const [ initialized, updateInitialized ] = useState<boolean>(false)
+    const [ filters, updateFilters ] = useState<Record<string,any>>(() => {
+        let init: Record<string,any> = {}
+        Object.keys(dropdowns).forEach(key => {
+            init[key] = []
         })
-    }, [])
+        return { ...init, ...queryFilters }
+    })
 
     useEffect(() => {
+        if (!initialized) {
+            updateInitialized(true)
+            return
+        }
         let query: Record<string,any> = {}
         Object.keys(filters).forEach(key => {
             if (filters[key].length) {
-                if (key == "anime_genres") {
-                    query.anime_genre_ids = filters[key]
-                    return
-                }
                 query[key] = filters[key].join(',')
             }
         })
@@ -140,7 +141,6 @@ const All = ({ results, page, dropdowns }) => {
      */
      const changeFilter = (filterOption: string, value: string, remove: boolean) => {
         updateFilters(oldFilterOptions => {
-            console.log(remove)
             if (!remove) {
                 oldFilterOptions[filterOption].push(value)
             } else if (oldFilterOptions[filterOption].includes(value)) {
