@@ -8,7 +8,7 @@ function MyApp({ Component, pageProps }) {
 
   NProgress.configure({
     minimum: 0.3,
-    easing: 'ease',
+    easing: 'ease-out',
     speed: 800,
     showSpinner: false
   })
