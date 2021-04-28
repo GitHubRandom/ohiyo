@@ -16,14 +16,14 @@ const WatchTopBar = ({ showEpisodeButton, episodeName, animeTitle }: IWatchTopBa
          * Replaced window.onscroll by document.addEventListener
          * to be more performance optimized (sply. mobile)
          */
-        document.addEventListener("scroll", () => {
+        /*document.addEventListener("scroll", () => {
             var button = document.getElementsByClassName("floating-button")[0] as HTMLElement
             if (button && window.innerWidth > 600 && window.pageYOffset < 100) {
                 button.style.position = "unset"
             } else if (button) {
                 button.style.position = "fixed"
             }
-        })
+        })*/
     }, [])
 
     return (
