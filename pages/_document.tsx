@@ -6,6 +6,7 @@ export default class MyDocument extends Document {
             <Html lang="ar">
                 <Head>
                     <meta name="google-site-verification" content="-nGbvZaTeYTZbORil3Ks3HI3q_gM0umMHLMEWkhpdl4" />
+                    <meta name="a.validate.01" content="4b0a3f07bf7f69576f919840b17b3a5eb93d" />
                     <script type="text/javascript" data-cfasync="false" dangerouslySetInnerHTML={{
                         __html: `
                             /*<![CDATA[/* */
