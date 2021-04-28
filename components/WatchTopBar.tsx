@@ -24,7 +24,7 @@ const WatchTopBar = ({ showEpisodeButton, episodeName, animeTitle }: IWatchTopBa
                 button.style.position = "fixed"
             }
         })
-    })
+    }, [])
 
     return (
         <div className="top-bar">
