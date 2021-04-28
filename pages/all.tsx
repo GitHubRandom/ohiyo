@@ -48,7 +48,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             if (key == "anime_genres") {
                 params.list_type != "filter" ? params.list_type = "filter" : null
                 params.anime_genre_ids = context.query.anime_genres
-                filters.anime_genre_ids = (context.query.anime_genres as string).split(',')
+                filters.anime_genres = context.query.anime_genres
                 return
             }
             if (Object.keys(props.dropdowns).includes(key)) {
