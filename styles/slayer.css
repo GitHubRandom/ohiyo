@@ -879,6 +879,9 @@ body {
         width: 165px;
         min-width: unset;
     }
+    .floating-button {
+        position: fixed;
+    }
 }
 
 @media only screen and (max-width: 600px) {
@@ -908,10 +911,6 @@ body {
     .player-settings * {
         width: 100%;
         text-align: center;
-    }
-
-    .floating-button {
-        position: fixed;
     }
 
     .player-settings *:not(:last-child) { margin-bottom: 5px; }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import VideoPlayer from './VideoPlayer'
 import Link from 'next/link'
 
@@ -21,6 +21,15 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, episodesList, animeId, epis
     const [ currentSource, updateCurrent ] = useState<[string,string | Record<string,string>[]]>(["",""])
     const [ introInterval, updateIntroInterval ] = useState<[string,string]>(["",""])
     const [ status, updateStatus ] = useState<string[]>([])
+
+    const videoPlyr = useMemo(() => {
+        return <VideoPlayer 
+                    introInterval = { introInterval }
+                    sources = {{
+                        type: 'video',
+                        sources: currentSource[0] != "" ? currentSource[1] : {}
+                    }} />
+    }, [currentSource, introInterval])
 
     /**
      * This sets the status of fetching for the episode source URLs
@@ -155,12 +164,7 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, episodesList, animeId, epis
             { !soon ? 
             <>
                 { supportedServers.includes(currentSource[0]) && !status.includes("pending") ? 
-                <VideoPlayer 
-                    introInterval = { introInterval }
-                    sources = {{
-                        type: 'video',
-                        sources: currentSource[0] != "" ? currentSource[1] : {}
-                    }} />
+                    videoPlyr
                 : <div className={ Object.keys(episodeSources).length && !status.includes("pending") ? "iframe-video-player" : "iframe-video-player loading" }>
                     { !status.includes("pending") ? <>
                         { currentSource[0] != "TP" ? // tune.pk requires a new code for embed player (very annoying)
