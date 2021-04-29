@@ -278,7 +278,7 @@ const All = ({ results, page, dropdowns, queryFilters }) => {
                             </div>
                         </Popup> : null
                     }
-                    <ContentList showEpisodeName={ false } className="content-list" contentList={ page == 1 ? results.data : result.data } />
+                    <ContentList latest={ false } className="content-list" contentList={ page == 1 ? results.data : result.data } />
                     <div className="bottom-detector"></div>
                 </div>
             </NavigationWrapper>
