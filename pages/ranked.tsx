@@ -91,7 +91,7 @@ const Ranked = ({ ranking, page }) => {
             <NavigationWrapper navTrigger="#hamburger-menu" contentId="ranked" selected="ranked">
                 <div id="ranked-page" className="content-page">
                     <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>تصنيف الأنمي (MAL)</h2>
-                    <ContentList showEpisodeName={ false } className="content-list" contentList={ page == 1 ? ranking : data } />
+                    <ContentList latest={ false } className="content-list" contentList={ page == 1 ? ranking : data } />
                     <div className="bottom-detector"></div>
                 </div>
             </NavigationWrapper>
