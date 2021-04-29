@@ -2,18 +2,29 @@ import { useEffect, useMemo, useState } from "react"
 import VideoPlayer from './VideoPlayer'
 import Link from 'next/link'
 
-const supportedServers = [ "OU", "MF", "UP" ]
-
-interface TEpisodePlayer {
-    fromEpisode: boolean,
-    episode: Record<string,any>,
-    episodesList: Record<string,any>[],
-    animeId: string,
-    episodeNumber: string,
-    soon: boolean
+const supportedServers = [ "OK", "FR", "SF" ]
+const serverKeys = {
+    OK: "Ok.ru",
+    FR: "Mediafire",
+    MS: "MyStream",
+    SF: "SolidFiles",
+    FD: "Fembed",
+    MA: "Mega"
+}
+const qualitiesMap = {
+    hdQ: "1080",
+    owQ: "480",
+    ink: "720"
 }
 
-const EpisodePlayer = ({ soon, fromEpisode, episode, episodesList, animeId, episodeNumber }: TEpisodePlayer) => {
+interface TEpisodePlayer {
+    episodesList: Record<string,any>[],
+    animeId: string,
+    episodeNumber: number,
+    mal: string
+}
+
+const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePlayer) => {
 
     type quality = Record<string,string>[]
 
@@ -45,145 +56,141 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, episodesList, animeId, epis
 
     /**
      * This function splits the different sources and decodes them
-     * @param sources An stringified array of the different sources (string)
+     * @param sources An stringified array of the different sources (object)
      */
-    function getServers(sources: string) {
+    function getServers(sources: Record<string,string>) {
         // Remove backslashes in sources list
-        let s = sources.replace(/\\/g, "").slice(2,-2).split("\",\"")
         let currentUpdated = false // A boolean to know if there is current server selected or not
 
-        updateStatus(Array(s.length).fill("pending"))
+        let sourcesKeys = Object.keys(sources)
+        updateStatus(Array(sourcesKeys.length).fill("pending"))
 
         function setUnsupportedServer(server: string, result: string, index: number) {
             updateSources(oldEpisodeSources => ({
                 ...oldEpisodeSources,
                 [server]: result
             }))
-            if (!currentUpdated) {
-                updateCurrent([server, result])
-                currentUpdated = true
-            }
             setStatus("parsed", index)
         }
 
-        s.forEach((item,index) => {
+        sourcesKeys.forEach((key,index) => {
+            let item = sources[key]
             item = item.replace("http://", "https://")
+            console.log(`${key} : ${item}`)
             switch (true) {
-                case item.includes("tune.pk"):
-                    let sliced = item.slice(item.indexOf("video/") + 6)
-                    item = "https://embed.tune.pk/play/" + sliced.substring(0, sliced.indexOf("/"))
-                    setUnsupportedServer("TP", sliced.substring(0, sliced.indexOf("/")), index)
-                    return    
-                case item.includes("vidlox"):
-                    setUnsupportedServer("VL", item, index); return
-                case item.includes("fembed"):
-                    item = item.replace("api/source", "v")
-                    setUnsupportedServer("FD", item, index); return
-                case item.includes("mixdrop"):
-                    setUnsupportedServer("MP", item, index); return
-                case item.includes("jawcloud"):
-                    setUnsupportedServer("JC", item, index); return
+                case key.startsWith("FD"):
+                    setUnsupportedServer(key, "https://fembed.com/v/" + item, index); return
+                case key.startsWith("MA"):
+                    setUnsupportedServer(key, "https://mega.nz/embed/" + item, index); return
+                case key.startsWith("MS"):
+                    setUnsupportedServer(key, "https://embed.mystream.to/" + item, index); return
                 default:
                     break;
             }
+            let isOk = key.startsWith("OK")
             let headers = { 'User-Agent': navigator.userAgent }
             let method = 'GET'
-            if (item.includes("ok.ru") || item.includes("fembed")) {
-                method = 'POST'
+            switch (true) {
+                case key.startsWith("FR"):
+                    item = "/api/mediafire?link=https://www.mediafire.com/?" + item
+                    break
+                /*case key.startsWith("MS"):
+                    item = "/api/mediafire?link=https://embed.mystream.to/" + item
+                    break*/
+                case key.startsWith("SF"):
+                    item = "/api/mediafire?link=https://www.solidfiles.com/v/" + item
+                    break
+                case isOk:
+                    method = 'POST'
+                    item = "https://cors.bridged.cc/https://ok.ru/dk?cmd=videoPlayerMetadata&mid=" + item
+                    break
+                default:
+                    break
             }
-            if (item.includes("ok.ru")) {
-                item = "https://ok.ru/dk?cmd=videoPlayerMetadata&mid=" + item.slice(item.indexOf("video") + 6)
-            } else if (item.includes("uptostream")) {
-                item = "https://uptostream.com/api/streaming/source/get?token=&file_code=" + item.slice(item.indexOf(".com/") + 5)
-            }
-            if (!item.includes("uptostream")) {
-                item = "https://cors.bridged.cc/" + item
-            }
-            fetch(item, {
+            fetch(encodeURI(item), {
                 method: method,
-                headers: new Headers(headers),
+                headers: new Headers(headers)
             })
             .then((response) => {
-                if (item.includes("ok.ru") || item.includes("uptostream")) {
+                if (isOk /*|| item.includes("uptostream")*/) {
                     return response.json()
                 } else {
                     return response.text()
                 }
             })
             .then((data) => {
-                let ds = item.includes("ok.ru") || item.includes("uptostream") ? decodeServers(item,data) : decodeHTML(item,data)
+                let ds = isOk /*|| item.includes("uptostream")*/ ? decodeServers(key,data) : decodeHTML(key,data,key.substr(-3,3))
                 if (ds[0].length && ds[1].length) {
-                    // Prioritize OU server or supported servers if OU is not available
-                    updateCurrent(oldCurrent => {
-                        if (!currentUpdated || !supportedServers.includes(oldCurrent[0]) || ds[0] == "OU") {
-                            currentUpdated = true
-                            return ds
+                    updateSources(oldEpisodeSources => {
+                        const oldLinks = oldEpisodeSources[ds[0]]
+                        if (oldLinks) {
+                            return { ...oldEpisodeSources,
+                                [ds[0]]: (oldEpisodeSources[ds[0]] as quality).concat(ds[1]) }
+                        } else {
+                            return { ...oldEpisodeSources,
+                                [ds[0]]: ds[1] }
                         }
-                        return oldCurrent
-                    });
-                    updateSources(oldEpisodeSources => ({
-                        ...oldEpisodeSources,
-                        [ds[0]]: ds[1]
-                    }))
+                    })
                     setStatus("parsed", index)
                 } else {
                     setStatus("failed", index)
                 }
+            }).catch(err => {
+                console.log(err)
+                setStatus("failed", index)
             })
         })
     }
 
     useEffect(() => {
-        const controller = new AbortController()
-        let ep: Record<string,any> | undefined = undefined
-        if (fromEpisode && Object.keys(episode).length) {
-            ep = episode
-        } else if (!fromEpisode && episodesList.length) {
-            ep = episodesList[parseInt(episodeNumber) - 1]
-        }
-        if (ep !== undefined) {
-            updateIntroInterval([ep["skip_from"], ep["skip_to"]])
-            fetch("https://cors.bridged.cc/" + encodeURI(ep["episode_urls"][1]["episode_url"]), { signal: controller.signal })
-            .then((response) => { 
-                response.text().then((sources) => {
-                    getServers(sources)
-                })
-            })    
-        }
-        return () => {
-            if (controller && !controller.signal.aborted) {
-                try { controller.abort() } catch (error) {}
+        if (Object.keys(episodeSources) && !status.includes('pending')) {
+            let selected = Object.keys(episodeSources)[0]
+            for (var key in episodeSources) {
+                console.log(key)
+                if (key == "FR") {
+                    selected = key
+                    break
+                } else if (key.startsWith("OU")) {
+                    selected = key
+                }
             }
-            updateCurrent(["",""])
-            updateSources({})    
+            updateCurrent([ key, episodeSources[key] ])
         }
-    }, [episodeNumber,episodesList])
+    }, [status])
+
+    useEffect(() => {
+        let episode = episodesList[episodeNumber - 1]
+        let sources: Record<string,string> = {}
+        Object.keys(episode).map(key => {
+            if (episode[key].length > 0 && (key.endsWith("LowQ") || key.endsWith("Link") || key.endsWith("hdQ"))) {
+                sources[key] = episode[key]
+            }
+        })
+        console.log("Changed sources !")
+        getServers(sources)
+        // TODO: Get episode titles from MAL
+        return () => {
+            updateSources({})
+            updateCurrent(["",""])
+        }
+    }, [episodeNumber])
 
     return (
         <section className="anime-watch">
-            { !soon ? 
-            <>
-                { supportedServers.includes(currentSource[0]) && !status.includes("pending") ? 
-                    videoPlyr
-                : <div className={ Object.keys(episodeSources).length && !status.includes("pending") ? "iframe-video-player" : "iframe-video-player loading" }>
-                    { !status.includes("pending") ? <>
-                        { currentSource[0] != "TP" ? // tune.pk requires a new code for embed player (very annoying)
-                            <iframe allowFullScreen={ true } className="iframe-video" src={ currentSource[1] as string } />
-                        : <><div className="open-stream-player" id={ `open-stream-player-${currentSource[1]}` }></div>
-                            <script src={ `https://tune.pk/js/open/embed.js?vid=${currentSource[1]}` }></script></> }</>
-                    : null }
-                </div> }
-            </>
-            : <div className="iframe-video-player">
-                <div className="soon-screen">
-                    هذا الأنمي سيبث قريبا
-                </div>
+            { currentSource[0] && supportedServers.includes(currentSource[0].slice(0,2)) && !status.includes("pending") ? 
+                videoPlyr
+            : <div className={ Object.keys(episodeSources).length && !status.includes("pending") ? "iframe-video-player" : "iframe-video-player loading" }>
+                { !status.includes("pending") ? <>
+                    { currentSource[0] != "TP" ? // tune.pk requires a new code for embed player (very annoying)
+                        <iframe allowFullScreen={ true } className="iframe-video" src={ currentSource[1] as string } />
+                    : <><div className="open-stream-player" id={ `open-stream-player-${currentSource[1]}` }></div>
+                        <script src={ `https://tune.pk/js/open/embed.js?vid=${currentSource[1]}` }></script></> }</>
+                : null }
             </div> }
-                
             <div className="player-settings">
-                { parseInt(episodeNumber) > 1 && episodesList.length != 0 ? 
-                    <Link scroll={ false } href={ "/watch/" + animeId + "/" + (parseInt(episodeNumber) - 1).toString() }>
-                        <a data-tippy-content={ episodesList[(parseInt(episodeNumber) - 2)]["episode_name"] } id="previous" className="player-episode-skip">
+                { episodeNumber > 1 && episodesList.length != 0 ? 
+                    <Link scroll={ false } href={ "/watch/" + animeId + "-" + mal + "/" + (episodeNumber - 1).toString() }>
+                        <a data-tippy-content={ episodesList[episodeNumber - 2]["episode_name"] } id="previous" className="player-episode-skip">
                             <span className="mdi mdi-chevron-right"></span>
                             الحلقة السابقة
                         </a>
@@ -191,22 +198,21 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, episodesList, animeId, epis
                     : 
                     <a id="previous" className="player-episode-skip disabled"><span className="mdi mdi-chevron-right"></span>الحلقة السابقة</a> 
                 }
-                { !soon ?
                 <div className="server-settings">
                     { Object.keys(episodeSources).length && !status.includes("pending") ?
                         <select name="server" className="selection" id="server-select" onChange={ (e) => updateCurrent([ e.target.value, episodeSources[e.target.value] ]) } value={ currentSource[0] }>
                             {
                                 Object.keys(episodeSources).map((key, index) => {
-                                    return <option key={ key } value={ key } id={ key }>{ "Server " + (index + 1).toString() }{ supportedServers.includes(key) ? " - المشغل المحلي" : " - مشغل خارجي"}</option>
+                                    return <option key={ key } value={ key } id={ key }>{ supportedServers.includes(key.slice(0,2)) ? "المشغل المحلي" : "مشغل خارجي"}{ ` - ${serverKeys[key.slice(0,2)]}${ key.endsWith("hdQ") ? " - Full HD" : `` }` }</option>
                                 })
                             }
                         </select>
                         : <span className="servers-loading-message"><span className="mdi mdi-loading mdi-spin"></span>جاري العمل على الخوادم</span>
                     }
-                </div> : null }
-                { parseInt(episodeNumber) < episodesList.length ? 
-                    <Link scroll={ false } href={ "/watch/" + animeId + "/" + (parseInt(episodeNumber) + 1).toString() }>
-                        <a data-tippy-content={ episodesList[parseInt(episodeNumber)]["episode_name"] } id="next" className="player-episode-skip">
+                </div>
+                { episodeNumber < episodesList.length ? 
+                    <Link scroll={ false } href={ "/watch/" + animeId + "-" + mal + "/" + (episodeNumber + 1).toString() }>
+                        <a data-tippy-content={ episodesList[episodeNumber]["episode_name"] } id="next" className="player-episode-skip">
                             الحلقة القادمة
                             <span className="mdi mdi-chevron-left mdi-left"></span>
                         </a>
@@ -224,24 +230,25 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, episodesList, animeId, epis
      * @param data HTML response (string)
      * @returns An array with server code & object of different qualities URLs
      */
-    function decodeHTML(s:string, data:string): [string,Record<string,string>[]] {
-        if (s.includes("mediafire")) {
+    function decodeHTML(key:string, data:string, qual:string): [string,Record<string,string>[]] {
+        if (key.startsWith("FR")) {
             // Search for the download button href (yeah i know too simple)
-            var regex = /href="(https?:\/\/download(?:\d{0,9}){4}\.mediafire\.com.*?\.mp4)/
+            var regex = /href="(https:\/\/download\d{1,6}\.mediafire\.com.*?\.mp4)"/
             var matches = data.match(regex)
             if (matches) {
-                return ["MF", [{ src: matches[1], size: "720" }]]
+                return ["FR", [{ src: matches[1], size: qualitiesMap[qual] }]]
             }
-        } else if (s.includes("mixdrop")) {
-            var myRegEx = /\s+?(eval\(function\(p,a,c,k,e,d\).+)\s+?/;
-            var matches = data.match(myRegEx)
-            if (matches && matches[0]) {
-                var unpacked = P_A_C_K_E_R.unpack(matches[0]);
-                var linkMatch = unpacked.match(/wurl=\"([^\"]+)/)
-                if (linkMatch) {
-                    var link = "https:" + linkMatch[1].replace('\\', '');
-                    return ["MP", [{ src: link, size: "720" }]]
-                }
+        } else if (key.startsWith("SF")) {
+            var regex = /"downloadUrl":"(.+solidfilesusercontent.com.+?)"/
+            var matches = data.match(regex)
+            if (matches) {
+                return [key, [{ src: matches[1], size: "720" }]]
+            }
+        } else if (key.startsWith("MS")) {
+            var regex = /<source type="video\/mp4" src="(https:\/\/.*?\.net.*?\.mp4)">/
+            var matches = data.match(regex)
+            if (matches) {
+                return ["MS", [{ src: matches[1], size: qualitiesMap[qual] }]]
             }
         }
         return ["",[]]
@@ -253,22 +260,8 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, episodesList, animeId, epis
      * @param data Response of the request (JSON Object)
      * @returns An array with server code & object of different qualities URLs
      */
-    function decodeServers(s:string, data:Record<string,any>): [string,Array<Record<string,string>>] {
-        if (s.includes("uptostream")) {
-            var source = data["data"]["sources"]
-            source = source.replace("\\/=+$\\/", "/=+$/")
-            source = source.split("window").join("this")
-            var regexReturn = /return\n/g;
-            source = source.replace(regexReturn, "return ");
-            var sources = evalSources(source)
-            return ["UP", sources.map((quality: Record<string,any>) => {
-                return {
-                    src: quality["src"],
-                    size: quality["label"].slice(0,-1)   
-                }
-            })]    
-        }
-        if (s.includes("ok.ru")) {
+    function decodeServers(key:string, data:Record<string,any>): [string,Array<Record<string,string>>] {
+        if (key.startsWith("OK")) {
             let q: Record<string,string> = { mobile: "144", lowest: "240", low: "360", sd: "480", hd: "720" }
             let qualities: Array<Record<string,string>> = []
             // Videos links are in "videos" array of the JSON response
@@ -276,7 +269,7 @@ const EpisodePlayer = ({ soon, fromEpisode, episode, episodesList, animeId, epis
                 data["videos"].forEach((quality: Record<string,string>) => {
                     qualities.push({ src: quality["url"], size: q[quality["name"]] })
                 })
-                return ["OU", qualities]    
+                return [key, qualities]    
             }
             return ["",[]]
         }

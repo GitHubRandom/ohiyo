@@ -513,7 +513,6 @@ body {
     padding: 5px 10px;
     color: white;
     background-color: #151515;
-    font-weight: bold;
     border: none;
 }
 
@@ -591,11 +590,16 @@ body {
     display: none;
 }
 
+.tab-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
 .tab-selection {
     border-radius: 5px;
     display: inline-flex;
     overflow: hidden;
-    margin-bottom: 10px;
     border: 1px solid var(--accent-color);
 }
 

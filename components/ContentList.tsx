@@ -1,21 +1,27 @@
+import { useEffect } from "react"
 import Episode from "./Episode"
 
 interface IContentList { 
     className: string,
     contentList: Record<string,any>[],
-    showEpisodeName: boolean
+    latest: boolean
 }
 
-const ContentList = ({ className, contentList, showEpisodeName }: IContentList) => {
+const ContentList = ({ className, contentList, latest }: IContentList) => {
     return (
         <div className={ className }>
             { contentList.map((episode,index) => {
+                let episodeName = ""
+                if (episode.AnimeData) {
+                    episodeName = episode.EpisodeData.Episode
+                    episode = episode.AnimeData
+                }
                 return <Episode key = { index }
-                    showEpisodeName = { showEpisodeName }
-                    animeName = {episode["anime_name"]}
-                    url={ showEpisodeName ? `/watch/${episode["anime_id"]}?from-episode=${episode["latest_episode_id"]}` : '/watch/' + episode["anime_id"] + '/1' }
-                    cover = {episode["anime_cover_image_url"]}
-                    episodeName = {episode["latest_episode_name"]} />
+                    animeName={ episode.Title }
+                    showEpisodeName={ latest }
+                    url={ latest ? `/watch/${episode.MainId.slice(1)}-${episode.JicanKey}/latest` : `/watch/${episode.MainId.slice(1)}-${episode.JicanKey}/1` }
+                    cover={ episode.Type == "Movie" ? `https://animeify.net/animeify/files/thumbnails/movies/${episode.Thumbnail}` : `https://animeify.net/animeify/files/thumbnails/series/${episode.Thumbnail}` }
+                    episodeName={ `الحلقة ${episodeName}` } />
             }) }
         </div>
     )

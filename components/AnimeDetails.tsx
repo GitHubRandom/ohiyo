@@ -3,7 +3,45 @@ import ExpandableText from "./ExpandableText"
 import Link from 'next/link'
 import Popup from "./Popup"
 
-const ENDPOINT = "/api/details"
+const animeGenres: Record<string,any> = {
+    Action: "اكشن",
+    Adventure: "مغامرات",
+    Cars: "سيارات",
+    Comedy: "كوميديا",
+    Dementia: "جنون",
+    Demons: "شياطين",
+    Mystery: "غموض",
+    Drama: "دراما",
+    Ecchi: "ايتشي",
+    Fantasy: "خيال",
+    Game: "العاب",
+    Historical: "تاريخي",
+    Horror: "رعب",
+    Kids: "اطفال",
+    Magic: "سحر",
+    "Martial Arts": "فنون قتالية",
+    Mecha: "ميكا",
+    Music: "موسيقى",
+    Parody: "محاكاة ساخرة",
+    Samurai: "ساموراي",
+    Romance: "رومانسي",
+    School: "مدرسي",
+    Shoujou: "شوجو",
+    Shounen: "شونين",
+    Space: "فضاء",
+    "Super Power": "قوى خارقة",
+    "Vampire": "مصاص دماء",
+    Harem: "حريم",
+    "Slice of life": "شريحة من الحياة",
+    Supernatural: "خارق للطبيعة",
+    Military: "عسكري",
+    Police: "بوليسي",
+    Psychological: "نفسي",
+    Thriller: "اثارة",
+    Seinen: "سينين",
+    Josei: "جوسي",
+    "Sci-Fi": "خيال علمي"
+}
 
 // Expected data response values scrapped from AnimeSlayer.apk :)
 const animeTypes: Record<string,string> = {
@@ -33,30 +71,20 @@ const source: Record<string,string> = {
 
 interface TAnimeDetails {
     episodesList: Array<Record<string,any>>,
-    animeDetails: Record<string,any>
+    animeDetails: Record<string,any>,
 }
 
 const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
 
     const [ ratingSource, updateRateSource ] = useState<"mal" | "arabic">("mal")
-    // Episodes order
     const [ ascending, updateEpisodesOrder ] = useState<boolean>(true)
 
     function reverseList() {
-        episodesList = episodesList.reverse()
         updateEpisodesOrder(!ascending)
     }
 
     function dismissPopup() {
         (document.getElementsByClassName("popup")[0] as HTMLElement).style.display = "none"
-    }
-
-    function toggleRatingSource() {
-        if (ratingSource == "mal") {
-            updateRateSource("arabic")
-        } else {
-            updateRateSource("mal")
-        }
     }
 
     function toggleOrder() {
@@ -69,90 +97,97 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
 
     function render() {
         var ready = Object.keys(animeDetails).length != 0
-        var mal = null
-        if (ready && animeDetails["more_info_result"]) mal = animeDetails["more_info_result"]
         return (
             <section className="anime-details">
                 <div className="anime-details-info">
                     <div className="anime-details-side">
                         <div { ... ready ? {
                             style: {
-                                backgroundImage: `url(${animeDetails["anime_cover_image_url"]})`
+                                backgroundImage: `url(${animeDetails["image_url"]})`
                             },
                             className: "anime-details-cover"
                         } : {
                             className: "anime-details-cover loading"
                         } }>
-                        { ready && mal && mal["score"] ?
-                            <><span onClick={ () => toggleRatingSource() } id="mal-rating" data-tippy-content="تقييم MAL" className={ ratingSource == "mal" ? "anime-details-score" : "anime-details-score hidden" }>
-                                <span className="mdi mdi-star"></span>
-                                { mal["score"] }
-                            </span>
-                            <span onClick={ () => toggleRatingSource() } id="arabic-rating" data-tippy-content="التقييم العربي" className={ ratingSource == "arabic" ? "anime-details-score" : "anime-details-score hidden" }>
-                                    <span className="mdi mdi-star"></span>
-                                    { animeDetails["anime_rating"] }
-                            </span></> : null
-                        }
+                        <span id="mal-rating" data-tippy-content="تقييم MAL" className="anime-details-score">
+                            <span className="mdi mdi-star"></span>
+                            { animeDetails["score"] }
+                        </span>
                         </div>
-                        { ready && mal && mal["trailer_url"] ? 
+                        { ready ? 
                         <button id="trailer-button" className="anime-details-trailer"><span className="mdi mdi-play"></span>العرض الدعائي</button> : null }
                     </div>
                     { ready ? 
                     <div className="anime-meta">
-                        <ExpandableText expandText="معرفة المزيد" hideText="اخفاء" text={ animeDetails["anime_description"] } className="anime-details-synopsis" />
+                        <ExpandableText expandText="معرفة المزيد" hideText="اخفاء" text={ animeDetails["synopsis"] } className="anime-details-synopsis" />
                         <p className="anime-details-misc">
 
-                            { animeDetails["anime_type"] ?
-                                <><strong>النوع : </strong>{ animeDetails["anime_type"] in animeTypes ? animeTypes[animeDetails["anime_type"]] : "غير معروف" }<br /></> 
+                            { animeDetails.type ?
+                                <><strong>النوع : </strong>{ animeDetails.type in animeTypes ? animeTypes[animeDetails.type] : "غير معروف" }<br /></> 
                             : null }
 
-                            { animeDetails["anime_status"] ?
-                                <><strong>الحالة : </strong>{ animeDetails["anime_status"] != "Currently Airing" ? "مكتمل" : "غير مكتمل" }<br /></>
+                            { animeDetails.status ?
+                                <><strong>الحالة : </strong>{ animeDetails.status != "Currently Airing" ? "مكتمل" : "غير مكتمل" }<br /></>
                             : null }
-                            { mal ?
-                                <><strong>الاستوديو : </strong><Link href={ `/all?anime_studio_ids=${mal["anime_studio_ids"]}` }><a className="stealth-link">{ mal["anime_studios"] }</a></Link><br /></>
+
+                            { animeDetails.studios.length ?
+                                <><strong>الاستوديو : </strong>
+                                { animeDetails.studios.map((studio,index,studios) => {
+                                    // TODO: Fix links here
+                                    return <><Link href={ `/all?anime_studio_ids=${studio["anime_studio_ids"]}` }><a className="stealth-link">{ studio["name"] }</a></Link>{ index != studios.length - 1 ? "، " : null }</>
+                                }) }
+                                <br /></>
                             : null }
                             
-                            { animeDetails["anime_age_rating"] ?
-                            <><strong>الفئة العمرية : </strong>{ animeDetails["anime_age_rating"] != "All" ? animeDetails["anime_age_rating"] : "للجميع" }<br /></>
+                            { animeDetails["rating"] ?
+                            <><strong>الفئة العمرية : </strong>{ animeDetails["rating"] != "All" ? animeDetails["rating"] : "للجميع" }<br /></>
                             : null }
 
-                            { mal && mal["source"] ?
-                            <><strong>المصدر : </strong>{ mal["source"] in source ? source[mal["source"]] : "غير معروف" }<br /></>
+                            { animeDetails["source"] ?
+                            <><strong>المصدر : </strong>{ animeDetails["source"] in source ? source[animeDetails["source"]] : "غير معروف" }<br /></>
                             : null }
 
-                            { animeDetails["anime_genres"] ?
-                                <><strong>الصنف : </strong>{ animeDetails["anime_genres"].split(",").map((genre: string, index:number, genres: string[]) => {
-                                    return <><Link href={ `/all?anime_genres=${animeDetails["anime_genre_ids"].split(",")[index].trim()}` } key={ index }><a className="stealth-link">{ genre.trim() }</a></Link>{ index != genres.length - 1 ? "، " : null }</>
+                            { animeDetails["genres"].length ?
+                                <><strong>الصنف : </strong>{ animeDetails["genres"].map((genre: string, index:number, genres: string[]) => {
+                                    // TODO: Arabic text
+                                    return <><Link href={ `/all?anime_genres=${genre["name"]}` } key={ index }><a className="stealth-link">{ animeGenres[genre["name"]] }</a></Link>{ index != genres.length - 1 ? "، " : null }</>
                                 })} <br /></> : null
                             }
 
-                            { mal && mal["episodes"] ?
-                                <><strong>عدد الحلقات : </strong> { mal["episodes"] }</>
+                            { animeDetails["episodes"] ?
+                                <><strong>عدد الحلقات : </strong> { animeDetails["episodes"] }</>
                             : null }
+
                         </p> 
                     </div> : null }
                 </div>
                 { ready && episodesList.length > 1 ?
                 <Popup id="episodes-popup" trigger="#episodes-button" title="الحلقات">
-                    { ascending ?
+                    { ascending ? <>
                         <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
                             <span className="mdi mdi-sort-ascending"></span>تصاعدي
                         </div>
-                    :
+                        <div className="popup-list">
+                            { episodesList.map((episode,index) => {
+                                return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + '-' + animeDetails.mal_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ "الحلقة " + episode.Episode }</a></Link>
+                            })}
+                        </div>
+                        </>
+                    : <>
                         <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
                             <span className="mdi mdi-sort-descending"></span>تنازلي
                         </div>
+                        <div className="popup-list">
+                            { episodesList.map((episode,index) => {
+                                return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + '-' + animeDetails.mal_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ "الحلقة " + episode.Episode }</a></Link>
+                            }).reverse()}
+                        </div>
+                        </>
                     }
-                    <div className="popup-list">
-                        { episodesList.map((episode,index) => {
-                            return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ episode["episode_name"] }</a></Link>
-                        })}
-                    </div>
                 </Popup> : null }
-                { ready && animeDetails && mal && mal["trailer_url"] ? 
+                { ready && animeDetails.trailer_url ? 
                 <Popup id="trailer-popup" trigger="#trailer-button" title="العرض الدعائي">
-                    <iframe allowFullScreen={ true } src={ mal["trailer_url"] } frameBorder="0"></iframe>
+                    <iframe allowFullScreen={ true } src={ animeDetails.trailer_url } frameBorder="0"></iframe>
                 </Popup> : null }
             </section>
         )

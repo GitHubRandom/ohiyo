@@ -15,7 +15,7 @@ import tippy from 'tippy.js'
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
     const queryParams = context.query.params
-    const animeId = queryParams[0]
+    const animeId = queryParams[0].slice(0,queryParams[0].indexOf("-"))
 
     /**
      * Make sure there is a from-episode query parameter if only animeId is specified
@@ -23,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
      */
     if (queryParams.length < 2 && !context.query["from-episode"]) {
         context.res.writeHead(301, {
-            Location: `/watch/${animeId}/1`
+            Location: `/watch/${queryParams[0]}/1`
         })
         context.res.end()
         return
@@ -31,74 +31,85 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // Check if both parameters are strings & parameters do not exceed three
     if (queryParams.length >= 3 ||
-        Number.isNaN(parseInt(queryParams[0])) ||
-        ( queryParams.length == 2 && Number.isNaN(parseInt(queryParams[1])) )
+        !Number.isNaN(parseInt(queryParams[0]))
     ) {
         return {
             notFound: true
         }
     }
 
-    const headers = new Headers({
-        "Client-Id": process.env.CLIENT_ID,
-        "Client-Secret": process.env.CLIENT_SECRET
-    })
-    const detailsFetch = await fetch(`https://anslayer.com/anime/public/anime/get-anime-details?anime_id=${animeId}&fetch_episodes=No&more_info=Yes`, { headers })
-
-    const episodesFetch = await fetch(`https://anslayer.com/anime/public/episodes/get-episodes?json={"more_info": "Yes","anime_id":${animeId}}`, { headers })
-    const episodesData = await episodesFetch.json()
-
     let props: Record<string,any> = {}
+    const headers = new Headers({
+        "Content-Type": "application/x-www-form-urlencoded"
+    })
+
+    const detailsFetch = await fetch(`https://api.jikan.moe/v3/anime/${queryParams[0].slice(queryParams[0].indexOf('-') + 1)}`)
 
     if ( detailsFetch.ok ) {
         const detailsData = await detailsFetch.json()
-        props = {
-            details: detailsData.response,
-            soon: detailsData.response.anime_status && detailsData.response.anime_status == "Not Yet Aired"
-        }
+        detailsData.anime_id = animeId
+        props.details = detailsData
     } else if ( detailsFetch.status == 404 ) {
         return {
             notFound: true
         }
     }
 
-    // Check the response if there is any episodes available
-    if ( episodesFetch.ok ) {
-        props["episodes"] = episodesData.response.data
-    } else {
-        props["episodes"] = [] // Set to empty list if no episodes
-        if (props.soon) {
-            props["episodeName"] = "قريبا" // If the anime is not yet aired
+    let movie = false
+    let episodesFetch: Response
+    episodesFetch = await fetch("https://animeify.net/animeify/apis_v2/episodes/episodes_loader.php", {
+        method: "POST",
+        headers,
+        body: `AnimeID=x${animeId}`
+    })
+
+    let episodesData
+    if (episodesFetch.ok) {
+        episodesData = await episodesFetch.json()
+        console.log(episodesData)
+    }
+
+    // Check if it's not a movie. Fetch the other endpoint if it's the case
+    if (!Array.isArray(episodesData) || !episodesData.length) {
+        console.log("It's a movie !")
+        movie = true
+        episodesFetch = await fetch("https://animeify.net/animeify/apis_v2/servers/movie_links.php", {
+            method: "POST",
+            headers,
+            body: `MovieId=x${animeId}&Part=0`
+        })    
+    }
+
+    if (episodesFetch.ok) {
+        if (movie) {
+            episodesData = await episodesFetch.json()
+        }
+        if (!Array.isArray(episodesData)) {
+            episodesData = [episodesData]
+        }
+        props.episodes = episodesData
+        if (queryParams[1] == "latest") {
+            props.episodeNumber = episodesData.length
+        } else {
+            if (parseInt(queryParams[1]) > episodesData.length) {
+                return {
+                    notFound: true
+                }
+            }
+            props.episodeNumber = parseInt(queryParams[1])
+        }
+        if (props.details.type != "Movie" && props.details.type != "Special") {
+            props.episodeName = `الحلقة ${episodesData[props.episodeNumber - 1].Episode}`
+        } else {
+            props.episodeName = "الفلم"
         }
     }
 
-    // Check if the request contains episode ID
-    if ( props.episodes.length && queryParams.length == 1 && context.query["from-episode"] ) {
-        const from = context.query["from-episode"]
-        const episodeFetch = await fetch(`https://anslayer.com/anime/public/episodes/get-episodes?json={"more_info": "Yes","anime_id":${animeId},"episode_id":${from}}`, { headers })
-        const episodeData = await episodeFetch.json()
-        const episode = episodeData.response.data[0]
-        if ( !(episodeData.status) ) { // Check if it's a valid response
-            props = {
-                ...props, 
-                episode,
-                episodeNumber: episode.episode_number,
-                episodeName: episode.episode_name
-            }    
-        }
-    } else if ( props.episodes.length && queryParams.length == 2) {
-        const eNum = queryParams[1]
-        props = {
-            ...props,
-            episodeNumber: eNum,
-            episodeName: props.episodes[parseInt(eNum) - 1].episode_name
-        }
-    }
 
     return { props }
 }
 
-const Watch = ({ details, episodes, episode, soon, episodeNumber, episodeName }) => {
+const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
 
     const router = useRouter()
 
@@ -108,10 +119,11 @@ const Watch = ({ details, episodes, episode, soon, episodeNumber, episodeName })
 
     useEffect(() => {
         // Replace the current URL with "/anime_id/episode_number" if it's from episode_id
-        if (episode) {
-            router.replace(`/watch/${details.anime_id}/${episode.episode_number}`, undefined, { shallow: true, scroll: false })
+        console.log(episodeNumber)
+        if (router.query.params[1] == "latest") {
+            router.replace(`/watch/${details.anime_id}-${details.mal_id}/${episodeNumber}`, undefined, { shallow: true, scroll: false })
         }
-    }, [episode])
+    }, [episodeNumber])
 
     useEffect(() => {
         tippy("[data-tippy-content]")
@@ -120,15 +132,15 @@ const Watch = ({ details, episodes, episode, soon, episodeNumber, episodeName })
     return (
         <>
             <Head>
-                <title>{ `${details.anime_name} - ${episodeName}` }</title>
-                <meta name="description" content={ `شاهد ${details.anime_name} - ${episodeName} على Animayhem بجودة عالية` }/>
-                <meta property="og:title" content={ `${details.anime_name} على Animayhem` }/>
+                <title>{ `${details.title} - ${episodeName}` }</title>
+                <meta name="description" content={ `شاهد ${details.title} - ${episodeName} على Animayhem بجودة عالية` }/>
+                <meta property="og:title" content={ `${details.title} على Animayhem` }/>
                 <meta property="og:site_name" content="Animayhem"/>
                 <meta property="og:url" content={ router.pathname } />
                 <meta property="og:description" content={ details.anime_description } />
-                <meta property="og:type" content={ details.anime_type == "Movie" ? "video.movie" : "video.episode" } />
-                <meta property="og:image" content={ details.anime_cover_image_url } />
-                { details.more_info_result && details.more_info_result.trailer_url ? <meta property="og:video" content={ details.more_info_result.trailer_url } /> : null }
+                <meta property="og:type" content={ details.type == "Movie" ? "video.movie" : "video.episode" } />
+                <meta property="og:image" content={ details.image_url } />
+                { details.trailer_url ? <meta property="og:video" content={ details.trailer_url } /> : null }
                 <style jsx>{`
                     html {
                         scroll-behavior: smooth;
@@ -139,10 +151,10 @@ const Watch = ({ details, episodes, episode, soon, episodeNumber, episodeName })
                 <WatchNavigation />
                 <Navigation trigger="#hamburger-menu" secondary={ true } selected="none" shown={false} />
                 <div className="watch-page">
-                    <WatchTopBar showEpisodeButton={ episodes.length > 1 } episodeName={ episodeName } animeTitle={ details.anime_name } />
-                    <EpisodePlayer soon={ soon } fromEpisode={ episode ? true : false } episode={ episode } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />
+                    <WatchTopBar showEpisodeButton={ episodes.length > 1 } episodeName={ episodeName } animeTitle={ details.title } />
+                    <EpisodePlayer mal={ details.mal_id } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />   
                     <AnimeDetails episodesList={ episodes } animeDetails={ details } />
-                    <RelatedContent related={ details.related_animes.data } />
+                    {/*<RelatedContent related={ details.related_animes.data } />*/}
                 </div>
             </div>
         </>

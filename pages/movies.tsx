@@ -15,20 +15,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     let offset: number = 25 * (page - 1)
     let res: Response
-    res = await fetch("https://animeify.net/animeify/apis_v2/episodes/latest_episodes.php", {
+    res = await fetch("https://animeify.net/animeify/apis_v2/anime/latest_anime.php", {
         method: "POST",
         headers: new Headers({
             "Content-Type": "application/x-www-form-urlencoded"
         }),
-        body: `UserID=0&Language=AR&From=${offset}`
+        body: `UserId=0&Type=Movie&Language=AR&From=${offset}`
     })
     if (res.ok) {
         const data = await res.json()
         if (data) {
-            props.newEpisodes = data
+            props.newMovies = data
         }
     } else {
-        props.newEpisodes = []
+        props.newMovies = []
     }
     
     return {
@@ -36,25 +36,25 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 }
 
-export default function Home({ newEpisodes, page }) {
+export default function Home({ newMovies, page }) {
 
     const [ data, updateData ] = useState<Record<string,any>[]>([])
     const [ refreshed, updateRefreshed ] = useState<boolean>(false)
     const router = useRouter()
 
     useEffect(() => {
-        if (newEpisodes.length) {
-            updateData(oldData => oldData.concat(newEpisodes))
+        if (newMovies.length) {
+            updateData(oldData => oldData.concat(newMovies))
             updateRefreshed(true)
         }
-    }, [newEpisodes])
+    }, [newMovies])
 
     useEffect(() => {
         let observer = new IntersectionObserver((entries) => {
             if (refreshed && entries[0] && entries[0].isIntersecting) {
                 updateRefreshed(false)
                 router.push({
-                    pathname: "/",
+                    pathname: "/movies",
                     query: { ...router.query, page: page + 1 }
                 }, undefined, { scroll: false })
             }
@@ -71,19 +71,19 @@ export default function Home({ newEpisodes, page }) {
     return (
         <>
             <Head>
-                <title>الرئيسة - Animayhem</title>
-                <meta name="keywords" content="anime,animayhem,anime slayer,translated,arabic,slayer,أنمي,مترجم,أنمي سلاير,أنمايهم"/>
-                <meta name="description" content="موقع لمشاهدة الأنمي المترجم بجودة عالية"/>
+                <title>Animayhem - آخر الفلام</title>
+                <meta name="keywords" content="anime,animayhem,anime slayer,translated,movies,arabic,slayer,أفلام,أنمي,مترجم,أنمي سلاير,أنمايهم"/>
+                <meta name="description" content="شاهد آخر الأفلام المترجمة بجودة عالية على موقعنا"/>
                 <meta property="og:title" content="Animayhem - أنمي مترجم"/>
                 <meta property="og:site_name" content="Animayhem"/>
                 <meta property="og:url" content="https://animayhem.ga" />
-                <meta property="og:description" content="موقع لمشاهدة الأنمي المترجم بجودة عالية" />
+                <meta property="og:description" content="شاهد آخر الأفلام المترجمة بجودة عالية على موقعنا" />
                 <meta property="og:type" content="website" />
             </Head>
-            <NavigationWrapper navTrigger="#hamburger-menu" contentId="home" selected="home">
-                <div id="home-page" className="content-page">
-                    <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>آخر الحلقات</h2>
-                    <ContentList latest={ true } className="content-list" contentList={ page == 1 ? newEpisodes : data } />
+            <NavigationWrapper navTrigger="#hamburger-menu" contentId="movies" selected="movies">
+                <div id="movies-page" className="content-page">
+                    <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>آخر الفلام</h2>
+                    <ContentList latest={ false } className="content-list" contentList={ page == 1 ? newMovies : data } />
                     <div className="bottom-detector"></div>
                 </div>
             </NavigationWrapper>

@@ -9,9 +9,16 @@ interface IMenuEntry {
 const MENU_ENTRIES: IMenuEntry[] = [
     {
         id: "home",
-        title: "الرئيسة",
+        title: "آخر الحلقات",
         path: "/",
-        icon: "mdi-home",
+        icon: "mdi-television-classic",
+        visible: true
+    },
+    {
+        id: "movies",
+        title: "آخر الأفلام",
+        path: "/movies",
+        icon: "mdi-filmstrip-box",
         visible: true
     },
     {
@@ -21,6 +28,7 @@ const MENU_ENTRIES: IMenuEntry[] = [
         icon: "mdi-format-list-text mdi-flip-h",
         visible: true
     },
+    
     {
         id: "ranked",
         title: "تصنيف الأنمي",
