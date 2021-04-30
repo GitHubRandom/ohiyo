@@ -92,7 +92,7 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
             let method = 'GET'
             switch (true) {
                 case key.startsWith("FR"):
-                    item = "/api/mediafire?link=https://www.mediafire.com/?" + item
+                    item = "/api/mediafire?link=http://www.mediafire.com/?" + item
                     break
                 /*case key.startsWith("MS"):
                     item = "/api/mediafire?link=https://embed.mystream.to/" + item
@@ -233,7 +233,7 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
     function decodeHTML(key:string, data:string, qual:string): [string,Record<string,string>[]] {
         if (key.startsWith("FR")) {
             // Search for the download button href (yeah i know too simple)
-            var regex = /href="(https:\/\/download\d{1,6}\.mediafire\.com.*?\.mp4)"/
+            var regex = /href="(https?:\/\/download\d{1,6}\.mediafire\.com.*?\.mp4)"/
             var matches = data.match(regex)
             if (matches) {
                 return [key, [{ src: matches[1], size: qualitiesMap[qual] }]]
