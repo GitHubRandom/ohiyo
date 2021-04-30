@@ -1,7 +1,8 @@
 export default async function handler(req, res) {
     const resource = await fetch(req.query.link, {
         headers: new Headers({
-            'User-Agent': req.headers["user-agent"]
+            "Connection": "keep-alive",
+            "Host": "www.mediafire.com"
         })
     })
     const data = await resource.text()
