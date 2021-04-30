@@ -92,7 +92,7 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
             let method = 'GET'
             switch (true) {
                 case key.startsWith("FR"):
-                    item = "/api/mediafire?link=https://www.mediafire.com/?" + item
+                    item = "https://cors.bridged.cc/https://www.mediafire.com/?" + item
                     break
                 /*case key.startsWith("MS"):
                     item = "/api/mediafire?link=https://embed.mystream.to/" + item
