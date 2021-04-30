@@ -13,66 +13,45 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         console.log(context)
     }
 
-    const headers = new Headers({
-        "Client-Id": process.env.CLIENT_ID,
-        "Client-Secret": process.env.CLIENT_SECRET
-    })
-
-    let params: Record<string,any> = {
-        _offset: 0,
-        _limit: 30,
-        _order_by: "latest_first",
-        list_type: "anime_list",
-        just_info: "Yes"
-    }
-
+    let offset = 0
     // Detect which page is requested (infinite scroll)
     const page = context.query.page ? parseInt(context.query.page.toString()) : 1
     if ( page > 1 ) {
-        params._offset = 30 * (page - 1)
+        offset = 25 * (page - 1)
     }
+
     props.page = page
 
-    // Detect if there is a search query
-    if (context.query.search && context.query.search != "") {
-        params.anime_name = context.query.search
+    let search = context.query.search
+
+    let res
+    if (search && search.length > 0) {
+        if (!context.query.page || context.query.page == '1') {
+            res = await fetch("https://animeify.net/animeify/apis_v2/anime/filtersort/search.php", {
+                method: "POST",
+                headers: new Headers({
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }),
+                body: `UserID=0&Language=AR&Text=${search}`
+            })
+        }
+    } else {
+        res = await fetch("https://animeify.net/animeify/apis_v2/anime/catalogseries.php", {
+            method: "POST",
+            headers: new Headers({
+                "Content-Type": "application/x-www-form-urlencoded"
+            }),
+            body: `UserID=0&Language=AR&From=${offset}`
+        })
     }
 
-    // Fetch filter options
-    const dropdownsFetch = await fetch("https://anslayer.com/anime/public/animes/get-anime-dropdowns", { headers })
-    let filters: Record<string,any> = {}
-    if ( dropdownsFetch.ok ) {
-        const dropdowns = await dropdownsFetch.json()
-        props.dropdowns = dropdowns.response
-        Object.keys(context.query).forEach(key => {
-            if (key == "anime_genres") {
-                params.list_type != "filter" ? params.list_type = "filter" : null
-                params.anime_genre_ids = context.query.anime_genres
-                filters.anime_genres = context.query.anime_genres
-                return
-            }
-            if (Object.keys(props.dropdowns).includes(key)) {
-                params.list_type != "filter" ? params.list_type = "filter" : null
-                params[key] = context.query[key]
-                filters[key] = (context.query[key] as string).split(',')
-            }
-        })
-    } else {
-        props.dropdowns = {}
-    }    
-
-    props.queryFilters = filters
-    console.log(params)
-
-    const res = await fetch(`https://anslayer.com/anime/public/animes/get-published-animes?json=${JSON.stringify(params)}`, { headers })
-
-    if (res.ok) {
+    if (res && res.ok) {
         const data = await res.json()
         console.log(data)
-        if (data && data.response && !Array.isArray(data.response)) {
+        if (Array.isArray(data) && data.length) {
             props.results = {
                 status: "success",
-                data: data.response.data
+                data: data
             }
         } else {
             props.results = {
@@ -92,7 +71,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 }
 
-const All = ({ results, page, dropdowns, queryFilters }) => {
+const All = ({ results, page }) => {
 
     const router = useRouter()
     const [ result, updateResult ] = useState<Record<string,any>>({
@@ -101,60 +80,16 @@ const All = ({ results, page, dropdowns, queryFilters }) => {
     })
     const [ refreshed, updateRefreshed ] = useState<boolean>(false)
     const [ currentPage, updateCurrent ] = useState<number>(1)
-    const filterOptions = {
-        ...dropdowns
-    }
-    const [ initialized, updateInitialized ] = useState<boolean>(false)
-    const [ filters, updateFilters ] = useState<Record<string,any>>(() => {
-        let init: Record<string,any> = {}
-        Object.keys(dropdowns).forEach(key => {
-            init[key] = []
-        })
-        return { ...init, ...queryFilters }
-    })
-
-    useEffect(() => {
-        if (!initialized) {
-            updateInitialized(true)
-            return
-        }
-        let query: Record<string,any> = {}
-        Object.keys(filters).forEach(key => {
-            if (filters[key].length) {
-                query[key] = filters[key].join(',')
-            }
-        })
-        if (typeof router.query.search === 'string' && router.query.search != "") {
-            query.search = router.query.search
-        }
-        router.push({
-            pathname: "/all",
-            query: { ...query }
-        })
-    }, [filters])
-
-    /**
-     * This function changes the search filters
-     * @param filterOption the option to update (string)
-     * @param value the value to insert or delete (string)
-     * @param remove delete or insert the value (string)
-     */
-     const changeFilter = (filterOption: string, value: string, remove: boolean) => {
-        updateFilters(oldFilterOptions => {
-            if (!remove) {
-                oldFilterOptions[filterOption].push(value)
-            } else if (oldFilterOptions[filterOption].includes(value)) {
-                let index = oldFilterOptions[filterOption].indexOf(value)
-                oldFilterOptions[filterOption].splice(index, 1)
-            }
-            return {...oldFilterOptions}
-        })
-    }
-
+    
     const updateSearch = (value: string) => {
+        let query: Record<string,string> = {}
+        if (value.length) {
+            console.log(value)
+            query.search = value
+        }
         router.push({
             pathname: "/all",
-            query: { ...router.query, search: value }
+            query
         }, undefined, { scroll: false })
     }
 
@@ -214,72 +149,11 @@ const All = ({ results, page, dropdowns, queryFilters }) => {
                     <div className="anime-list-header">
                         <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>قائمة الأنمي</h2>
                         <div className="anime-search-container">
-                            { Object.keys(filterOptions).length ? <span id="anime-filter-button" data-tippy-content="التصنيف" className="mdi mdi-filter"></span> : null }
                             <input onInput={ (e: React.ChangeEvent<HTMLInputElement>) => updateSearch(e.target.value) } placeholder="البحث عن الأنمي" type="text" name="anime-search" id="anime-search"/>
                         </div>
                     </div>
-                    { Object.keys(filterOptions).length ?
-                        <Popup title="تصنيف حسب" trigger="#anime-filter-button" id="anime-filter-popup">
-                            <div className="anime-filters">
-                                <div id="studio" className="anime-filter-section">
-                                    <h3 className="anime-filter-header">
-                                        الاستوديو
-                                    </h3>
-                                    <div className="anime-filter-checkboxes">
-                                        { filterOptions["anime_studio_ids"]["data"].map((filterOption: Record<string,string>) => {
-                                            return (
-                                                <div key={ "studio-" + filterOption.value } className="anime-filter-checkbox">
-                                                    <input checked={ filters.anime_studio_ids && filters.anime_studio_ids.includes(filterOption.value) } onChange={ (e) => changeFilter("anime_studio_ids", filterOption.value, !e.target.checked) }
-                                                        type="checkbox"
-                                                        name={ filterOption.option } 
-                                                        id={ "studio-" + filterOption.value } />
-                                                    <label htmlFor={ "studio-" + filterOption.value }>{ filterOption.option }</label>
-                                                </div>
-                                            )
-                                        }) }
-                                    </div>
-                                </div>
-                                <div id="genre" className="anime-filter-section">
-                                    <h3 className="anime-filter-header">
-                                        النوع
-                                    </h3>
-                                    <div className="anime-filter-checkboxes">
-                                        { filterOptions["anime_genres"]["data"].map((filterOption: Record<string,string>) => {
-                                            return (
-                                                <div key={ "genre-" + filterOption.value } className="anime-filter-checkbox">
-                                                    <input checked={ filters.anime_genres && filters.anime_genres.includes(filterOption.value) } onChange={ (e) => changeFilter("anime_genres", filterOption.value, !e.target.checked) }
-                                                        type="checkbox"
-                                                        name={ filterOption.option }
-                                                        id={ "genre-" + filterOption.value } />
-                                                    <label htmlFor={ "genre-" + filterOption.value }>{ filterOption.option }</label>
-                                                </div>
-                                            )
-                                        }) }
-                                    </div>
-                                </div>
-                                <div id="release-year" className="anime-filter-section">
-                                    <h3 className="anime-filter-header">
-                                        تاريخ الصدور
-                                    </h3>
-                                    <div className="anime-filter-checkboxes">
-                                        { filterOptions["anime_release_years"]["data"].map((filterOption: Record<string,string>) => {
-                                            return (
-                                                <div key={ "year-" + filterOption.value } className="anime-filter-checkbox">
-                                                    <input checked={ filters.anime_release_years && filters.anime_release_years.includes(filterOption.value) } onChange={ (e) => changeFilter("anime_release_years", filterOption.value, !e.target.checked) }
-                                                        type="checkbox"
-                                                        name={ filterOption.option }
-                                                        id={ "year-" + filterOption.value } />
-                                                    <label htmlFor={ "year-" + filterOption.value }>{ filterOption.option }</label>
-                                                </div>
-                                            )
-                                        }) }
-                                    </div>
-                                </div>
-                            </div>
-                        </Popup> : null
-                    }
                     <ContentList latest={ false } className="content-list" contentList={ page == 1 ? results.data : result.data } />
-                    <div className="bottom-detector"></div>
+                    { result.data.length % 25 == 0 ? <div className="bottom-detector"></div> : null }
                 </div>
             </NavigationWrapper>
         </>

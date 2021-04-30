@@ -92,7 +92,7 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
             let method = 'GET'
             switch (true) {
                 case key.startsWith("FR"):
-                    item = "/api/mediafire?link=/https://www.mediafire.com/?" + item
+                    item = "/api/mediafire?link=https://www.mediafire.com/?" + item
                     break
                 /*case key.startsWith("MS"):
                     item = "/api/mediafire?link=https://embed.mystream.to/" + item
@@ -236,19 +236,13 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
             var regex = /href="(https:\/\/download\d{1,6}\.mediafire\.com.*?\.mp4)"/
             var matches = data.match(regex)
             if (matches) {
-                return ["FR", [{ src: matches[1], size: qualitiesMap[qual] }]]
+                return [key, [{ src: matches[1], size: qualitiesMap[qual] }]]
             }
         } else if (key.startsWith("SF")) {
             var regex = /"downloadUrl":"(.+solidfilesusercontent.com.+?)"/
             var matches = data.match(regex)
             if (matches) {
                 return [key, [{ src: matches[1], size: "720" }]]
-            }
-        } else if (key.startsWith("MS")) {
-            var regex = /<source type="video\/mp4" src="(https:\/\/.*?\.net.*?\.mp4)">/
-            var matches = data.match(regex)
-            if (matches) {
-                return ["MS", [{ src: matches[1], size: qualitiesMap[qual] }]]
             }
         }
         return ["",[]]
