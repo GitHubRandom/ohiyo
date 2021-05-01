@@ -14,7 +14,8 @@ export default async function handler(req, res) {
         headers: {
             'X-Real-IP': requestIp.getClientIp(req),
             'X-Forwarded-For': requestIp.getClientIp(req),
-            'True-Client-IP' : requestIp.getClientIp(req)
+            'True-Client-IP' : requestIp.getClientIp(req),
+            'User-Agent': req.headers['user-agent']
         }
     }
     http.request(options, response => {
