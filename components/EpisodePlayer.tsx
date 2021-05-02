@@ -73,7 +73,7 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
             setStatus("parsed", index)
         }
 
-        sourcesKeys.forEach((key,index) => {
+        sourcesKeys.forEach(async (key,index) => {
             let item = sources[key]
             item = item.replace("http://", "https://")
             console.log(`${key} : ${item}`)
@@ -92,11 +92,17 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
             let method = 'GET'
             switch (true) {
                 case key.startsWith("FR"):
-                    item = "/api/mediafire?link=http://www.mediafire.com/?" + item
+                    item = "https://cors.bridged.cc/www.mediafire.com/?" + item
+                    const getFoundFetch = await fetch(item, { redirect: "manual" })
+                    if (getFoundFetch.status == 302 || getFoundFetch.status == 200) {
+                        console.log(getFoundFetch.headers.get("Location"))
+                        console.log(getFoundFetch.headers.get("x-final-url"))
+                        item = "https://cors.bridged.cc/" + getFoundFetch.headers.get('x-final-url')
+                    } else {
+                        setStatus('failed', index)
+                        return
+                    }
                     break
-                /*case key.startsWith("MS"):
-                    item = "/api/mediafire?link=https://embed.mystream.to/" + item
-                    break*/
                 case key.startsWith("SF"):
                     item = "/api/mediafire?link=https://www.solidfiles.com/v/" + item
                     break
@@ -112,14 +118,14 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
                 headers: new Headers(headers)
             })
             .then((response) => {
-                if (isOk /*|| item.includes("uptostream")*/) {
+                if (isOk) {
                     return response.json()
                 } else {
                     return response.text()
                 }
             })
             .then((data) => {
-                let ds = isOk /*|| item.includes("uptostream")*/ ? decodeServers(key,data) : decodeHTML(key,data,key.substr(-3,3))
+                let ds = isOk ? decodeServers(key,data) : decodeHTML(key,data,key.substr(-3,3))
                 if (ds[0].length && ds[1].length) {
                     updateSources(oldEpisodeSources => {
                         const oldLinks = oldEpisodeSources[ds[0]]
