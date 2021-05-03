@@ -79,6 +79,21 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
     const [ ratingSource, updateRateSource ] = useState<"mal" | "arabic">("mal")
     const [ ascending, updateEpisodesOrder ] = useState<boolean>(true)
 
+    function getRate(rate:string) {
+        switch (true) {
+            case rate.includes("PG-13"):
+                return "13+"
+            case rate.includes("PG"):
+                return "للأطفال"
+            case rate.includes("17"):
+                return "17+"
+            case rate.includes("G"):
+                return "للجميع"
+            default:
+                return "غير معروف"
+        }
+    }
+
     function reverseList() {
         updateEpisodesOrder(!ascending)
     }
@@ -139,8 +154,8 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
                                 <br /></>
                             : null }
                             
-                            { animeDetails["rating"] ?
-                            <><strong>الفئة العمرية : </strong>{ animeDetails["rating"] != "All" ? animeDetails["rating"] : "للجميع" }<br /></>
+                            { animeDetails.rating ?
+                            <><strong>الفئة العمرية : </strong>{ getRate(animeDetails.rating) }<br /></>
                             : null }
 
                             { animeDetails["source"] ?
@@ -149,7 +164,6 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
 
                             { animeDetails["genres"].length ?
                                 <><strong>الصنف : </strong>{ animeDetails["genres"].map((genre: string, index:number, genres: string[]) => {
-                                    // TODO: Arabic text
                                     return <><Link href={ `/all?anime_genres=${genre["name"]}` } key={ index }><a className="stealth-link">{ animeGenres[genre["name"]] }</a></Link>{ index != genres.length - 1 ? "، " : null }</>
                                 })} <br /></> : null
                             }

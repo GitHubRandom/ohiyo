@@ -14,6 +14,7 @@ import tippy from 'tippy.js'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
+    console.log("Processing watch request...")
     const queryParams = context.query.params
     const animeId = queryParams[0].slice(0,queryParams[0].indexOf("-"))
 
@@ -30,9 +31,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     // Check if both parameters are strings & parameters do not exceed three
-    if (queryParams.length >= 3 ||
-        !Number.isNaN(parseInt(queryParams[0]))
-    ) {
+    console.log(context.query)
+    if (queryParams.length >= 3) {
+        console.log("Route problem found !")
         return {
             notFound: true
         }
@@ -49,7 +50,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         const detailsData = await detailsFetch.json()
         detailsData.anime_id = animeId
         props.details = detailsData
+        console.log("Details found !")
     } else if ( detailsFetch.status == 404 ) {
+        console.log("Details not found !")
         return {
             notFound: true
         }
@@ -98,9 +101,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
         props.episodes = episodesData
         if (queryParams[1] == "latest") {
-            props.episodeNumber = episodesData.length
+            props.episodeNumber = episodesData.length 
         } else {
             if (parseInt(queryParams[1]) > episodesData.length) {
+                console.log("Episode not found !")
                 return {
                     notFound: true
                 }
