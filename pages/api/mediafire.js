@@ -5,8 +5,6 @@ export default async function handler(req, res) {
     let finished = false
     var url = new URL(req.query.link)
 
-    console.log(requestIp.getClientIp(req))
-
     const options = {
         method: "GET",
         host: url.hostname,
@@ -18,6 +16,7 @@ export default async function handler(req, res) {
             'User-Agent': req.headers['user-agent']
         }
     }
+    console.log(options)
     http.request(options, response => {
         let data = ""
         response.on("data", chunk => {

@@ -55,6 +55,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 
+    const plotFetch = await fetch("https://animeify.net/animeify/apis_v2/anime/series_desc.php", {
+        method: "POST",
+        headers,
+        body: `AnimeID=x${animeId}&Language=AR`
+    })
+    
+    if ( plotFetch.ok ) {
+        const plotData = await plotFetch.json()
+        if (plotData.Plot) props.details.synopsis = plotData.Plot
+    }
+
     let movie = false
     let episodesFetch: Response
     episodesFetch = await fetch("https://animeify.net/animeify/apis_v2/episodes/episodes_loader.php", {
@@ -66,12 +77,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let episodesData
     if (episodesFetch.ok) {
         episodesData = await episodesFetch.json()
-        console.log(episodesData)
     }
 
     // Check if it's not a movie. Fetch the other endpoint if it's the case
     if (!Array.isArray(episodesData) || !episodesData.length) {
-        console.log("It's a movie !")
         movie = true
         episodesFetch = await fetch("https://animeify.net/animeify/apis_v2/servers/movie_links.php", {
             method: "POST",

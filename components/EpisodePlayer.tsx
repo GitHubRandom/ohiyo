@@ -92,7 +92,7 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
             let method = 'GET'
             switch (true) {
                 case key.startsWith("FR"):
-                    item = "https://cors.bridged.cc/www.mediafire.com/?" + item
+                    item = "https://quiet-cove-27971.herokuapp.com/www.mediafire.com/?" + item
                     const getFoundFetch = await fetch(item, { redirect: "manual" })
                     if (getFoundFetch.status == 302 || getFoundFetch.status == 200) {
                         console.log(getFoundFetch.headers.get("Location"))
@@ -242,7 +242,7 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
             var regex = /href="(https?:\/\/download\d{1,6}\.mediafire\.com.*?\.mp4)"/
             var matches = data.match(regex)
             if (matches) {
-                return [key, [{ src: matches[1], size: qualitiesMap[qual] }]]
+                return ["FR", [{ src: "https://quiet-cove-27971.herokuapp.com/" + matches[1], size: qualitiesMap[qual] }]]
             }
         } else if (key.startsWith("SF")) {
             var regex = /"downloadUrl":"(.+solidfilesusercontent.com.+?)"/

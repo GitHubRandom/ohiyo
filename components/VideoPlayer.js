@@ -27,7 +27,7 @@ class VideoPlayer extends React.Component {
     render() {
         return (
             <div className="anime-video-player">
-                <video id="main-content" rel="noreferrer" playsInline controls className='player plyr'>
+                <video id="main-content" playsInline controls className='player plyr'>
                 </video> 
             </div>
         )
