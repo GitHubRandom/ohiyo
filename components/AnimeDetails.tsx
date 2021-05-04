@@ -6,7 +6,7 @@ import Popup from "./Popup"
 
 export const animeGenres: Record<string,any> = {
     Action: "اكشن",
-    Adventure: "مغامرات",
+    Adventure: "مغامرة",
     Cars: "سيارات",
     Comedy: "كوميدي",
     Dementia: "جنون",
