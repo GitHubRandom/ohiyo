@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Popup from "./Popup"
 
 export const animeGenres: Record<string,any> = {
-    Action: "اكشن",
+    Action: "أكشن",
     Adventure: "مغامرة",
     Cars: "سيارات",
     Comedy: "كوميدي",
