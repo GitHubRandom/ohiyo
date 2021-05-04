@@ -34,7 +34,7 @@ const MENU_ENTRIES: IMenuEntry[] = [
         title: "تصنيف الأنمي",
         path: "/ranked",
         icon: "mdi-chevron-triple-up",
-        visible: true
+        visible: false
     },
     {
         id: "library",

@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react"
 import ExpandableText from "./ExpandableText"
+import { getEpisodeTags } from '../components/WatchTopBar'
 import Link from 'next/link'
 import Popup from "./Popup"
 
-const animeGenres: Record<string,any> = {
+export const animeGenres: Record<string,any> = {
     Action: "اكشن",
     Adventure: "مغامرات",
     Cars: "سيارات",
-    Comedy: "كوميديا",
+    Comedy: "كوميدي",
     Dementia: "جنون",
     Demons: "شياطين",
     Mystery: "غموض",
     Drama: "دراما",
-    Ecchi: "ايتشي",
+    Ecchi: "إيتشي",
     Fantasy: "خيال",
-    Game: "العاب",
+    Game: "لعبة",
     Historical: "تاريخي",
     Horror: "رعب",
     Kids: "اطفال",
@@ -25,19 +26,20 @@ const animeGenres: Record<string,any> = {
     Parody: "محاكاة ساخرة",
     Samurai: "ساموراي",
     Romance: "رومانسي",
+    Sports: "رياضي",
     School: "مدرسي",
     Shoujou: "شوجو",
     Shounen: "شونين",
     Space: "فضاء",
-    "Super Power": "قوى خارقة",
+    "Super Power": "قوة خارقة",
     "Vampire": "مصاص دماء",
     Harem: "حريم",
     "Slice of life": "شريحة من الحياة",
     Supernatural: "خارق للطبيعة",
     Military: "عسكري",
-    Police: "بوليسي",
+    Police: "شرطة",
     Psychological: "نفسي",
-    Thriller: "اثارة",
+    Thriller: "إثارة",
     Seinen: "سينين",
     Josei: "جوسي",
     "Sci-Fi": "خيال علمي"
@@ -149,13 +151,13 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
                                 <><strong>الاستوديو : </strong>
                                 { animeDetails.studios.map((studio,index,studios) => {
                                     // TODO: Fix links here
-                                    return <><Link href={ `/all?anime_studio_ids=${studio["anime_studio_ids"]}` }><a className="stealth-link">{ studio["name"] }</a></Link>{ index != studios.length - 1 ? "، " : null }</>
+                                    return <><Link href={ `/all?studio=${studio.name}` }><a className="stealth-link">{ studio.name }</a></Link>{ index != studios.length - 1 ? "، " : null }</>
                                 }) }
                                 <br /></>
                             : null }
                             
                             { animeDetails.rating ?
-                            <><strong>الفئة العمرية : </strong>{ getRate(animeDetails.rating) }<br /></>
+                            <><strong>الفئة العمرية : </strong><span dir="ltr">{ getRate(animeDetails.rating) }</span><br /></>
                             : null }
 
                             { animeDetails["source"] ?
@@ -164,7 +166,11 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
 
                             { animeDetails["genres"].length ?
                                 <><strong>الصنف : </strong>{ animeDetails["genres"].map((genre: string, index:number, genres: string[]) => {
-                                    return <><Link href={ `/all?anime_genres=${genre["name"]}` } key={ index }><a className="stealth-link">{ animeGenres[genre["name"]] }</a></Link>{ index != genres.length - 1 ? "، " : null }</>
+                                    if (genre["name"] in animeGenres) {
+                                        return <><Link href={ `/all?genre=${encodeURI(animeGenres[genre["name"]])}` } key={ index }><a className="stealth-link">{ animeGenres[genre["name"]] }</a></Link>{ index != genres.length - 1 ? "، " : null }</>
+                                    } else {
+                                        <></>
+                                    }
                                 })} <br /></> : null
                             }
 
@@ -183,7 +189,7 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
                         </div>
                         <div className="popup-list">
                             { episodesList.map((episode,index) => {
-                                return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + '-' + animeDetails.mal_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ "الحلقة " + episode.Episode }</a></Link>
+                                return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + '-' + animeDetails.mal_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</a></Link>
                             })}
                         </div>
                         </>
@@ -193,7 +199,7 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
                         </div>
                         <div className="popup-list">
                             { episodesList.map((episode,index) => {
-                                return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + '-' + animeDetails.mal_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ "الحلقة " + episode.Episode }</a></Link>
+                                return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + '-' + animeDetails.mal_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</a></Link>
                             }).reverse()}
                         </div>
                         </>

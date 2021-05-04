@@ -58,17 +58,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 
-    const plotFetch = await fetch("https://animeify.net/animeify/apis_v2/anime/series_desc.php", {
-        method: "POST",
-        headers,
-        body: `AnimeID=x${animeId}&Language=AR`
-    })
-    
-    if ( plotFetch.ok ) {
-        const plotData = await plotFetch.json()
-        if (plotData.Plot) props.details.synopsis = plotData.Plot
-    }
-
     let movie = false
     let episodesFetch: Response
     episodesFetch = await fetch("https://animeify.net/animeify/apis_v2/episodes/episodes_loader.php", {
@@ -92,6 +81,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         })    
     }
 
+    let plotEndpoint = "https://animeify.net/animeify/apis_v2/anime/series_desc.php"
+    if (movie) plotEndpoint = "https://animeify.net/animeify/apis_v2/movies/movies_desc.php"
+    const plotFetch = await fetch(plotEndpoint, {
+        method: "POST",
+        headers,
+        body: `AnimeID=x${animeId}&Language=AR`
+    })
+    
+    if ( plotFetch.ok ) {
+        const plotData = await plotFetch.json()
+        if (plotData.Plot) props.details.synopsis = plotData.Plot
+    }
+
     if (episodesFetch.ok) {
         if (movie) {
             episodesData = await episodesFetch.json()
@@ -112,7 +114,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             props.episodeNumber = parseInt(queryParams[1])
         }
         if (props.details.type != "Movie" && props.details.type != "Special") {
-            props.episodeName = `الحلقة ${episodesData[props.episodeNumber - 1].Episode}`
+            let ep = episodesData[props.episodeNumber - 1]
+            props.episodeName = `الحلقة ${ep.Episode}${ep.ExtraEpisodes ? `-${ep.ExtraEpisodes}` : ""}`
         } else {
             props.episodeName = "الفلم"
         }
@@ -141,7 +144,7 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
     useEffect(() => {
         tippy("[data-tippy-content]")
     })
-
+    
     return (
         <>
             <Head>
@@ -162,16 +165,17 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
             </Head>
             <div id="watch" className="menu-content">
                 <WatchNavigation />
-                <Navigation trigger="#hamburger-menu" secondary={ true } selected="none" shown={false} />
+                <Navigation trigger="#hamburger-menu" secondary={ true } selected="none" shown={ false } />
                 <div className="watch-page">
-                    <WatchTopBar showEpisodeButton={ episodes.length > 1 } episodeName={ episodeName } animeTitle={ details.title } />
+                    <WatchTopBar episode={ episodes[episodeNumber - 1] } showEpisodeButton={ episodes.length > 1 } episodeName={ episodeName } animeTitle={ details.title } />
                     <EpisodePlayer mal={ details.mal_id } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />   
                     <AnimeDetails episodesList={ episodes } animeDetails={ details } />
                     {/*<RelatedContent related={ details.related_animes.data } />*/}
                 </div>
             </div>
         </>
-    )
+    )    
+
 }
 
 export default Watch

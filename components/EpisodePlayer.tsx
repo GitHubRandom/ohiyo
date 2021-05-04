@@ -76,7 +76,6 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
         sourcesKeys.forEach(async (key,index) => {
             let item = sources[key]
             item = item.replace("http://", "https://")
-            console.log(`${key} : ${item}`)
             switch (true) {
                 case key.startsWith("FD"):
                     setUnsupportedServer(key, "https://fembed.com/v/" + item, index); return
@@ -93,15 +92,6 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
             switch (true) {
                 case key.startsWith("FR"):
                     item = "https://quiet-cove-27971.herokuapp.com/www.mediafire.com/?" + item
-                    const getFoundFetch = await fetch(item, { redirect: "manual" })
-                    if (getFoundFetch.status == 302 || getFoundFetch.status == 200) {
-                        console.log(getFoundFetch.headers.get("Location"))
-                        console.log(getFoundFetch.headers.get("x-final-url"))
-                        item = "https://cors.bridged.cc/" + getFoundFetch.headers.get('x-final-url')
-                    } else {
-                        setStatus('failed', index)
-                        return
-                    }
                     break
                 case key.startsWith("SF"):
                     item = "/api/mediafire?link=https://www.solidfiles.com/v/" + item
@@ -152,7 +142,6 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
         if (Object.keys(episodeSources) && !status.includes('pending')) {
             let selected = Object.keys(episodeSources)[0]
             for (var key in episodeSources) {
-                console.log(key)
                 if (key == "FR") {
                     selected = key
                     break

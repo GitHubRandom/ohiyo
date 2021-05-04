@@ -4,10 +4,11 @@ import Episode from "./Episode"
 interface IContentList { 
     className: string,
     contentList: Record<string,any>[],
-    latest: boolean
+    latest: boolean,
+    overrideMovie?: boolean
 }
 
-const ContentList = ({ className, contentList, latest }: IContentList) => {
+const ContentList = ({ overrideMovie, className, contentList, latest }: IContentList) => {
     return (
         <div className={ className }>
             { contentList.map((episode,index) => {
@@ -20,7 +21,7 @@ const ContentList = ({ className, contentList, latest }: IContentList) => {
                     animeName={ episode.Title }
                     showEpisodeName={ latest }
                     url={ latest ? `/watch/${episode.MainId.slice(1)}-${episode.JicanKey}/latest` : `/watch/${episode.MainId.slice(1)}-${episode.JicanKey}/1` }
-                    cover={ episode.Type == "Movie" ? `https://animeify.net/animeify/files/thumbnails/movies/${episode.Thumbnail}` : `https://animeify.net/animeify/files/thumbnails/series/${episode.Thumbnail}` }
+                    cover={ episode.Type != "Movie" && !overrideMovie ? `https://animeify.net/animeify/files/thumbnails/series/${episode.Thumbnail}` : `https://animeify.net/animeify/files/thumbnails/movies/${episode.Thumbnail}` }
                     episodeName={ `الحلقة ${episodeName}` } />
             }) }
         </div>

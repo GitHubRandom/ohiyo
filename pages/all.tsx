@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react"
 import ContentList from '../components/ContentList'
 import Head from 'next/head'
 import NavigationWrapper from '../containers/NavigationWrapper'
+import TabIndicator from '../components/TabIndicator'
+import Link from 'next/link'
 import Popup from '../components/Popup'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -23,11 +25,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.page = page
 
     let search = context.query.search
+    let type = context.query.m ? "movies" : "anime"
+    if (context.query.m) { 
+        props.movies = true
+    } else {
+        props.movies = false
+    }
 
-    let res
+    let res: Response
     if (search && search.length > 0) {
         if (!context.query.page || context.query.page == '1') {
-            res = await fetch("https://animeify.net/animeify/apis_v2/anime/filtersort/search.php", {
+            res = await fetch(`https://animeify.net/animeify/apis_v2/${type}/filtersort/search.php`, {
                 method: "POST",
                 headers: new Headers({
                     "Content-Type": "application/x-www-form-urlencoded"
@@ -35,8 +43,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 body: `UserID=0&Language=AR&Text=${search}`
             })
         }
+    } else if (context.query.genre) {
+        res = await fetch(`https://animeify.net/animeify/apis_v2/${type}/filtersort/genre.php`, {
+            method: "POST",
+            headers: new Headers({
+                "Content-Type": "application/x-www-form-urlencoded"
+            }),
+            body: `UserID=0&Language=AR&GenreList=${context.query.genre}&From=${offset}`
+        })
+        props.genreSelected = context.query.genre
+    } else if (context.query.studio) {
+        res = await fetch(`https://animeify.net/animeify/apis_v2/${type}/filtersort/studios.php`, {
+            method: "POST",
+            headers: new Headers({
+                "Content-Type": "application/x-www-form-urlencoded"
+            }),
+            body: `UserID=0&Language=AR&StudiosList=${context.query.studio}&From=${offset}`
+        })
+        props.studioSelected = context.query.studio
     } else {
-        res = await fetch("https://animeify.net/animeify/apis_v2/anime/catalogseries.php", {
+        res = await fetch(`https://animeify.net/animeify/apis_v2/${type}/catalog${type == "movies" ? "movies" : "series"}.php`, {
             method: "POST",
             headers: new Headers({
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -71,7 +97,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 }
 
-const All = ({ results, page }) => {
+const All = ({ results, page, genreSelected, studioSelected, movies }) => {
 
     const router = useRouter()
     const [ result, updateResult ] = useState<Record<string,any>>({
@@ -80,16 +106,17 @@ const All = ({ results, page }) => {
     })
     const [ refreshed, updateRefreshed ] = useState<boolean>(false)
     const [ currentPage, updateCurrent ] = useState<number>(1)
+    const [ firstInit, updateInit ] = useState<boolean>(false)
+    const [ stickyQuery, updateStickyQuery ] = useState<Record<string,string>>({})
     
     const updateSearch = (value: string) => {
         let query: Record<string,string> = {}
         if (value.length) {
-            console.log(value)
             query.search = value
         }
         router.push({
             pathname: "/all",
-            query
+            query: { ...stickyQuery, ...query }
         }, undefined, { scroll: false })
     }
 
@@ -117,7 +144,7 @@ const All = ({ results, page }) => {
         let observer = new IntersectionObserver((entries) => {
             if (refreshed && entries[0] && entries[0].isIntersecting) {
                 updateRefreshed(false)
-                router.push({
+                router.replace({
                     pathname: "/all",
                     query: { ...router.query, page: page + 1 }
                 }, undefined, { scroll: false })
@@ -131,6 +158,22 @@ const All = ({ results, page }) => {
             observer.disconnect()
         }
     })
+
+    useEffect(() => {
+        if (router.isReady) {
+            let query: Record<string,string> = {}
+            if (router.query.studio) {
+                query.studio = router.query.studio as string
+            }
+            if (router.query.genre) {
+                query.genre = router.query.genre as string
+            }
+            router.push({
+                pathname: "/all",
+                query: {...query, ...stickyQuery}
+            })
+        }
+    }, [stickyQuery])
 
     return (
         <>
@@ -152,7 +195,32 @@ const All = ({ results, page }) => {
                             <input onInput={ (e: React.ChangeEvent<HTMLInputElement>) => updateSearch(e.target.value) } placeholder="البحث عن الأنمي" type="text" name="anime-search" id="anime-search"/>
                         </div>
                     </div>
-                    <ContentList latest={ false } className="content-list" contentList={ page == 1 ? results.data : result.data } />
+
+                    <TabIndicator items={{
+                        series: {
+                            title: "الأنمي",
+                            icon: "mdi mdi-television-classic"
+                        },
+                        movies: {
+                            title: "الأفلام",
+                            icon: "mdi mdi-filmstrip-box"
+                        }
+                    }} setTab={ (tab) => {
+                        if (tab == "movies") { 
+                            updateStickyQuery({ m: '1' }) 
+                        } else {
+                            updateStickyQuery({})
+                        } 
+                    }} selected={ movies ? "movies" : "series" } />
+
+                    { genreSelected ?
+                        <p className="filter-description"><span className="mdi mdi-filter"></span>أنمي من نوع <strong style={{ color: "#fffb00" }}>{ genreSelected }</strong>. <Link href="/all" scroll={ true } ><a className="link">إلغاء</a></Link></p>
+                    : null }
+                    { studioSelected ?
+                        <p className="filter-description"><span className="mdi mdi-filter"></span>أعمال استوديو <strong style={{ color: "#fffb00" }}>{ studioSelected }</strong>. <Link href="/all" scroll={ true } ><a className="link">إلغاء</a></Link></p>
+                    : null }
+
+                    <ContentList overrideMovie={ movies } latest={ false } className="content-list" contentList={ page == 1 ? results.data : result.data } />
                     { result.data.length % 25 == 0 ? <div className="bottom-detector"></div> : null }
                 </div>
             </NavigationWrapper>
