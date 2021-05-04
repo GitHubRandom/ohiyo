@@ -18,18 +18,6 @@ function MyApp({ Component, pageProps }) {
     Router.events.on('routeChangeComplete', () => NProgress.done())
     Router.events.on('routeChangeError', () => NProgress.done())
 
-    useEffect(() => {
-        window.OneSignal = window.OneSignal || [];
-        OneSignal.push(function () {
-            OneSignal.init({
-                appId: "15773eb1-d11b-4a85-b8cf-e251797ffb12",
-                notifyButton: {
-                    enable: true,
-                },
-            });
-        });
-    })
-
     return <Component {...pageProps} />
 }
 
