@@ -15,6 +15,13 @@ export default class MyDocument extends Document {
                     /*]]>/* */
                         `}}>
                     </script>
+                    <script data-cfasync="false" type="text/javascript" src="//st.bebi.com/bebi_v3.js"></script>
+                    <script type="text/javascript" data-cfasync="false" dangerouslySetInnerHTML={{
+                        __html: `
+                    if(!window.BB_a) { BB_a = [];} if(!window.BB_ind) { BB_ind = 0; } if(!window.BB_vrsa) { BB_vrsa = 'v3'; }if(!window.BB_r) { BB_r = Math.floor(Math.random()*1000000000)} BB_ind++; BB_a.push({ "pl" : 1111111, "index": BB_ind});
+                        `
+                    }}></script>
+                    <script data-cfasync="false" type="text/javascript" src="//st.bebi.com/bebi_v3.js"></script>
                 </Head>
                 <body>
                     <Main />
