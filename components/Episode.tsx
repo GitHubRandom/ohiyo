@@ -10,7 +10,7 @@ interface TEpisode {
 
 const Episode = (props: TEpisode) => {
     return (
-        <Link href={ props.url }>
+        <Link prefetch={ false } href={ props.url }>
             <a title={ props.animeName } className="content">
                 <div style={{ backgroundImage: 'url(' + props.cover + ')' }} className="anime-cover">
                     { props.showEpisodeName ?

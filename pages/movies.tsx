@@ -71,18 +71,18 @@ export default function Home({ newMovies, page }) {
     return (
         <>
             <Head>
-                <title>Animayhem - آخر الفلام</title>
+                <title>Animayhem - آخر الأفلام</title>
                 <meta name="keywords" content="anime,animayhem,anime slayer,translated,movies,arabic,slayer,أفلام,أنمي,مترجم,أنمي سلاير,أنمايهم"/>
-                <meta name="description" content="شاهد آخر الأفلام المترجمة بجودة عالية على موقعنا"/>
+                <meta name="description" content="شاهد آخر أفلام الأنمي المترجمة بجودة عالية على موقعنا"/>
                 <meta property="og:title" content="Animayhem - أنمي مترجم"/>
                 <meta property="og:site_name" content="Animayhem"/>
                 <meta property="og:url" content="https://animayhem.ga" />
-                <meta property="og:description" content="شاهد آخر الأفلام المترجمة بجودة عالية على موقعنا" />
+                <meta property="og:description" content="شاهد آخر أفلام الأنمي المترجمة بجودة عالية على موقعنا" />
                 <meta property="og:type" content="website" />
             </Head>
             <NavigationWrapper navTrigger="#hamburger-menu" contentId="movies" selected="movies">
                 <div id="movies-page" className="content-page">
-                    <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>آخر الفلام</h2>
+                    <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>آخر الأفلام</h2>
                     <ContentList latest={ false } className="content-list" contentList={ page == 1 ? newMovies : data } />
                     <div className="bottom-detector"></div>
                 </div>
