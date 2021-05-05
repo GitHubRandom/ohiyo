@@ -217,7 +217,7 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
                         <p className="filter-description"><span className="mdi mdi-filter"></span>أنمي من نوع <strong style={{ color: "#fffb00" }}>{ genreSelected }</strong>. <Link href="/all" scroll={ true } ><a className="link">إلغاء</a></Link></p>
                     : null }
                     { studioSelected ?
-                        <p className="filter-description"><span className="mdi mdi-filter"></span>أعمال استوديو <strong style={{ color: "#fffb00" }}>{ studioSelected }</strong>. <Link href="/all" scroll={ true } ><a className="link">إلغاء</a></Link></p>
+                        <p className="filter-description"><span className="mdi mdi-filter"></span>أعمال استوديو <strong dir="ltr" style={{ color: "#fffb00" }}>{ studioSelected }</strong>. <Link href="/all" scroll={ true } ><a className="link">إلغاء</a></Link></p>
                     : null }
 
                     <ContentList overrideMovie={ movies } latest={ false } className="content-list" contentList={ page == 1 ? results.data : result.data } />

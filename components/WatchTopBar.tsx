@@ -4,7 +4,8 @@ interface IWatchTopBar {
     showEpisodeButton: boolean,
     episodeName: string,
     animeTitle: string,
-    episode: Record<string,any>
+    episode: Record<string,any>,
+    episodeTitle: string
 }
 
 export const getEpisodeTags = (episode: Record<string,any>) => {
@@ -21,7 +22,7 @@ export const getEpisodeTags = (episode: Record<string,any>) => {
     return tags
 }
 
-const WatchTopBar = ({ episode, showEpisodeButton, episodeName, animeTitle }: IWatchTopBar) => {
+const WatchTopBar = ({ episodeTitle, episode, showEpisodeButton, episodeName, animeTitle }: IWatchTopBar) => {
 
     useEffect(() => {
         if (episodeName && animeTitle) {
@@ -33,7 +34,7 @@ const WatchTopBar = ({ episode, showEpisodeButton, episodeName, animeTitle }: IW
         <div className="top-bar">
             <div className="top-bar-text">
                 { animeTitle ? <h1 className="top-bar-anime-title">{ animeTitle }</h1> : <div className="anime-title-placeholder loading"></div>}
-                { episodeName ? <p className="top-bar-episode-name">{ episodeName }{ getEpisodeTags(episode) }</p> : <div className="episode-name-placeholder loading"></div> }
+                { episodeName ? <p className="top-bar-episode-name"><span className="episode-name">{ episodeName }{ getEpisodeTags(episode) }</span>{ episodeTitle.length ? <><span style={{ marginTop: 2 }} className="mdi mdi-nm mdi-circle-medium"></span><span title="عنوان الحلقة" dir="ltr" className="episode-title">{ episodeTitle }</span></> : null }</p> : <div className="episode-name-placeholder loading"></div> }
             </div>
             { showEpisodeButton ?
             <div id="episodes-button" className="floating-button"><span className="mdi mdi-cards-variant"></span>

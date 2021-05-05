@@ -101,6 +101,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: absolute;
+    width: inherit;
+    top: 20px;
+    padding: 20px;
+    font-size: 18pt;
+    color: var(--accent-color);
 }
 
 .watch-menu .logo-section {
@@ -154,18 +160,10 @@ body {
     position: fixed;
 }
 
-.logo-section {
-    position: absolute;
-    width: inherit;
-    top: 20px;
-    padding: 20px;
-    font-size: 18pt;
-    color: var(--accent-color);
-}
-
-#main-logo {
+.main-logo {
     text-align: center;
     font-family: "Ninja Naruto";
+    color: var(--accent-color);
 }
 
 .menu-section .menu-item:hover {
@@ -358,12 +356,10 @@ body {
 }
 
 .top-bar-episode-name {
-    margin-top: 5px;
+    margin-top: 2px;
     color: var(--accent-color);
-    font-size: 15pt;
+    font-size: 13pt;
     font-weight: bold;
-    display: flex;
-    align-items: center;
 }
 
 .more-text,
@@ -831,7 +827,7 @@ body {
     font-weight: 400;
     border-radius: 5px;
     vertical-align: unset;
-    margin-right: 10px;
+    margin-right: 5px;
     padding: 2px 10px;
     margin-bottom: 1px;
 }
@@ -914,7 +910,14 @@ body {
 @media only screen and (max-width: 600px) {
     .player-episode-skip#next { order: 3; }
     .player-episode-skip#previous { order: 2 }
-
+    .top-bar-anime-title {
+        font-size: 17pt;
+    }
+    .top-bar-episode-name {
+        font-size: 10pt;
+        margin-top: 5px;
+    }
+    .playeer-episode-skip { font-size: 11pt; }
     .anime-list-header {
         display: block;
     }

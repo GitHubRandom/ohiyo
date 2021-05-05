@@ -21,10 +21,11 @@ interface TEpisodePlayer {
     episodesList: Record<string,any>[],
     animeId: string,
     episodeNumber: number,
-    mal: string
+    mal: string,
+    setEpisodeTitle: (title:string) => void
 }
 
-const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePlayer) => {
+const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, mal }: TEpisodePlayer) => {
 
     type quality = Record<string,string>[]
 
@@ -163,10 +164,21 @@ const EpisodePlayer = ({ episodesList, animeId, episodeNumber, mal }: TEpisodePl
         })
         console.log("Changed sources !")
         getServers(sources)
-        // TODO: Get episode titles from MAL
+        fetch("https://api.jikan.moe/v3/anime/" + mal + "/episodes/" + Math.ceil(parseInt(episode.Episode) / 100))
+        .then(res => res.json())
+        .then(data => {
+            console.log(data.episodes)
+            try {
+                let epData = data.episodes[(parseInt(episode.Episode) - 1) % 100]
+                setEpisodeTitle(epData.title)
+                console.log(epData.title)
+            } catch (err) {}
+        })
+        .catch(err => console.error(err)) 
         return () => {
             updateSources({})
             updateCurrent(["",""])
+            setEpisodeTitle("")
         }
     }, [episodeNumber])
 

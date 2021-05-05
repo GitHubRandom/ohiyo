@@ -6,7 +6,7 @@ import EpisodePlayer from '../../components/EpisodePlayer'
 import Navigation from '../../components/Navigation'
 import WatchNavigation from '../../components/WatchNavigation'
 import Head from 'next/head'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import tippy from 'tippy.js'
 
@@ -128,6 +128,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
 
     const router = useRouter()
+    const [ episodeTitle, updateEpisodeTitle ] = useState<string>("")
 
     useEffect(() => {
         window.scrollTo(0, 60)
@@ -167,8 +168,8 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                 <WatchNavigation />
                 <Navigation trigger="#hamburger-menu" secondary={ true } selected="none" shown={ false } />
                 <div className="watch-page">
-                    <WatchTopBar episode={ episodes[episodeNumber - 1] } showEpisodeButton={ episodes.length > 1 } episodeName={ episodeName } animeTitle={ details.title } />
-                    <EpisodePlayer mal={ details.mal_id } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />   
+                    <WatchTopBar episodeTitle={ episodeTitle } episode={ episodes[episodeNumber - 1] } showEpisodeButton={ episodes.length > 1 } episodeName={ episodeName } animeTitle={ details.title } />
+                    <EpisodePlayer setEpisodeTitle={ (title) => updateEpisodeTitle(title) } mal={ details.mal_id } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />   
                     <AnimeDetails episodesList={ episodes } animeDetails={ details } />
                     {/*<RelatedContent related={ details.related_animes.data } />*/}
                 </div>

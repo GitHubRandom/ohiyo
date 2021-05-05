@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import ExpandableText from "./ExpandableText"
 import { getEpisodeTags } from '../components/WatchTopBar'
 import Link from 'next/link'
@@ -18,7 +18,7 @@ export const animeGenres: Record<string,any> = {
     Game: "لعبة",
     Historical: "تاريخي",
     Horror: "رعب",
-    Kids: "اطفال",
+    Kids: "أطفال",
     Magic: "سحر",
     "Martial Arts": "فنون قتالية",
     Mecha: "ميكا",
@@ -149,9 +149,8 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
 
                             { animeDetails.studios.length ?
                                 <><strong>الاستوديو : </strong>
-                                { animeDetails.studios.map((studio,index,studios) => {
-                                    // TODO: Fix links here
-                                    return <><Link href={ `/all?studio=${studio.name}` }><a className="stealth-link">{ studio.name }</a></Link>{ index != studios.length - 1 ? "، " : null }</>
+                                { animeDetails.studios.map((studio:Record<string,any>,index:number,studios:Record<string,any>[]) => {
+                                    return <React.Fragment key={ index }><Link href={ `/all?studio=${studio.name}` }><a dir="ltr" className="stealth-link">{ studio.name }</a></Link>{ index != studios.length - 1 ? "، " : null }</React.Fragment>
                                 }) }
                                 <br /></>
                             : null }
@@ -169,7 +168,7 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
                                     if (genre["name"] in animeGenres) {
                                         return <><Link href={ `/all?genre=${encodeURI(animeGenres[genre["name"]])}` } key={ index }><a className="stealth-link">{ animeGenres[genre["name"]] }</a></Link>{ index != genres.length - 1 ? "، " : null }</>
                                     } else {
-                                        <></>
+                                        <React.Fragment key={ index }></React.Fragment>
                                     }
                                 })} <br /></> : null
                             }
