@@ -8,6 +8,9 @@ class VideoPlayer extends React.Component {
         this.player = new Plyr('#main-content', {
             title: this.props.title,
             controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'download', 'volume', 'settings', 'pip', 'airplay', 'fullscreen'],
+            quality: {
+                default: "1080"
+            },
             keyboard: {
                 focused: false,
                 global: true

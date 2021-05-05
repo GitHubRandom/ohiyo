@@ -84,6 +84,8 @@ const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, 
                     setUnsupportedServer(key, "https://mega.nz/embed/" + item, index); return
                 case key.startsWith("MS"):
                     setUnsupportedServer(key, "https://embed.mystream.to/" + item, index); return
+                case key.startsWith("GD"):
+                    setUnsupportedServer(key, "https://drive.google.com/file/d/" + item + "/preview", index); return
                 default:
                     break;
             }
@@ -137,6 +139,33 @@ const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, 
                 setStatus("failed", index)
             })
         })
+    }
+
+    const getBestQuality = (key:string) => {
+        let sources = episodeSources[key]
+        if (Array.isArray(sources)) {
+            if ((sources as quality).some(src => src.size == "1080")) {
+                return " - Full HD"
+            }
+            if ((sources as quality).some(src => src.size == "720")) {
+                return " - HD"
+            }
+            if ((sources as quality).some(src => src.size == "480")) {
+                return " - SD"
+            }
+            return ""
+        } else {
+            if (key.endsWith("hdQ")) {
+                return " - Full HD"
+            }
+            if (key.endsWith("Link")) {
+                return " - HD"
+            }
+            if (key.endsWith("LowQ")) {
+                return " - SD"
+            }
+            return ""
+        }
     }
 
     useEffect(() => {
@@ -210,7 +239,7 @@ const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, 
                         <select name="server" className="selection" id="server-select" onChange={ (e) => updateCurrent([ e.target.value, episodeSources[e.target.value] ]) } value={ currentSource[0] }>
                             {
                                 Object.keys(episodeSources).map((key, index) => {
-                                    return <option key={ key } value={ key } id={ key }>{ supportedServers.includes(key.slice(0,2)) ? "المشغل المحلي" : "مشغل خارجي"}{ ` - ${serverKeys[key.slice(0,2)]}${ key.endsWith("hdQ") ? " - Full HD" : `` }` }</option>
+                                    return <option key={ key } value={ key } id={ key }>{ supportedServers.includes(key.slice(0,2)) ? "م. المحلي" : "م. خارجي"}{ ` - ${serverKeys[key.slice(0,2)]}${getBestQuality(key)}` }</option>
                                 })
                             }
                         </select>
