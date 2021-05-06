@@ -768,11 +768,19 @@ body {
     color: var(--accent-color);
 }
 
-.fourofour-container * {
+.bl-container h1 {
+    font-size: 25pt;
+    color: var(--accent-color);
+    margin-bottom: 10px;
+}
+
+.fourofour-container *,
+.bl-container * {
     margin: 0;
 }
 
-.fourofour-buttons {
+.fourofour-buttons,
+.bl-buttons {
     display: flex;
 }
 
@@ -780,7 +788,8 @@ body {
     margin-top: 25px;
 }
 
-.fourofour-back-button {
+.fourofour-back-button,
+.bl-back-button {
     margin-left: 10px;
     margin-top: 25px;
 }
@@ -795,7 +804,8 @@ body {
     user-select: none;
 }
 
-.fourofour-watermark {
+.fourofour-watermark,
+.bl-watermark {
     color: #202020;
     font-family: "Ninja Naruto";
     font-size: 16pt;
@@ -807,7 +817,8 @@ body {
     text-align: center;
 }
 
-.fourofour-container {
+.fourofour-container,
+.bl-container {
     height: 100vh;
     width: 100vw;
     display: flex;

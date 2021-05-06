@@ -33,9 +33,11 @@ const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, 
     const [ currentSource, updateCurrent ] = useState<[string,string | Record<string,string>[]]>(["",""])
     const [ introInterval, updateIntroInterval ] = useState<[string,string]>(["",""])
     const [ status, updateStatus ] = useState<string[]>([])
+    const [ episodeTitle, updateTitle ] = useState<string>("")
 
     const videoPlyr = useMemo(() => {
         return <VideoPlayer 
+                    title={`الحلقة ${episodeNumber} - ${episodeTitle}`}
                     introInterval = { introInterval }
                     sources = {{
                         type: 'video',
@@ -200,6 +202,7 @@ const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, 
             try {
                 let epData = data.episodes[(parseInt(episode.Episode) - 1) % 100]
                 setEpisodeTitle(epData.title)
+                updateTitle(epData.title)
                 console.log(epData.title)
             } catch (err) {}
         })
@@ -208,6 +211,7 @@ const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, 
             updateSources({})
             updateCurrent(["",""])
             setEpisodeTitle("")
+            updateTitle("")
         }
     }, [episodeNumber])
 
