@@ -22,7 +22,6 @@ export default class MyDocument extends Document {
                         `
                     }}></script>
                     <script data-cfasync="false" type="text/javascript" src="//st.bebi.com/bebi_v3.js"></script>
-                    <script src="./animayhem.js"></script>
                 </Head>
                 <body>
                     <Main />
