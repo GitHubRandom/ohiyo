@@ -3,7 +3,6 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import ContentList from '../components/ContentList'
 import NavigationWrapper from '../containers/NavigationWrapper'
-import TabIndicator from '../components/TabIndicator'
 import { useRouter } from 'next/router'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {

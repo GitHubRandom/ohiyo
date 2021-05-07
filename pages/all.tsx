@@ -6,7 +6,6 @@ import Head from 'next/head'
 import NavigationWrapper from '../containers/NavigationWrapper'
 import TabIndicator from '../components/TabIndicator'
 import Link from 'next/link'
-import Popup from '../components/Popup'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Record<string,any> = {}

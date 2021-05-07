@@ -1,10 +1,8 @@
-import { useRouter } from 'next/router'
 import '../styles/slayer.css'
 import NProgress from 'nprogress';
 import Router from 'next/router';
 import "../styles/nprogress.css";
 import 'tippy.js/dist/tippy.css'
-import { useEffect } from 'react';
 import { useDetectAdBlock } from 'adblock-detect-react'
 import AntiADB from './adblock'
 

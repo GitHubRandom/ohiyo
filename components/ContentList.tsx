@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import Episode from "./Episode"
 
 interface IContentList { 
