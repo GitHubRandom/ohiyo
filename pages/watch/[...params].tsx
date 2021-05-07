@@ -140,7 +140,7 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
 
     useEffect(() => {
         tippy("[data-tippy-content]")
-    })
+    },[])
     
     return (
         <>

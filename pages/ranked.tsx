@@ -74,7 +74,7 @@ const Ranked = ({ ranking, page }) => {
         return () => {
             observer.disconnect()
         }
-    })
+    }, [])
 
     return (
         <>

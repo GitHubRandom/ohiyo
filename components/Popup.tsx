@@ -34,7 +34,7 @@ const Popup: FunctionComponent<IPopup> = ({ children, trigger, id, title }) => {
                 });
             }
         }
-    })
+    }, [])
 
     useEffect(() => {
         if (visible) {

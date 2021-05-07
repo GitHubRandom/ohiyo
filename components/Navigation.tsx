@@ -39,7 +39,7 @@ const Navigation = ({ trigger, selected, shown, secondary }: INavigation) => {
                 })
             }
         }
-    })    
+    }, [])    
 
     return (
         // Secondary class name means that there is a top navigation and the side menu is secondary
