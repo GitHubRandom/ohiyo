@@ -20,7 +20,6 @@ class VideoPlayer extends React.Component {
     }
 
     componentDidUpdate() {
-        console.log(this.props.title)
         this.player.title = this.props.title
         this.player.source = this.props.sources
     }

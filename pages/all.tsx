@@ -11,10 +11,6 @@ import Popup from '../components/Popup'
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Record<string,any> = {}
 
-    if (process.env.NODE_ENV == 'development') {
-        console.log(context)
-    }
-
     let offset = 0
     // Detect which page is requested (infinite scroll)
     const page = context.query.page ? parseInt(context.query.page.toString()) : 1

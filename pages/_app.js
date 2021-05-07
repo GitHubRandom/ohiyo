@@ -11,7 +11,6 @@ import AntiADB from './adblock'
 function MyApp({ Component, pageProps }) {
 
     const adBlockDetected = useDetectAdBlock()
-    const router = useRouter()
 
     NProgress.configure({
         minimum: 0.3,
@@ -26,7 +25,7 @@ function MyApp({ Component, pageProps }) {
 
     return (
         <>
-        { !adBlockDetected ?
+        { !adBlockDetected || process.env.NODE_ENV === "development" ?
             <Component {...pageProps} />
         : <AntiADB /> }</>
     )

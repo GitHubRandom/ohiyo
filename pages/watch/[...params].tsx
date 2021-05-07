@@ -14,7 +14,6 @@ import tippy from 'tippy.js'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
-    console.log("Processing watch request...")
     const queryParams = context.query.params
     const animeId = queryParams[0].slice(0,queryParams[0].indexOf("-"))
 
@@ -31,9 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     // Check if both parameters are strings & parameters do not exceed three
-    console.log(context.query)
     if (queryParams.length >= 3) {
-        console.log("Route problem found !")
         return {
             notFound: true
         }
@@ -136,7 +133,6 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
 
     useEffect(() => {
         // Replace the current URL with "/anime_id/episode_number" if it's from episode_id
-        console.log(episodeNumber)
         if (router.query.params[1] == "latest") {
             router.replace(`/watch/${details.anime_id}-${details.mal_id}/${episodeNumber}`, undefined, { shallow: true, scroll: false })
         }

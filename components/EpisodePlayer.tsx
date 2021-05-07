@@ -193,17 +193,14 @@ const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, 
                 sources[key] = episode[key]
             }
         })
-        console.log("Changed sources !")
         getServers(sources)
         fetch("https://api.jikan.moe/v3/anime/" + mal + "/episodes/" + Math.ceil(parseInt(episode.Episode) / 100))
         .then(res => res.json())
         .then(data => {
-            console.log(data.episodes)
             try {
                 let epData = data.episodes[(parseInt(episode.Episode) - 1) % 100]
                 setEpisodeTitle(epData.title)
                 updateTitle(epData.title)
-                console.log(epData.title)
             } catch (err) {}
         })
         .catch(err => console.error(err)) 
