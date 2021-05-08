@@ -150,7 +150,7 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                 <meta property="og:title" content={ `${details.title} على Animayhem` }/>
                 <meta property="og:site_name" content="Animayhem"/>
                 <meta property="og:url" content={ router.pathname } />
-                <meta property="og:description" content={ details.anime_description } />
+                <meta property="og:description" content={ details.synopsis } />
                 <meta property="og:type" content={ details.type == "Movie" ? "video.movie" : "video.episode" } />
                 <meta property="og:image" content={ details.image_url } />
                 { details.trailer_url ? <meta property="og:video" content={ details.trailer_url } /> : null }
