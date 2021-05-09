@@ -689,7 +689,7 @@ body {
     top: 0;
     right: 0;
     background-color: #0009;
-    display: none;
+    display: flex;
     justify-content: center;
     align-items: center;
 }

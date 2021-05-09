@@ -1,4 +1,5 @@
 import { useState, useEffect, FunctionComponent } from "react"
+import { AnimatePresence, motion } from 'framer-motion'
 
 interface IPopup {
     trigger: string,
@@ -18,17 +19,11 @@ const Popup: FunctionComponent<IPopup> = ({ children, trigger, id, title }) => {
         if (trigger) {
             if (trigger.startsWith("#")) {
                 document.getElementById(trigger.slice(1))?.addEventListener("click", () => {
-                    var popup = document.getElementById(id) as HTMLElement
-                    popup.style.display = "flex"
-                    popup.focus()
                     updateVisibility(true)
                 })
             } else if (trigger.startsWith(".")) {
                 Array.from(document.getElementsByClassName(trigger.slice(1))).forEach(element => {
                     element.addEventListener("click", () => {
-                        var popup = document.getElementById(id) as HTMLElement
-                        popup.style.display = "flex"
-                        popup.focus()
                         updateVisibility(true)
                     })
                 });
@@ -45,15 +40,21 @@ const Popup: FunctionComponent<IPopup> = ({ children, trigger, id, title }) => {
     }, [visible])
 
     return (
-        <div id={id} className="popup">
-            <div className="popup-container">
-                <div className="popup-header">
-                    <h2 className="popup-title">{ title }</h2>
-                    <div className="popup-close" onClick={ () => { (document.getElementById(id) as HTMLElement).style.display = "none"; updateVisibility(false) } }>إغلاق</div>
-                </div>
-                { visible ? children : null }
-            </div>
-        </div>
+        <AnimatePresence>
+            { visible ? 
+            <div id={id} className="popup">
+                <motion.div initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        className="popup-container">
+                    <div className="popup-header">
+                        <h2 className="popup-title">{ title }</h2>
+                        <div className="popup-close" onClick={ () => { updateVisibility(false) } }>إغلاق</div>
+                    </div>
+                    { children }
+                </motion.div>
+            </div> : null }
+        </AnimatePresence>
     )
 }
 

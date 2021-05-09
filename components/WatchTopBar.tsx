@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { motion } from 'framer-motion'
 
 interface IWatchTopBar {
     showEpisodeButton: boolean,
@@ -37,9 +38,9 @@ const WatchTopBar = ({ episodeTitle, episode, showEpisodeButton, episodeName, an
                 { episodeName ? <p className="top-bar-episode-name"><span className="episode-name">{ episodeName }{ getEpisodeTags(episode) }</span>{ episodeTitle.length ? <><span style={{ marginTop: 2 }} className="mdi mdi-nm mdi-circle-medium"></span><span title="عنوان الحلقة" dir="ltr" className="episode-title">{ episodeTitle }</span></> : null }</p> : <div className="episode-name-placeholder loading"></div> }
             </div>
             { showEpisodeButton ?
-            <div id="episodes-button" className="floating-button"><span className="mdi mdi-cards-variant"></span>
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1.0 }} transition={{ delay: 0.7 }} id="episodes-button" className="floating-button"><span className="mdi mdi-cards-variant"></span>
             الحلقات
-            </div> : null }
+            </motion.div> : null }
         </div>
     )
 }
