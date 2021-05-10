@@ -9,7 +9,8 @@ const serverKeys = {
     MS: "MyStream",
     SF: "SolidFiles",
     FD: "Fembed",
-    MA: "Mega"
+    MA: "Mega",
+    GD: "G.Drive"
 }
 const qualitiesMap = {
     hdQ: "1080",
@@ -99,7 +100,7 @@ const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, 
                     item = "https://quiet-cove-27971.herokuapp.com/www.mediafire.com/?" + item
                     break
                 case key.startsWith("SF"):
-                    item = "/api/mediafire?link=https://www.solidfiles.com/v/" + item
+                    item = "/api/cors?link=https://www.solidfiles.com/v/" + item
                     break
                 case isOk:
                     method = 'POST'

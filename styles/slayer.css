@@ -839,6 +839,12 @@ body {
     color: white;
 }
 
+#bebi-banner-home:not(:empty) {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
 @media only screen and (min-width: 1600px) {
     .content-page {
         max-width: 1000px
