@@ -49,18 +49,6 @@ export default function Home({ newEpisodes, page }) {
     }, [newEpisodes])
     
     useEffect(() => {
-        const adscript = document.createElement("script")
-        adscript.innerHTML = `if(!window.BB_ind) { BB_ind = 0; } if(!window.BB_r) { BB_r = Math.floor(Math.random()*1000000000)} 
-        BB.getAds(
-            "bebi-banner-home",  // Ad div ID 
-            2018555, // Bebi placement ID
-            BB_ind++, 
-            true // Clear the div before placing ad or not
-        );`
-        document.body.appendChild(adscript)
-    }, [])
-
-    useEffect(() => {
         let observer = new IntersectionObserver((entries) => {
             if (refreshed && entries[0] && entries[0].isIntersecting) {
                 updateRefreshed(false)
@@ -94,7 +82,7 @@ export default function Home({ newEpisodes, page }) {
             <NavigationWrapper navTrigger="#hamburger-menu" contentId="home" selected="home">
                 <div id="home-page" className="content-page">
                     <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>آخر الحلقات</h2>
-                    <div id="bebi-banner-home"></div>
+                    <div id="bebi-banner"></div>
                     <ContentList latest={ true } className="content-list" contentList={ page == 1 ? newEpisodes : data } />
                     <div className="bottom-detector"></div>
                 </div>
