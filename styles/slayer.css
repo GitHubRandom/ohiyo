@@ -757,6 +757,7 @@ body {
 .fourofour-container h1 {
     font-size: 60pt;
     color: var(--accent-color);
+    font-family: "M PLUS 1p";
 }
 
 .bl-container h1 {
@@ -810,12 +811,13 @@ body {
 
 .fourofour-container,
 .bl-container {
-    height: 100vh;
+    min-height: 100vh;
     width: 100vw;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 30px 0;
 }
 
 .filter-description {
@@ -837,6 +839,18 @@ body {
 .episode-tag#filler {
     background-color: rgb(255, 24, 74);
     color: white;
+}
+
+.bl-ff-note {
+    background-color: #111111;
+    padding: 15px 30px;
+    margin-top: 30px;
+    border-radius: 5px;
+}
+
+.bl-ff-note div {
+    margin-top: 15px !important;
+    border-radius: 5px;
 }
 
 @media only screen and (min-width: 1600px) {
@@ -949,6 +963,12 @@ body {
 }
 
 @media only screen and (max-width: 490px) {
+    .bl-container h1 {
+        font-size: 19pt;
+        color: var(--accent-color);
+        margin-bottom: 10px;
+    }
+
     .anime-details-cover {
         height: 190px;
         width: 135px;

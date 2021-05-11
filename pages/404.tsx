@@ -10,6 +10,7 @@ const FourOFour = () => {
         <>
             <Head>
                 <title>خطأ 404 - Animahyem</title>
+                <link href="https://fonts.googleapis.com/css?family=M+PLUS+1p" rel="stylesheet" />
             </Head>
             <div className="fourofour-container">
                 <h1>四百四</h1>
