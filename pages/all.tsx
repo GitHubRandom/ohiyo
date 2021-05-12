@@ -182,7 +182,6 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
                 <meta property="og:url" content="https://animayhem.ga/all" />
                 <meta property="og:description" content="اختر الأنمي ضمن القائمة أو إبحث عن الأنمي" />
                 <meta property="og:type" content="website" />
-                <AdScripts />
             </Head>
             <NavigationWrapper navTrigger="#hamburger-menu" contentId="all" selected="list-all">
                 <div id="all-page" className="content-page">

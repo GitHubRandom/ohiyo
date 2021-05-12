@@ -88,7 +88,6 @@ const Ranked = ({ ranking, page }) => {
                 <meta property="og:url" content="https://animayhem.ga/ranked" />
                 <meta property="og:description" content="تصنيف الأنمي حسب التقييم العام على MyAnimeList" />
                 <meta property="og:type" content="website" />
-                <AdScripts />
             </Head>
             <NavigationWrapper navTrigger="#hamburger-menu" contentId="ranked" selected="ranked">
                 <div id="ranked-page" className="content-page">

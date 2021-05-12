@@ -160,7 +160,6 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                         scroll-behavior: smooth;
                     }
                 `}</style>
-                <AdScripts />
             </Head>
             <div id="watch" className="menu-content">
                 <WatchNavigation />

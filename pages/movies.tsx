@@ -79,7 +79,6 @@ export default function Home({ newMovies, page }) {
                 <meta property="og:url" content="https://animayhem.ga" />
                 <meta property="og:description" content="شاهد آخر أفلام الأنمي المترجمة بجودة عالية على موقعنا" />
                 <meta property="og:type" content="website" />
-                <AdScripts />
             </Head>
             <NavigationWrapper navTrigger="#hamburger-menu" contentId="movies" selected="movies">
                 <div id="movies-page" className="content-page">
