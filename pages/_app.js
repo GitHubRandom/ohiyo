@@ -31,6 +31,15 @@ function MyApp({ Component, pageProps }) {
         /*]]>/* */
         `
         document.head.appendChild(popAds)
+        // ----------------------------------------------------------
+        const popCash = document.createElement('script')
+        popCash.innerHTML = `
+        var uid = '317440';
+        var wid = '617624';
+        var pop_tag = document.createElement('script');pop_tag.src='//cdn.popcash.net/show.js';document.body.appendChild(pop_tag);
+        pop_tag.onerror = function() {pop_tag = document.createElement('script');pop_tag.src='//cdn2.popcash.net/show.js';document.body.appendChild(pop_tag)};
+        `
+        document.head.appendChild(popAds)
     },[])
 
     return (
