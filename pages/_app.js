@@ -31,7 +31,7 @@ function MyApp({ Component, pageProps }) {
         /*]]>/* */
         `
         document.head.appendChild(popAds)
-    })
+    },[])
 
     return (
         <>
