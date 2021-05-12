@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import ContentList from '../components/ContentList'
 import NavigationWrapper from '../containers/NavigationWrapper'
 import { useRouter } from 'next/router'
+import AdScripts from '../components/AdScripts'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
@@ -78,6 +79,7 @@ export default function Home({ newEpisodes, page }) {
                 <meta property="og:url" content="https://animayhem.ga" />
                 <meta property="og:description" content="موقع لمشاهدة الأنمي المترجم بجودة عالية" />
                 <meta property="og:type" content="website" />
+                <AdScripts />
             </Head>
             <NavigationWrapper navTrigger="#hamburger-menu" contentId="home" selected="home">
                 <div id="home-page" className="content-page">

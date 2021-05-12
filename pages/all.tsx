@@ -6,6 +6,7 @@ import Head from 'next/head'
 import NavigationWrapper from '../containers/NavigationWrapper'
 import TabIndicator from '../components/TabIndicator'
 import Link from 'next/link'
+import AdScripts from "../components/AdScripts"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Record<string,any> = {}
@@ -181,6 +182,7 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
                 <meta property="og:url" content="https://animayhem.ga/all" />
                 <meta property="og:description" content="اختر الأنمي ضمن القائمة أو إبحث عن الأنمي" />
                 <meta property="og:type" content="website" />
+                <AdScripts />
             </Head>
             <NavigationWrapper navTrigger="#hamburger-menu" contentId="all" selected="list-all">
                 <div id="all-page" className="content-page">

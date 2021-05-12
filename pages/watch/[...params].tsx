@@ -9,6 +9,7 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import tippy from 'tippy.js'
+import AdScripts from '../../components/AdScripts'
 
 // From all of this I learned how shit is the Anime Slayer API. Just sayin'. @ritzy
 
@@ -159,6 +160,7 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                         scroll-behavior: smooth;
                     }
                 `}</style>
+                <AdScripts />
             </Head>
             <div id="watch" className="menu-content">
                 <WatchNavigation />
