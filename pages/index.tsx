@@ -66,7 +66,7 @@ export default function Home({ newEpisodes, page }) {
         return () => {
             observer.disconnect()
         }
-    })
+    }, [refreshed])
 
     return (
         <>

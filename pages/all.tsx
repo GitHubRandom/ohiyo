@@ -153,7 +153,7 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
         return () => {
             observer.disconnect()
         }
-    })
+    }, [refreshed])
 
     useEffect(() => {
         if (router.isReady) {
