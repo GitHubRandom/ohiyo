@@ -7,7 +7,7 @@ interface IPopup {
     title: string
 }
 
-const Popup: FunctionComponent<IPopup> = ({ children, trigger, id, title }) => {
+const Popup = ({ children, trigger, id, title }: React.PropsWithChildren<IPopup>) => {
 
     const [ visible, updateVisibility ] = useState(false)
 
