@@ -5,9 +5,9 @@ import "../styles/nprogress.css";
 import 'tippy.js/dist/tippy.css'
 import { useDetectAdBlock } from 'adblock-detect-react'
 import AntiADB from './adblock'
-import { useEffect } from 'react';
+import { createElement, useEffect } from 'react';
 
-const popAds = document.createElement('script')
+const popAds = createElement('script')
 popAds.setAttribute("data-cfasync", "false")
 popAds.innerHTML = `
     /*<![CDATA[/* */
@@ -15,7 +15,7 @@ popAds.innerHTML = `
     /*]]>/* */
 `
 
-const popCash = document.createElement('script')
+const popCash = createElement('script')
 popCash.innerHTML = `
     var uid = '317440';
     var wid = '617624';
