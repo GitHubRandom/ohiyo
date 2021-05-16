@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import VideoPlayer from './VideoPlayer'
 import Link from 'next/link'
 
@@ -20,31 +20,22 @@ const qualitiesMap = {
 
 interface TEpisodePlayer {
     episodesList: Record<string,any>[],
+    animeName: string,
     animeId: string,
     episodeNumber: number,
     mal: string,
     setEpisodeTitle: (title:string) => void
 }
 
-const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, mal }: TEpisodePlayer) => {
+const EpisodePlayer = ({ setEpisodeTitle, animeName, episodesList, animeId, episodeNumber, mal }: TEpisodePlayer) => {
 
     type quality = Record<string,string>[]
 
     const [ episodeSources, updateSources ] = useState<Record<string,quality | string>>({})
     const [ currentSource, updateCurrent ] = useState<[string,string | Record<string,string>[]]>(["",""])
-    const [ introInterval, updateIntroInterval ] = useState<[string,string]>(["",""])
+    const [ introInterval, updateIntroInterval ] = useState<[number,number]>([0,0])
     const [ status, updateStatus ] = useState<string[]>([])
     const [ episodeTitle, updateTitle ] = useState<string>("")
-
-    const videoPlyr = useMemo(() => {
-        return <VideoPlayer 
-                    title={`الحلقة ${episodeNumber} - ${episodeTitle}`}
-                    introInterval = { introInterval }
-                    sources = {{
-                        type: 'video',
-                        sources: currentSource[0] != "" ? currentSource[1] : {}
-                    }} />
-    }, [currentSource, introInterval])
 
     /**
      * This sets the status of fetching for the episode source URLs
@@ -182,7 +173,7 @@ const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, 
                     selected = key
                 }
             }
-            updateCurrent([ key, episodeSources[key] ])
+            updateCurrent([ selected, episodeSources[selected] ])
         }
     }, [status])
 
@@ -195,6 +186,7 @@ const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, 
             }
         })
         getServers(sources)
+        // Fetching episode title from MyAnimeList (via Jikan)
         fetch("https://api.jikan.moe/v3/anime/" + mal + "/episodes/" + Math.ceil(parseInt(episode.Episode) / 100))
         .then(res => res.json())
         .then(data => {
@@ -205,6 +197,21 @@ const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, 
             } catch (err) {}
         })
         .catch(err => console.error(err)) 
+        // Fetching intro timestamps
+        fetch(encodeURI(`/api/skip?anime=${animeName}&num=${episodeNumber}`))
+        .then(res => {
+            if (res.ok) {
+                return res.json()
+            } else {
+                throw new Error("Timestamps not found")
+            }
+        })
+        .then(data => {
+            updateIntroInterval([parseInt(data.skip_from) / 1000, parseInt(data.skip_to) / 1000])
+        })
+        .catch(err => {
+            console.info("Timestamps not found !")
+        })
         return () => {
             updateSources({})
             updateCurrent(["",""])
@@ -216,13 +223,16 @@ const EpisodePlayer = ({ setEpisodeTitle, episodesList, animeId, episodeNumber, 
     return (
         <section className="anime-watch">
             { currentSource[0] && supportedServers.includes(currentSource[0].slice(0,2)) && !status.includes("pending") ? 
-                videoPlyr
+                <VideoPlayer 
+                    title={`الحلقة ${episodeNumber} - ${episodeTitle}`}
+                    introInterval = { introInterval }
+                    sources = {{
+                        type: 'video',
+                        sources: currentSource[0] != "" ? currentSource[1] : {}
+                    }} />
             : <div className={ Object.keys(episodeSources).length && !status.includes("pending") ? "iframe-video-player" : "iframe-video-player loading" }>
-                { !status.includes("pending") ? <>
-                    { currentSource[0] != "TP" ? // tune.pk requires a new code for embed player (very annoying)
-                        <iframe allowFullScreen={ true } className="iframe-video" src={ currentSource[1] as string } />
-                    : <><div className="open-stream-player" id={ `open-stream-player-${currentSource[1]}` }></div>
-                        <script src={ `https://tune.pk/js/open/embed.js?vid=${currentSource[1]}` }></script></> }</>
+                { !status.includes("pending") ?
+                    <iframe allowFullScreen={ true } className="iframe-video" src={ currentSource[1] as string } />
                 : null }
             </div> }
             <div className="player-settings">
@@ -345,4 +355,4 @@ var P_A_C_K_E_R = {
     }
 }
 
-export default EpisodePlayer
+export default React.memo(EpisodePlayer)

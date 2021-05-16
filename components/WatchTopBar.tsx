@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import React, { useEffect } from "react"
 import { motion } from 'framer-motion'
 
 interface IWatchTopBar {
@@ -45,4 +45,4 @@ const WatchTopBar = ({ episodeTitle, episode, showEpisodeButton, episodeName, an
     )
 }
 
-export default WatchTopBar
+export default React.memo(WatchTopBar)

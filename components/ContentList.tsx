@@ -1,4 +1,5 @@
 import Episode from "./Episode"
+import React from "react"
 
 interface IContentList { 
     className: string,
@@ -27,4 +28,4 @@ const ContentList = ({ overrideMovie, className, contentList, latest }: IContent
     )
 }
 
-export default ContentList
+export default React.memo(ContentList)

@@ -29,12 +29,4 @@ export default async function handler(req, res) {
             finished = true
         })
     }).end()
-    /*
-    const resource = await fetch(req.query.link, {
-        headers: new Headers({
-            "X-Forwarded-For": req.headers["x-real-ip"],
-            "X-Real-IP": req.headers["x-real-ip"]
-        })
-    })
-    const data = await resource.text()*/
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useCallback, useState } from "react"
 import ExpandableText from "./ExpandableText"
 import { getEpisodeTags } from '../components/WatchTopBar'
 import Link from 'next/link'
@@ -78,7 +78,6 @@ interface TAnimeDetails {
 
 const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
 
-    const [ ratingSource, updateRateSource ] = useState<"mal" | "arabic">("mal")
     const [ ascending, updateEpisodesOrder ] = useState<boolean>(true)
 
     function getRate(rate:string) {
@@ -96,20 +95,12 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
         }
     }
 
-    function reverseList() {
+    const reverseList = useCallback(() => {
         updateEpisodesOrder(!ascending)
-    }
+    }, [ascending])
 
     function dismissPopup() {
         (document.getElementsByClassName("popup")[0] as HTMLElement).style.display = "none"
-    }
-
-    function toggleOrder() {
-        if (ascending) {
-            updateEpisodesOrder(false)
-        } else {
-            updateEpisodesOrder(true)
-        }
     }
 
     function render() {
@@ -215,4 +206,4 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
     return render()
 }
 
-export default AnimeDetails
+export default React.memo(AnimeDetails)

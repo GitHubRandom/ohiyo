@@ -1,4 +1,4 @@
-import { useState, useEffect, FunctionComponent } from "react"
+import React, { useState, useEffect, FunctionComponent } from "react"
 import { AnimatePresence, motion } from 'framer-motion'
 
 interface IPopup {
@@ -58,4 +58,4 @@ const Popup: FunctionComponent<IPopup> = ({ children, trigger, id, title }) => {
     )
 }
 
-export default Popup
+export default React.memo(Popup)
