@@ -5,7 +5,7 @@ import "../styles/nprogress.css";
 import 'tippy.js/dist/tippy.css'
 import { useDetectAdBlock } from 'adblock-detect-react'
 import AntiADB from './adblock'
-import { useEffect } from 'react';
+import { useState,useEffect } from 'react';
 import Head from 'next/head';
 
 function MyApp({ Component, pageProps }) {
