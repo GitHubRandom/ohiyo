@@ -11,7 +11,6 @@ class VideoPlayer extends React.PureComponent {
 
     componentDidMount() {
         this.player = new Plyr('#main-content', {
-            title: this.props.title,
             controls: ['play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'mute', 'download', 'volume', 'settings', 'pip', 'airplay', 'fullscreen'],
             quality: {
                 default: "1080"

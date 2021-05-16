@@ -1,6 +1,7 @@
 export default async function handler(req, res) {
     const animeName = req.query.anime
     const epNumber = parseInt(req.query.num)
+    const epNameNumber = req.query.detail
     const headers = {
         "Client-Id": "android-app2",
         "Client-Secret": "7befba6263cc14c90d2f1d6da2c5cf9b251bfbbd"
@@ -36,8 +37,12 @@ export default async function handler(req, res) {
         res.status(404).send("404 Episodes Not Found")
     }
     try {
-        const episodes = (await episodesFetch.json()).response?.data
-        const { skip_from, skip_to } = episodes[epNumber - 1]
+        let episodes = (await episodesFetch.json()).response?.data
+        if (episodes.length > 20) {
+            episodes = episodes.slice(epNumber - 20, epNumber + 20)
+        }
+        const episode = episodes.find(ep => ep.episode_name.includes(epNameNumber))
+        const { skip_from, skip_to } = episode
         res.status(200).send(JSON.stringify({ skip_from, skip_to }))    
     } catch (err) {
         console.error(err)

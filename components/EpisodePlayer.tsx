@@ -198,7 +198,7 @@ const EpisodePlayer = ({ setEpisodeTitle, animeName, episodesList, animeId, epis
         })
         .catch(err => console.error(err)) 
         // Fetching intro timestamps
-        fetch(encodeURI(`/api/skip?anime=${animeName}&num=${episodeNumber}`))
+        fetch(encodeURI(`/api/skip?anime=${animeName}&num=${episodeNumber}&detail=${episode.Episode}`))
         .then(res => {
             if (res.ok) {
                 return res.json()
@@ -224,10 +224,10 @@ const EpisodePlayer = ({ setEpisodeTitle, animeName, episodesList, animeId, epis
         <section className="anime-watch">
             { currentSource[0] && supportedServers.includes(currentSource[0].slice(0,2)) && !status.includes("pending") ? 
                 <VideoPlayer 
-                    title={`الحلقة ${episodeNumber} - ${episodeTitle}`}
                     introInterval = { introInterval }
                     sources = {{
                         type: 'video',
+                        title: `الحلقة ${episodeNumber} - ${episodeTitle}`,
                         sources: currentSource[0] != "" ? currentSource[1] : {}
                     }} />
             : <div className={ Object.keys(episodeSources).length && !status.includes("pending") ? "iframe-video-player" : "iframe-video-player loading" }>
