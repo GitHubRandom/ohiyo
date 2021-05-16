@@ -38,8 +38,13 @@ export default async function handler(req, res) {
     }
     try {
         let episodes = (await episodesFetch.json()).response?.data
+        let sliceStart = epNumber < 20 ? 0 : epNumber - 20
         if (episodes.length > 20) {
-            episodes = episodes.slice(epNumber - 20, epNumber + 20)
+            if (episodes.length < epNumber) {
+                episodes = episodes.slice(sliceStart)
+            } else {
+                episodes = episodes.slice(sliceStart, epNumber + 20)
+            }
         }
         const episode = episodes.find(ep => ep.episode_name.includes(epNameNumber))
         const { skip_from, skip_to } = episode

@@ -2,7 +2,7 @@ import React from 'react'
 import Plyr from 'plyr'
 import 'plyr/dist/plyr.css'
 
-class VideoPlayer extends React.PureComponent {
+class VideoPlayer extends React.Component {
 
     constructor(props) {
         super(props)
@@ -24,8 +24,9 @@ class VideoPlayer extends React.PureComponent {
             }
         })
         this.player.source = this.props.sources
-        this.player.on('progress', () => {
-            if (this.player.currentTime > this.props.introInterval[0] && this.player.currentTime < this.props.introInterval[1]) {
+        this.player.on('progress', event => {
+            const plyr = event.detail.plyr
+            if (plyr.currentTime > this.props.introInterval[0] && plyr.currentTime < this.props.introInterval[1]) {
                 this.introButton.current.style.display = 'block'
             } else if (this.introButton.current.style.display != 'none') {
                 this.introButton.current.style.display = 'none'
@@ -60,10 +61,5 @@ class VideoPlayer extends React.PureComponent {
         )
     }
 }
-
-/*function toSeconds(time) {
-    var timeSplit = time.split(":")
-    return (+timeSplit[0]) * 60 * 60 + (+timeSplit[1]) * 60 + (+timeSplit[2])
-}*/
 
 export default VideoPlayer
