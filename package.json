@@ -12,6 +12,7 @@
     "adblock-detect-react": "^1.0.4",
     "follow-redirects": "^1.14.0",
     "framer-motion": "^4.1.13",
+    "indigo-player": "^1.5.1",
     "next": "10.1.3",
     "nprogress": "^0.2.0",
     "plyr": "^3.6.8",
