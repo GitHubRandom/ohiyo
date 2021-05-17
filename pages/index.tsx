@@ -86,14 +86,14 @@ export default function Home({ newEpisodes, page }) {
                     <div id="bebi-banner">
                         <script type="text/javascript" data-cfasync="false" dangerouslySetInnerHTML={{
                             __html: `
-                            if(!window.BB_a) { BB_a = [];} if(!window.BB_ind) { BB_ind = 0; } if(!window.BB_r) { BB_r = Math.floor(Math.random()*1000000000)} BB_ind++; BB_a.push({ "pl" : 2018555, "index": BB_ind});
+                            if(!window.BB_a) { BB_a = [];} if(!window.BB_ind) { BB_ind = 0; } if(!window.BB_r) { BB_r = Math.floor(Math.random()*1000000000)} BB_ind++; BB_a.push({ "pl" : 2018624, "index": BB_ind});
                             `
                         }}>
                         </script>
                         <script type="text/javascript" data-cfasync="false" src="//st.bebi.com/bebi_v3.js"></script>
                     </div>
-                <ContentList latest={true} className="content-list" contentList={page == 1 ? newEpisodes : data} />
-                <div className="bottom-detector"></div>
+                    <ContentList latest={true} className="content-list" contentList={page == 1 ? newEpisodes : data} />
+                    <div className="bottom-detector"></div>
                 </div>
         </NavigationWrapper>
         </>
