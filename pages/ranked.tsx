@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import NavigationWrapper from '../containers/NavigationWrapper'
 import ContentList from '../components/ContentList'
 import Head from 'next/head'
-import AdScripts from "../components/AdScripts"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 

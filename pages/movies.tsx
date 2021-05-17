@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import ContentList from '../components/ContentList'
 import NavigationWrapper from '../containers/NavigationWrapper'
 import { useRouter } from 'next/router'
-import AdScripts from '../components/AdScripts'
+import Link from 'next/link'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
@@ -36,7 +36,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 }
 
-export default function Home({ newMovies, page }) {
+export default function Movies({ newMovies, page }) {
 
     const [ data, updateData ] = useState<Record<string,any>[]>([])
     const [ refreshed, updateRefreshed ] = useState<boolean>(false)
@@ -44,7 +44,11 @@ export default function Home({ newMovies, page }) {
 
     useEffect(() => {
         if (newMovies.length) {
-            updateData(oldData => oldData.concat(newMovies))
+            if (page == 1) {
+                updateData(newMovies)
+            } else {
+                updateData(oldData => oldData.concat(newMovies))
+            }
             updateRefreshed(true)
         }
     }, [newMovies])
@@ -66,7 +70,7 @@ export default function Home({ newMovies, page }) {
         return () => {
             observer.disconnect()
         }
-    }, [refreshed])
+    }, [page,refreshed])
 
     return (
         <>
@@ -83,6 +87,9 @@ export default function Home({ newMovies, page }) {
             <NavigationWrapper navTrigger="#hamburger-menu" contentId="movies" selected="movies">
                 <div id="movies-page" className="content-page">
                     <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>آخر الأفلام</h2>
+                    { data.length < page * 25 && page != 1 ? 
+                    <p id="page-warning" className="list-notice"><span className="mdi mdi-information"></span>أنت الآن في الصفحة { page }. <Link href="/movies" scroll={ true } ><a className="link">العودة للصفحة الأولى</a></Link></p>
+                    : null }
                     <ContentList latest={ false } className="content-list" contentList={ page == 1 ? newMovies : data } />
                     <div className="bottom-detector"></div>
                 </div>

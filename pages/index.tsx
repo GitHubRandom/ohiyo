@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import ContentList from '../components/ContentList'
 import NavigationWrapper from '../containers/NavigationWrapper'
 import { useRouter } from 'next/router'
-import AdScripts from '../components/AdScripts'
+import Link from 'next/link'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
@@ -44,13 +44,21 @@ export default function Home({ newEpisodes, page }) {
 
     useEffect(() => {
         if (newEpisodes.length) {
-            updateData(oldData => oldData.concat(newEpisodes))
+            if (page == 1) {
+                updateData(newEpisodes)
+            } else {
+                updateData(oldData => oldData.concat(newEpisodes))
+            }
             updateRefreshed(true)
         }
     }, [newEpisodes])
 
     useEffect(() => {
-        let observer = new IntersectionObserver((entries) => {
+        console.log(`Page changed to ${page}`)
+    }, [page])
+
+    useEffect(() => {
+        let observer = new IntersectionObserver(entries => {
             if (refreshed && entries[0] && entries[0].isIntersecting) {
                 updateRefreshed(false)
                 router.push({
@@ -66,7 +74,7 @@ export default function Home({ newEpisodes, page }) {
         return () => {
             observer.disconnect()
         }
-    }, [refreshed])
+    }, [page,refreshed])
 
     return (
         <>
@@ -83,6 +91,9 @@ export default function Home({ newEpisodes, page }) {
             <NavigationWrapper navTrigger="#hamburger-menu" contentId="home" selected="home">
                 <div id="home-page" className="content-page">
                     <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>آخر الحلقات</h2>
+                    { data.length < page * 25 && page != 1 ? 
+                    <p id="page-warning" className="list-notice"><span className="mdi mdi-information"></span>أنت الآن في الصفحة { page }. <Link href="/" scroll={ true } ><a className="link">العودة للصفحة الأولى</a></Link></p>
+                    : null }
                     <div id="bebi-banner">
                         <script type="text/javascript" data-cfasync="false" dangerouslySetInnerHTML={{
                             __html: `

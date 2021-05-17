@@ -6,7 +6,6 @@ import Head from 'next/head'
 import NavigationWrapper from '../containers/NavigationWrapper'
 import TabIndicator from '../components/TabIndicator'
 import Link from 'next/link'
-import AdScripts from "../components/AdScripts"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Record<string,any> = {}
@@ -137,7 +136,7 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
     }, [results])
 
     useEffect(() => {
-        let observer = new IntersectionObserver((entries) => {
+        let observer = new IntersectionObserver(entries => {
             if (refreshed && entries[0] && entries[0].isIntersecting) {
                 updateRefreshed(false)
                 router.replace({
@@ -153,7 +152,7 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
         return () => {
             observer.disconnect()
         }
-    }, [refreshed])
+    }, [page,refreshed])
 
     useEffect(() => {
         if (router.isReady) {
@@ -210,10 +209,10 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
                     }} selected={ movies ? "movies" : "series" } />
 
                     { genreSelected ?
-                        <p className="filter-description"><span className="mdi mdi-filter"></span>أنمي من نوع <strong style={{ color: "#fffb00" }}>{ genreSelected }</strong>. <Link href="/all" scroll={ true } ><a className="link">إلغاء</a></Link></p>
+                        <p id="genre-filter-info" className="list-notice"><span className="mdi mdi-filter"></span>أنمي من نوع <strong style={{ color: "#fffb00" }}>{ genreSelected }</strong>. <Link href="/all" scroll={ true } ><a className="link">إلغاء</a></Link></p>
                     : null }
                     { studioSelected ?
-                        <p className="filter-description"><span className="mdi mdi-filter"></span>أعمال استوديو <strong dir="ltr" style={{ color: "#fffb00" }}>{ studioSelected }</strong>. <Link href="/all" scroll={ true } ><a className="link">إلغاء</a></Link></p>
+                        <p id="studio-filter-info" className="list-notice"><span className="mdi mdi-filter"></span>أعمال استوديو <strong dir="ltr" style={{ color: "#fffb00" }}>{ studioSelected }</strong>. <Link href="/all" scroll={ true } ><a className="link">إلغاء</a></Link></p>
                     : null }
 
                     <ContentList overrideMovie={ movies } latest={ false } className="content-list" contentList={ page == 1 ? results.data : result.data } />
