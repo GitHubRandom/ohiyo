@@ -1,46 +1,57 @@
+import next from 'next'
 import React from 'react'
-import Plyr from 'plyr'
-import 'plyr/dist/plyr.css'
+
 
 class VideoPlayer extends React.Component {
 
     constructor(props) {
         super(props)
         this.introButton = React.createRef()
+        this.videoContainer = React.createRef()
+    }
+
+    initDPlayer() {
+        console.log(this.props.sources)
+        const DPlayer = require('dplayer')
+        this.player = new DPlayer({
+            container: this.videoContainer.current,
+            theme: '#fffb00',
+            video: {
+                quality: this.props.sources,
+                defaultQuality: 0
+            }
+        })
+        this.player.on('progress', () => {
+            const currentProgress = this.player.video.currentTime
+            if (currentProgress >= this.props.introInterval[0] && currentProgress <= this.props.introInterval[1]) {
+                this.introButton.current.style.display = "block"
+            } else if (this.introButton.current.style.display == "block") {
+                this.introButton.current.style.display = "none"
+            }
+        })
+        document.querySelector(".dplayer-video").removeAttribute("crossorigin")
+        this.videoContainer.current.appendChild(this.introButton.current)
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (this.props.introInterval[0] != nextProps.introInterval[0] && this.props.introInterval[1] != nextProps.introInterval[1]) {
+            return false
+        }
+        return true
     }
 
     componentDidMount() {
-        this.player = new Plyr('#main-content', {
-            controls: ['play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'mute', 'download', 'volume', 'settings', 'pip', 'airplay', 'fullscreen'],
-            quality: {
-                default: "1080"
-            },
-            fullscreen: {
-                container: ".anime-video-player"
-            },
-            keyboard: {
-                focused: false,
-                global: true
-            }
-        })
-        this.player.source = this.props.sources
-        this.player.on('progress', event => {
-            const plyr = event.detail.plyr
-            if (plyr.currentTime > this.props.introInterval[0] && plyr.currentTime < this.props.introInterval[1]) {
-                this.introButton.current.style.display = 'block'
-            } else if (this.introButton.current.style.display != 'none') {
-                this.introButton.current.style.display = 'none'
-            }
-        })
+        this.initDPlayer()
     }
 
     componentDidUpdate() {
-        this.player.source = this.props.sources
+        this.player.destroy()
+        this.initDPlayer()
     }
 
     skipIntro() {
         if (this.props.introInterval != undefined && this.props.introInterval.length != 0) {
-            this.player.currentTime = this.props.introInterval[1]
+            this.player.seek(this.props.introInterval[1])
             this.introButton.current.style.display = 'none'
         }
     }
@@ -51,9 +62,7 @@ class VideoPlayer extends React.Component {
 
     render() {
         return (
-            <div className="anime-video-player">
-                <video id="main-content" playsInline controls className='player plyr'>
-                </video>
+            <div dir="ltr" ref={ this.videoContainer } className="anime-video-player">
                 <button onClick={ this.skipIntro.bind(this) } ref={ this.introButton } style={{ display: "none" }} type="button" id="episode-skip-intro">
                     تخطي المقدمة
                 </button>  

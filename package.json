@@ -10,6 +10,7 @@
   "dependencies": {
     "@tippyjs/react": "^4.2.5",
     "adblock-detect-react": "^1.0.4",
+    "dplayer": "^1.26.0",
     "follow-redirects": "^1.14.0",
     "framer-motion": "^4.1.13",
     "indigo-player": "^1.5.1",

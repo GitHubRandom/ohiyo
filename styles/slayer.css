@@ -635,7 +635,7 @@ body {
     color: #3b3b3b;
 }
 
-.anime-video-player:not(:fullscreen) {
+/*.anime-video-player:not(:fullscreen) {
     position: relative;
     border-radius: 5px;
     overflow: hidden;
@@ -652,7 +652,7 @@ body {
 
 .anime-video-player > .plyr {
     height: 100% !important;
-}
+}*/
 
 .iframe-video-player {
     position: relative;
