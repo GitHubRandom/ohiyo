@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react"
 import VideoPlayer from './VideoPlayer'
 import Link from 'next/link'
+import Popup from "./Popup"
 
 const supportedServers = ["OK", "FR", "SF"]
 const serverKeys = {
@@ -24,10 +25,11 @@ interface TEpisodePlayer {
     animeId: string,
     episodeNumber: number,
     mal: string,
+    episodeName: string,
     setEpisodeTitle: (title: string) => void
 }
 
-const EpisodePlayer = ({ setEpisodeTitle, animeName, episodesList, animeId, episodeNumber, mal }: TEpisodePlayer) => {
+const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, animeId, episodeNumber, mal }: TEpisodePlayer) => {
 
     type quality = Record<string, string>[]
 
@@ -249,13 +251,15 @@ const EpisodePlayer = ({ setEpisodeTitle, animeName, episodesList, animeId, epis
                 }
                 <div className="server-settings">
                     {Object.keys(episodeSources).length && !status.includes("pending") ?
-                        <select name="server" className="selection" id="server-select" onChange={(e) => updateCurrent([e.target.value, episodeSources[e.target.value]])} value={currentSource[0]}>
-                            {
-                                Object.keys(episodeSources).map((key, index) => {
-                                    return <option key={key} value={key} id={key}>{supportedServers.includes(key.slice(0, 2)) ? "م. المحلي" : "م. خارجي"}{` - ${serverKeys[key.slice(0, 2)]}${getBestQuality(key)}`}</option>
-                                })
-                            }
-                        </select>
+                        <>
+                            <span id="download-button" className="mdi mdi-download mdi-nm"></span>
+                            <select name="server" className="selection" id="server-select" onChange={(e) => updateCurrent([e.target.value, episodeSources[e.target.value]])} value={currentSource[0]}>
+                                {
+                                    Object.keys(episodeSources).map((key, index) => {
+                                        return <option key={key} value={key} id={key}>{supportedServers.includes(key.slice(0, 2)) ? "م. المحلي" : "م. خارجي"}{` - ${serverKeys[key.slice(0, 2)]}${getBestQuality(key)}`}</option>
+                                    })
+                                }
+                            </select></>
                         : <span className="servers-loading-message"><span className="mdi mdi-loading mdi-spin"></span>جاري العمل على الخوادم</span>
                     }
                 </div>
@@ -270,6 +274,28 @@ const EpisodePlayer = ({ setEpisodeTitle, animeName, episodesList, animeId, epis
                     <a id="next" className="player-episode-skip disabled">الحلقة القادمة<span className="mdi mdi-chevron-left mdi-left"></span></a>
                 }
             </div>
+            { !status.includes("pending") ?
+            <Popup id="download-popup" trigger="#download-button" title="تحميل">
+                <div id="downloads-list" className="popup-list">
+                    {Object.keys(episodeSources).map(sourceKey => {
+                        if (supportedServers.includes(sourceKey.slice(0,2))) {
+                            return (
+                                <div key={ sourceKey } id={sourceKey} className="download-section">
+                                    <h2>{serverKeys[sourceKey.slice(0,2)]}</h2>
+                                    {(episodeSources[sourceKey] as quality).map(source => {
+                                        return (
+                                            <div key={ sourceKey } id={ source.name } className="download-link">
+                                                <p className="download-link-quality">{ source.name }</p>
+                                                <a className="link" href={ source.url } download={ animeName + "-" + episodeName + ".mp4" }>تحميل</a>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            )
+                        }
+                    })}
+                </div>
+            </Popup> : null }
         </section>
     )
 
@@ -291,7 +317,7 @@ const EpisodePlayer = ({ setEpisodeTitle, animeName, episodesList, animeId, epis
             var regex = /"downloadUrl":"(.+solidfilesusercontent.com.+?)"/
             var matches = data.match(regex)
             if (matches) {
-                return [key, [{ type: "normal", url: matches[1], name: "720" }]]
+                return [key, [{ type: "normal", url: matches[1], name: qualitiesMap[qual] }]]
             }
         }
         return ["", []]
@@ -310,7 +336,7 @@ const EpisodePlayer = ({ setEpisodeTitle, animeName, episodesList, animeId, epis
             // Videos links are in "videos" array of the JSON response
             if ("videos" in data) {
                 data["videos"].forEach((quality: Record<string, string>) => {
-                    qualities.push({ type: "normal", url: quality["url"], name: q[quality["name"]] })
+                    if (quality["name"] in q) qualities.push({ type: "normal", url: quality["url"], name: q[quality["name"]] })
                 })
                 return [key, qualities]
             }

@@ -11,7 +11,16 @@ class VideoPlayer extends React.Component {
     }
 
     initDPlayer() {
-        console.log(this.props.sources)
+        let video = {
+            quality: this.props.sources,
+            defaultQuality: 0
+        }
+        if (this.props.sources.length == 1) {
+            video = {
+                url: this.props.sources[0].url,
+                type: "normal"
+            }
+        }
         const DPlayer = require('dplayer')
         this.player = new DPlayer({
             container: this.videoContainer.current,
@@ -23,10 +32,12 @@ class VideoPlayer extends React.Component {
         })
         this.player.on('progress', () => {
             const currentProgress = this.player.video.currentTime
-            if (currentProgress >= this.props.introInterval[0] && currentProgress <= this.props.introInterval[1]) {
-                this.introButton.current.style.display = "block"
-            } else if (this.introButton.current.style.display == "block") {
-                this.introButton.current.style.display = "none"
+            if (this.props.introInterval[0] != this.props.introInterval[1]) {
+                if (currentProgress >= this.props.introInterval[0] && currentProgress <= this.props.introInterval[1]) {
+                    this.introButton.current.style.display = "block"
+                } else if (this.introButton.current.style.display == "block") {
+                    this.introButton.current.style.display = "none"
+                }
             }
         })
         document.querySelector(".dplayer-video").removeAttribute("crossorigin")

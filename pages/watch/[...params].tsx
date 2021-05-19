@@ -165,7 +165,7 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                 <Navigation trigger="#hamburger-menu" secondary={ true } selected="none" shown={ false } />
                 <div className="watch-page">
                     <WatchTopBar episodeTitle={ episodeTitle } episode={ episodes[episodeNumber - 1] } showEpisodeButton={ episodes.length > 1 } episodeName={ episodeName } animeTitle={ details.title } />
-                    <EpisodePlayer animeName={ details.title } setEpisodeTitle={ (title) => updateEpisodeTitle(title) } mal={ details.mal_id } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />   
+                    <EpisodePlayer episodeName={ episodeName } animeName={ details.title } setEpisodeTitle={ (title) => updateEpisodeTitle(title) } mal={ details.mal_id } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />   
                     <AnimeDetails episodesList={ episodes } animeDetails={ details } />
                     {/*<RelatedContent related={ details.related_animes.data } />*/}
                 </div>

@@ -177,7 +177,7 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
                         <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
                             <span className="mdi mdi-sort-ascending"></span>تصاعدي
                         </div>
-                        <div className="popup-list">
+                        <div id="episodes-list" className="popup-list">
                             { episodesList.map((episode,index) => {
                                 return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + '-' + animeDetails.mal_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</a></Link>
                             })}
@@ -187,7 +187,7 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
                         <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
                             <span className="mdi mdi-sort-descending"></span>تنازلي
                         </div>
-                        <div className="popup-list">
+                        <div id="episodes-list" className="popup-list">
                             { episodesList.map((episode,index) => {
                                 return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + '-' + animeDetails.mal_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</a></Link>
                             }).reverse()}

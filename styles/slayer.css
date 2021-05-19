@@ -83,6 +83,21 @@ body {
     --plyr-color-main: #b3b000;    
 }
 
+::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 50px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--primary-color); 
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #252525;
+    border-radius: 50px;
+    width: 5px;
+}
+
 #__next {
     display: flex;
     min-height: 100vh;
@@ -527,7 +542,6 @@ body {
     border-radius: 5px;
     padding: 5px 10px;
     color: var(--accent-color);
-    /*background-color: #3d212d;*/
     font-weight: bold;
     border: 1px solid var(--accent-color);
 }
@@ -635,24 +649,20 @@ body {
     color: #3b3b3b;
 }
 
-/*.anime-video-player:not(:fullscreen) {
+.anime-video-player:not(:fullscreen) {
     position: relative;
     border-radius: 5px;
     overflow: hidden;
     padding-bottom: 56.25%;
 }
 
-.anime-video-player:not(:fullscreen) > .plyr {
+.anime-video-player:not(:fullscreen) .dplayer-video-wrap {
     position: absolute !important;
     top: 0;
     right: 0;
     left: 0;
     bottom: 0;
 }
-
-.anime-video-player > .plyr {
-    height: 100% !important;
-}*/
 
 .iframe-video-player {
     position: relative;
@@ -853,6 +863,33 @@ body {
     border-radius: 5px;
 }
 
+#download-button {
+    padding: 5px;
+    margin-left: 5px;
+    margin-top: 1px;
+    cursor: pointer;
+    border-radius: 5px;
+    color: var(--accent-color);
+}
+
+#download-button:hover {
+    background-color: #151515;
+}
+
+.popup-list#downloads-list .download-section:first-child h2 {
+    margin-top: 0;
+}
+
+.download-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.download-link-quality {
+    margin: 5px 0;
+}
+
 @media only screen and (min-width: 1600px) {
     .content-page {
         max-width: 1000px
@@ -948,21 +985,29 @@ body {
 
     .server-settings { 
         order: 1;
-        flex-direction: column; 
+        justify-content: center;
     }
 
-    #server-select { margin-left: 0; }
+    #download-button {
+        padding: 5px 15px;
+    }
+
+    #server-select { margin-left: 0; flex-grow: 1; }
     .player-settings { flex-direction: column; }
 
-    .player-settings * {
+    .player-settings > * {
         width: 100%;
         text-align: center;
     }
 
-    .player-settings *:not(:last-child) { margin-bottom: 5px; }
+    .player-settings > *:not(:last-child) { margin-bottom: 5px; }
 }
 
 @media only screen and (max-width: 490px) {
+    #episode-skip-intro {
+        padding: 7px 20px;
+        font-size: 9pt;
+    }
     .bl-container h1 {
         font-size: 19pt;
         color: var(--accent-color);
