@@ -970,6 +970,9 @@ body {
         font-size: 10pt;
         margin-top: 5px;
     }
+    .episode-tag {
+        font-size: 10px;
+    }
     .playeer-episode-skip { font-size: 11pt; }
     .anime-list-header {
         display: block;
@@ -1028,10 +1031,7 @@ body {
         font-size: 7pt;
     }
 
-    .anime-title {
-        font-size: 9pt;
-    }
-
+    .anime-title,
     .anime-details-trailer {
         font-size: 9pt;
     }
