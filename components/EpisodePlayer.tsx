@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import VideoPlayer from './VideoPlayer'
 import Link from 'next/link'
 import Popup from "./Popup"
@@ -38,6 +38,7 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
     const [introInterval, updateIntroInterval] = useState<[number, number]>([0, 0])
     const [status, updateStatus] = useState<string[]>([])
     const [episodeTitle, updateTitle] = useState<string>("")
+    const downloadListTrigger = useRef()
 
     /**
      * This sets the status of fetching for the episode source URLs
@@ -252,7 +253,7 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
                 <div className="server-settings">
                     {Object.keys(episodeSources).length && !status.includes("pending") ?
                         <>
-                            <span id="download-button" className="mdi mdi-download mdi-nm"></span>
+                            <span ref={ downloadListTrigger } id="download-button" className="mdi mdi-download mdi-nm"></span>
                             <select name="server" className="selection" id="server-select" onChange={(e) => updateCurrent([e.target.value, episodeSources[e.target.value]])} value={currentSource[0]}>
                                 {
                                     Object.keys(episodeSources).map((key, index) => {
@@ -275,7 +276,7 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
                 }
             </div>
             { !status.includes("pending") ?
-            <Popup id="download-popup" trigger="#download-button" title="تحميل">
+            <Popup id="download-popup" trigger={ downloadListTrigger } title="تحميل">
                 <div id="downloads-list" className="popup-list">
                     {Object.keys(episodeSources).map(sourceKey => {
                         if (supportedServers.includes(sourceKey.slice(0,2))) {

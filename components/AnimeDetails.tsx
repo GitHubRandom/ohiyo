@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useRef, useState } from "react"
 import ExpandableText from "./ExpandableText"
 import { getEpisodeTags } from '../components/WatchTopBar'
 import Link from 'next/link'
@@ -72,13 +72,13 @@ const source: Record<string,string> = {
 }
 
 interface TAnimeDetails {
-    episodesList: Array<Record<string,any>>,
-    animeDetails: Record<string,any>,
+    animeDetails: Record<string,any>
 }
 
-const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
+const AnimeDetails = ({ animeDetails }: TAnimeDetails) => {
 
     const [ ascending, updateEpisodesOrder ] = useState<boolean>(true)
+    const trailerPopupTrigger = useRef()
 
     function getRate(rate:string) {
         switch (true) {
@@ -93,14 +93,6 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
             default:
                 return "غير معروف"
         }
-    }
-
-    const reverseList = useCallback(() => {
-        updateEpisodesOrder(!ascending)
-    }, [ascending])
-
-    function dismissPopup() {
-        (document.getElementsByClassName("popup")[0] as HTMLElement).style.display = "none"
     }
 
     function render() {
@@ -123,7 +115,7 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
                         </span>
                         </div>
                         { ready ? 
-                        <button id="trailer-button" className="anime-details-trailer"><span className="mdi mdi-play"></span>العرض الدعائي</button> : null }
+                        <button ref={ trailerPopupTrigger } id="trailer-button" className="anime-details-trailer"><span className="mdi mdi-play"></span>العرض الدعائي</button> : null }
                     </div>
                     { ready ? 
                     <div className="anime-meta">
@@ -171,32 +163,8 @@ const AnimeDetails = ({ episodesList, animeDetails }: TAnimeDetails) => {
                         </p> 
                     </div> : null }
                 </div>
-                { ready && episodesList.length > 1 ?
-                <Popup id="episodes-popup" trigger="#episodes-button" title="الحلقات">
-                    { ascending ? <>
-                        <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
-                            <span className="mdi mdi-sort-ascending"></span>تصاعدي
-                        </div>
-                        <div id="episodes-list" className="popup-list">
-                            { episodesList.map((episode,index) => {
-                                return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + '-' + animeDetails.mal_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</a></Link>
-                            })}
-                        </div>
-                        </>
-                    : <>
-                        <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
-                            <span className="mdi mdi-sort-descending"></span>تنازلي
-                        </div>
-                        <div id="episodes-list" className="popup-list">
-                            { episodesList.map((episode,index) => {
-                                return <Link scroll={ false } href={ "/watch/" + animeDetails.anime_id + '-' + animeDetails.mal_id + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</a></Link>
-                            }).reverse()}
-                        </div>
-                        </>
-                    }
-                </Popup> : null }
                 { ready && animeDetails.trailer_url ? 
-                <Popup id="trailer-popup" trigger="#trailer-button" title="العرض الدعائي">
+                <Popup id="trailer-popup" trigger={ trailerPopupTrigger } title="العرض الدعائي">
                     <iframe allowFullScreen={ true } src={ animeDetails.trailer_url } frameBorder="0"></iframe>
                 </Popup> : null }
             </section>

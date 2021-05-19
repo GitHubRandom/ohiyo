@@ -1,8 +1,8 @@
-import React, { useState, useEffect, FunctionComponent } from "react"
+import React, { useState, useEffect, FunctionComponent, RefObject } from "react"
 import { AnimatePresence, motion } from 'framer-motion'
 
 interface IPopup {
-    trigger: string,
+    trigger: RefObject<HTMLElement>,
     id: string,
     title: string
 }
@@ -12,24 +12,12 @@ const Popup = ({ children, trigger, id, title }: React.PropsWithChildren<IPopup>
     const [ visible, updateVisibility ] = useState(false)
 
     useEffect(() => {
-        /**
-         * Add click listeners to selected triggers
-         * to make popup appears. @Ritzy
-         */
-        if (trigger) {
-            if (trigger.startsWith("#")) {
-                document.getElementById(trigger.slice(1))?.addEventListener("click", () => {
-                    updateVisibility(true)
-                })
-            } else if (trigger.startsWith(".")) {
-                Array.from(document.getElementsByClassName(trigger.slice(1))).forEach(element => {
-                    element.addEventListener("click", () => {
-                        updateVisibility(true)
-                    })
-                });
-            }
+        if (trigger.current) {
+            trigger.current.addEventListener('click', () => {
+                updateVisibility(true)
+            }) 
         }
-    }, [])
+    }, [trigger])
 
     useEffect(() => {
         if (visible) {
