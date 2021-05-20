@@ -1,8 +1,8 @@
 import React, { useCallback, useRef, useState } from "react"
 import ExpandableText from "./ExpandableText"
-import { getEpisodeTags } from '../components/WatchTopBar'
 import Link from 'next/link'
 import Popup from "./Popup"
+import { motion } from "framer-motion"
 
 export const animeGenres: Record<string,any> = {
     Action: "أكشن",
@@ -98,7 +98,7 @@ const AnimeDetails = ({ animeDetails }: TAnimeDetails) => {
     function render() {
         var ready = Object.keys(animeDetails).length != 0
         return (
-            <section className="anime-details">
+            <motion.section animate={{ translateX: 0, opacity: 1 }} initial={{ translateX: 20, opacity: 0 }} transition={{ delay: 0.5 }} className="anime-details">
                 <div className="anime-details-info">
                     <div className="anime-details-side">
                         <div { ... ready ? {
@@ -167,7 +167,7 @@ const AnimeDetails = ({ animeDetails }: TAnimeDetails) => {
                 <Popup id="trailer-popup" trigger={ trailerPopupTrigger } title="العرض الدعائي">
                     <iframe allowFullScreen={ true } src={ animeDetails.trailer_url } frameBorder="0"></iframe>
                 </Popup> : null }
-            </section>
+            </motion.section>
         )
     }
 

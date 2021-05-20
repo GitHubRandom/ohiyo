@@ -160,7 +160,7 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
                 return " - Full HD"
             }
             if (key.endsWith("Link")) {
-                return " - HD"
+                return ""
             }
             if (key.endsWith("LowQ")) {
                 return " - SD"
