@@ -9,6 +9,7 @@ import Head from 'next/head'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import tippy from 'tippy.js'
+import { useRef } from 'react'
 
 // From all of this I learned how shit is the Anime Slayer API. Just sayin'. @ritzy
 
@@ -126,6 +127,7 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
 
     const router = useRouter()
     const [ episodeTitle, updateEpisodeTitle ] = useState<string>("")
+    const hamburgerButton = useRef()
 
     useEffect(() => {
         window.scrollTo(0, 60)
@@ -161,8 +163,8 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                 `}</style>
             </Head>
             <div id="watch" className="menu-content">
-                <WatchNavigation />
-                <Navigation trigger="#hamburger-menu" secondary={ true } selected="none" shown={ false } />
+                <WatchNavigation hamburgerButtonRef={ hamburgerButton } />
+                <Navigation trigger={ hamburgerButton } secondary={ true } selected="none" shown={ false } />
                 <div className="watch-page">
                     <WatchTopBar mal={ details.mal_id } animeId={ details.anime_id } episodesList={ episodes } episodeTitle={ episodeTitle } episodeNumber={ episodeNumber } episodeName={ episodeName } animeTitle={ details.title } />
                     <EpisodePlayer episodeName={ episodeName } animeName={ details.title } setEpisodeTitle={ (title) => updateEpisodeTitle(title) } mal={ details.mal_id } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />   

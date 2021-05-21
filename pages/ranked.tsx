@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import NavigationWrapper from '../containers/NavigationWrapper'
 import ContentList from '../components/ContentList'
 import Head from 'next/head'
+import { useRef } from "react"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
@@ -48,6 +49,7 @@ const Ranked = ({ ranking, page }) => {
 
     const [ data, updateData ] = useState<Record<string,any>[]>([])
     const [ refreshed, updateRefreshed ] = useState<boolean>(false)
+    const hamburgerButton = useRef()
     const router = useRouter()
     
     useEffect(() => {
@@ -88,9 +90,9 @@ const Ranked = ({ ranking, page }) => {
                 <meta property="og:description" content="تصنيف الأنمي حسب التقييم العام على MyAnimeList" />
                 <meta property="og:type" content="website" />
             </Head>
-            <NavigationWrapper navTrigger="#hamburger-menu" contentId="ranked" selected="ranked">
+            <NavigationWrapper navTrigger={ hamburgerButton } contentId="ranked" selected="ranked">
                 <div id="ranked-page" className="content-page">
-                    <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>تصنيف الأنمي (MAL)</h2>
+                    <h2 className="section-title"><span ref={ hamburgerButton } id="hamburger-menu" className="mdi mdi-menu"></span>تصنيف الأنمي (MAL)</h2>
                     <ContentList latest={ false } className="content-list" contentList={ page == 1 ? ranking : data } />
                     <div className="bottom-detector"></div>
                 </div>

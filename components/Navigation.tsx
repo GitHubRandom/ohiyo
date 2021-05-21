@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react"
+import { RefObject, useEffect, useState } from "react"
 import Link from 'next/link'
 import { MENU_ENTRIES } from "../utils/Constants"
 
 interface INavigation {
-    trigger: string,
+    trigger: RefObject<HTMLElement>,
     selected: string,
     shown: boolean,
     secondary?: boolean
@@ -22,24 +22,12 @@ const Navigation = ({ trigger, selected, shown, secondary }: INavigation) => {
     }
 
     useEffect(() => {
-        /**
-         * Add click listeners to selected triggers
-         * to make side menu appears (or disappear). @Ritzy
-         */
-        if (trigger) {
-            let elements = document.querySelectorAll(trigger)
-            if (elements.length) {
-                elements.forEach(element => {
-                    if (!element.getAttribute("data-attached-click") || element.getAttribute("data-attached-click") !== "true") {
-                        element.addEventListener("click", () => {
-                            openMenu()
-                        })
-                        element.setAttribute("data-attached-click", "true")
-                    }
-                })
-            }
+        if (trigger.current) {
+            trigger.current.addEventListener('click', () => {
+                openMenu()
+            })
         }
-    }, [])    
+    }, [trigger])    
 
     return (
         // Secondary class name means that there is a top navigation and the side menu is secondary

@@ -6,6 +6,7 @@ import Head from 'next/head'
 import NavigationWrapper from '../containers/NavigationWrapper'
 import TabIndicator from '../components/TabIndicator'
 import Link from 'next/link'
+import { useRef } from "react"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Record<string,any> = {}
@@ -101,7 +102,7 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
     })
     const [ refreshed, updateRefreshed ] = useState<boolean>(false)
     const [ currentPage, updateCurrent ] = useState<number>(1)
-    const [ firstInit, updateInit ] = useState<boolean>(false)
+    const hamburgerButton = useRef()
     const [ stickyQuery, updateStickyQuery ] = useState<Record<string,string>>({})
     
     const updateSearch = (value: string) => {
@@ -182,10 +183,10 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
                 <meta property="og:description" content="اختر الأنمي ضمن القائمة أو إبحث عن الأنمي" />
                 <meta property="og:type" content="website" />
             </Head>
-            <NavigationWrapper navTrigger="#hamburger-menu" contentId="all" selected="list-all">
+            <NavigationWrapper navTrigger={ hamburgerButton } contentId="all" selected="list-all">
                 <div id="all-page" className="content-page">
                     <div className="anime-list-header">
-                        <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>قائمة الأنمي</h2>
+                        <h2 className="section-title"><span ref={ hamburgerButton } id="hamburger-menu" className="mdi mdi-menu"></span>قائمة الأنمي</h2>
                         <div className="anime-search-container">
                             <input onInput={ (e: React.ChangeEvent<HTMLInputElement>) => updateSearch(e.target.value) } placeholder="البحث عن الأنمي" type="text" name="anime-search" id="anime-search"/>
                         </div>

@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ContentList from '../components/ContentList'
 import NavigationWrapper from '../containers/NavigationWrapper'
 import { useRouter } from 'next/router'
@@ -40,6 +40,7 @@ export default function Home({ newEpisodes, page }) {
 
     const [data, updateData] = useState<Record<string, any>[]>([])
     const [refreshed, updateRefreshed] = useState<boolean>(false)
+    const hamburgerButton = useRef()
     const router = useRouter()
 
     useEffect(() => {
@@ -88,9 +89,9 @@ export default function Home({ newEpisodes, page }) {
                 <meta property="og:description" content="موقع لمشاهدة الأنمي المترجم بجودة عالية" />
                 <meta property="og:type" content="website" />
             </Head>
-            <NavigationWrapper navTrigger="#hamburger-menu" contentId="home" selected="home">
+            <NavigationWrapper navTrigger={ hamburgerButton } contentId="home" selected="home">
                 <div id="home-page" className="content-page">
-                    <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>آخر الحلقات</h2>
+                    <h2 className="section-title"><span ref={ hamburgerButton } id="hamburger-menu" className="mdi mdi-menu"></span>آخر الحلقات</h2>
                     { data.length < page * 25 && page != 1 ? 
                     <p id="page-warning" className="list-notice"><span className="mdi mdi-information"></span>أنت الآن في الصفحة { page }. <Link href="/" scroll={ true } ><a className="link">العودة للصفحة الأولى</a></Link></p>
                     : null }

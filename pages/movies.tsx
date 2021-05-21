@@ -5,6 +5,7 @@ import ContentList from '../components/ContentList'
 import NavigationWrapper from '../containers/NavigationWrapper'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { useRef } from 'react'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
@@ -40,6 +41,7 @@ export default function Movies({ newMovies, page }) {
 
     const [ data, updateData ] = useState<Record<string,any>[]>([])
     const [ refreshed, updateRefreshed ] = useState<boolean>(false)
+    const hamburgerButton = useRef()
     const router = useRouter()
 
     useEffect(() => {
@@ -84,9 +86,9 @@ export default function Movies({ newMovies, page }) {
                 <meta property="og:description" content="شاهد آخر أفلام الأنمي المترجمة بجودة عالية على موقعنا" />
                 <meta property="og:type" content="website" />
             </Head>
-            <NavigationWrapper navTrigger="#hamburger-menu" contentId="movies" selected="movies">
+            <NavigationWrapper navTrigger={ hamburgerButton } contentId="movies" selected="movies">
                 <div id="movies-page" className="content-page">
-                    <h2 className="section-title"><span id="hamburger-menu" className="mdi mdi-menu"></span>آخر الأفلام</h2>
+                    <h2 className="section-title"><span ref={ hamburgerButton } id="hamburger-menu" className="mdi mdi-menu"></span>آخر الأفلام</h2>
                     { data.length < page * 25 && page != 1 ? 
                     <p id="page-warning" className="list-notice"><span className="mdi mdi-information"></span>أنت الآن في الصفحة { page }. <Link href="/movies" scroll={ true } ><a className="link">العودة للصفحة الأولى</a></Link></p>
                     : null }

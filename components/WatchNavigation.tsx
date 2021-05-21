@@ -1,11 +1,16 @@
 import Link from 'next/link'
+import { RefObject } from 'react'
 import { MENU_ENTRIES } from "../utils/Constants"
 
-const WatchNavigation = () => {
+interface IWatchNavigation {
+    hamburgerButtonRef: RefObject<HTMLElement>
+}
+
+const WatchNavigation = ({ hamburgerButtonRef }: IWatchNavigation) => {
     return (
         <nav className={ "watch-menu" }>
             <section className="logo-section">
-                <span id="hamburger-menu" className="mdi mdi-menu"></span>
+                <span ref={ hamburgerButtonRef } id="hamburger-menu" className="mdi mdi-menu"></span>
                 <Link href="/"><a id="watch-nav" className="main-logo">Animayhem</a></Link>
             </section>
             <section className="menu-section">
