@@ -3,7 +3,7 @@ import VideoPlayer from './VideoPlayer'
 import Link from 'next/link'
 import Popup from "./Popup"
 
-const supportedServers = ["OK", "FR", "SF"]
+const supportedServers = ["OK", "FR", "SF", "FD"]
 const serverKeys = {
     OK: "Ok.ru",
     FR: "Mediafire",
@@ -57,9 +57,6 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
      * @param sources An stringified array of the different sources (object)
      */
     function getServers(sources: Record<string, string>) {
-        // Remove backslashes in sources list
-        let currentUpdated = false // A boolean to know if there is current server selected or not
-
         let sourcesKeys = Object.keys(sources)
         updateStatus(Array(sourcesKeys.length).fill("pending"))
 
@@ -75,8 +72,8 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
             let item = sources[key]
             item = item.replace("http://", "https://")
             switch (true) {
-                case key.startsWith("FD"):
-                    setUnsupportedServer(key, "https://fembed.com/v/" + item, index); return
+                //case key.startsWith("FD"):
+                    //setUnsupportedServer(key, "https://fembed.com/v/" + item, index); return
                 case key.startsWith("MA"):
                     setUnsupportedServer(key, "https://mega.nz/embed/" + item, index); return
                 case key.startsWith("MS"):
@@ -87,9 +84,14 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
                     break;
             }
             let isOk = key.startsWith("OK")
+            let isFd = key.startsWith("FD")
             let headers = { 'User-Agent': navigator.userAgent }
             let method = 'GET'
             switch (true) {
+                case isFd:
+                    item = "https://quiet-cove-27971.herokuapp.com/www.fembed.com/api/source/" + item
+                    method = 'POST'
+                    break
                 case key.startsWith("FR"):
                     item = "https://quiet-cove-27971.herokuapp.com/www.mediafire.com/?" + item
                     break
@@ -108,14 +110,14 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
                 headers: new Headers(headers)
             })
                 .then((response) => {
-                    if (isOk) {
+                    if (isOk || isFd) {
                         return response.json()
                     } else {
                         return response.text()
                     }
                 })
                 .then((data) => {
-                    let ds = isOk ? decodeServers(key, data) : decodeHTML(key, data, key.substr(-3, 3))
+                    let ds = isOk || isFd ? decodeServers(key, data) : decodeHTML(key, data, key.substr(-3, 3))
                     if (ds[0].length && ds[1].length) {
                         updateSources(oldEpisodeSources => {
                             const oldLinks = oldEpisodeSources[ds[0]]
@@ -337,9 +339,18 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
             // Videos links are in "videos" array of the JSON response
             if ("videos" in data) {
                 data["videos"].forEach((quality: Record<string, string>) => {
-                    if (quality["name"] in q) qualities.push({ type: "normal", url: quality["url"], name: q[quality["name"]] })
+                    if (quality["name"] in q) qualities.push({ type: "normal", url: quality.url, name: q[quality.name] })
                 })
                 return [key, qualities]
+            }
+            return ["", []]
+        } else if (key.startsWith("FD")) {
+            let qualities: Array<Record<string, string>> = []
+            if ("data" in data) {
+                data.data.forEach((quality: Record<string,string>) => {
+                    qualities.push({ type: "normal", url: "https://quiet-cove-27971.herokuapp.com/" + quality.file, name: quality.label })
+                })
+                return [ key, qualities ]
             }
             return ["", []]
         }
