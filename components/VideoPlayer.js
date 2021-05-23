@@ -94,7 +94,6 @@ class VideoPlayer extends React.Component {
 
     render() {
         return (
-            <>
             <div dir="ltr" ref={ this.videoContainer } className="anime-video-player">
                 <button onClick={ this.skipIntro } ref={ this.introButton } style={{ display: "none" }} type="button" id="episode-skip-intro">
                     تخطي المقدمة
@@ -106,22 +105,7 @@ class VideoPlayer extends React.Component {
                     </div>  
                     <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ this.rewindTen } ref={ this.rewind } id="rewind" className="control-overlay">
                     </div></> : null }
-                    
             </div>
-            <script type="text/javascript" data-cfasync="false" src="//st.bebi.com/bebi_v3.js"></script>
-            <script dangerouslySetInnerHTML={{
-                __html: `
-                    if(!window.BB_ind) { BB_ind = 0; } if(!window.BB_r) { BB_r = Math.floor(Math.random()*1000000000)} 
-                    BB.getAds(
-                        "video-ad",  // -> div id 
-                        2018624, // -> placement id
-                        BB_ind++, 
-                        true // -> this parameter defines if you want to clear the div before inserting or not.
-                    ); 
-                `
-            }}>
-            </script>
-            </>
         )
     }
 }
