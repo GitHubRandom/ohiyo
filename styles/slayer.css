@@ -591,6 +591,7 @@ body {
     font-size: 12pt;
     transition: all 0.125s ease-in-out;
     cursor: pointer;
+    z-index: 2;
 }
 
 #episode-skip-intro:hover {
@@ -888,6 +889,32 @@ body {
 
 .download-link-quality {
     margin: 5px 0;
+}
+
+.control-overlay {
+    position: absolute;
+    height: calc(100% - 50px);
+    width: 40%;
+    top: 0;
+    z-index: 1;
+}
+
+.control-overlay#forward {
+    right: 0;
+}
+
+.control-overlay#rewind {
+    left: 0;
+}
+
+#video-ad {
+    position: absolute;
+    top: 50%;
+    right: 50%;
+}
+
+.dplayer-paused #video-ad {
+    display: none;
 }
 
 @media only screen and (min-width: 1600px) {

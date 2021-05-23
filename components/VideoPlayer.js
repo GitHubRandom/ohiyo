@@ -8,6 +8,12 @@ class VideoPlayer extends React.Component {
         super(props)
         this.introButton = React.createRef()
         this.videoContainer = React.createRef()
+        this.forward = React.createRef()
+        this.rewind = React.createRef()
+        this.videoAd = React.createRef()
+        this.rewindTen = this.rewindTen.bind(this)
+        this.forwardTen = this.forwardTen.bind(this)
+        this.skipIntro = this.skipIntro.bind(this)
     }
 
     initDPlayer() {
@@ -42,9 +48,16 @@ class VideoPlayer extends React.Component {
         })
         document.querySelector(".dplayer-video").removeAttribute("crossorigin")
         this.videoContainer.current.appendChild(this.introButton.current)
+        if (this.forward.current && this.rewind.current) {
+            this.videoContainer.current.appendChild(this.forward.current)
+            this.videoContainer.current.appendChild(this.rewind.current)
+        }
+        if (this.videoAd.current) {
+            this.videoContainer.current.appendChild(this.videoAd.current)
+        }
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
+    shouldComponentUpdate(nextProps,_) {
         if (this.props.introInterval[0] != nextProps.introInterval[0] && this.props.introInterval[1] != nextProps.introInterval[1]) {
             return false
         }
@@ -60,6 +73,14 @@ class VideoPlayer extends React.Component {
         this.initDPlayer()
     }
 
+    forwardTen() {
+        this.player.seek(this.player.video.currentTime + 10)
+    }
+
+    rewindTen() {
+        this.player.seek(this.player.video.currentTime - 10)
+    }
+
     skipIntro() {
         if (this.props.introInterval != undefined && this.props.introInterval.length != 0) {
             this.player.seek(this.props.introInterval[1])
@@ -73,11 +94,34 @@ class VideoPlayer extends React.Component {
 
     render() {
         return (
+            <>
             <div dir="ltr" ref={ this.videoContainer } className="anime-video-player">
-                <button onClick={ this.skipIntro.bind(this) } ref={ this.introButton } style={{ display: "none" }} type="button" id="episode-skip-intro">
+                <button onClick={ this.skipIntro } ref={ this.introButton } style={{ display: "none" }} type="button" id="episode-skip-intro">
                     تخطي المقدمة
-                </button>  
+                </button>
+                <div ref={ this.videoAd } id="video-ad">
+                </div>
+                { /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? <>
+                    <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ this.forwardTen } ref={ this.forward } id="forward" className="control-overlay">
+                    </div>  
+                    <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ this.rewindTen } ref={ this.rewind } id="rewind" className="control-overlay">
+                    </div></> : null }
+                    
             </div>
+            <script type="text/javascript" data-cfasync="false" src="//st.bebi.com/bebi_v3.js"></script>
+            <script dangerouslySetInnerHTML={{
+                __html: `
+                    if(!window.BB_ind) { BB_ind = 0; } if(!window.BB_r) { BB_r = Math.floor(Math.random()*1000000000)} 
+                    BB.getAds(
+                        "video-ad",  // -> div id 
+                        2018624, // -> placement id
+                        BB_ind++, 
+                        true // -> this parameter defines if you want to clear the div before inserting or not.
+                    ); 
+                `
+            }}>
+            </script>
+            </>
         )
     }
 }
