@@ -180,6 +180,8 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
                     break
                 } else if (key.startsWith("OU")) {
                     selected = key
+                } else if (key.startsWith("FD")) {
+                    selected = key
                 }
             }
             updateCurrent([selected, episodeSources[selected]])
