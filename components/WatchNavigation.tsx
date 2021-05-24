@@ -11,7 +11,7 @@ const WatchNavigation = ({ hamburgerButtonRef }: IWatchNavigation) => {
         <nav className={ "watch-menu" }>
             <section className="logo-section">
                 <span ref={ hamburgerButtonRef } id="hamburger-menu" className="mdi mdi-menu"></span>
-                <Link href="/"><a id="watch-nav" className="main-logo">Animayhem dev</a></Link>
+                <Link href="/"><a id="watch-nav" className="main-logo">Animayhem</a></Link>
             </section>
             <section className="menu-section">
                 { MENU_ENTRIES.filter(entry => entry.visible).map(entry => {
