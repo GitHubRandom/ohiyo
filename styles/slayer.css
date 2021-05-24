@@ -716,6 +716,7 @@ body {
     cursor: pointer;
     padding: 5px;
     border-radius: 5px;
+    user-select: none;
 }
 
 .popup-close:hover {
@@ -757,6 +758,7 @@ body {
     z-index: 1;
     font-weight: bold;
     flex-shrink: 0;
+    user-select: none;
 }
 
 #hamburger-menu {
