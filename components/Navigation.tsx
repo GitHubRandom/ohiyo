@@ -33,7 +33,7 @@ const Navigation = ({ trigger, selected, shown, secondary }: INavigation) => {
         // Secondary class name means that there is a top navigation and the side menu is secondary
         <nav className={ secondary ? (isShown ? "main-menu shown secondary" : "main-menu hidden secondary") : (isShown ? "main-menu shown" : "main-menu hidden") }>
             <section className="logo-section">
-                <div id="side-nav" className="main-logo">Animayhem</div>
+                <div id="side-nav" className="main-logo">Animayhem dev</div>
             </section>
             <section className="menu-section">
                 { MENU_ENTRIES.filter(entry => entry.visible).map(entry => {
