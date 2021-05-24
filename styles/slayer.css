@@ -919,6 +919,11 @@ body {
     display: none;
 }
 
+.dplayer-quality {
+    z-index: unset !important;
+    /* A fix for quality switcher showing on top of popup overlay. It shouldn't be set anyway */
+}
+
 @media only screen and (min-width: 1600px) {
     .content-page {
         max-width: 1000px
