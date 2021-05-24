@@ -22,7 +22,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
      * Make sure there is a from-episode query parameter if only animeId is specified
      * Redirect to first episode otherwise
      */
-    if (queryParams.length < 2 && !context.query["from-episode"]) {
+    if (queryParams.length < 2) {
         context.res.writeHead(301, {
             Location: `/watch/${queryParams[0]}/1`
         })
@@ -32,6 +32,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // Check if both parameters are strings & parameters do not exceed three
     if (queryParams.length >= 3) {
+        return {
+            notFound: true
+        }
+    }
+
+    if (isNaN(parseInt(queryParams[1])) && queryParams[1] != "latest") {
         return {
             notFound: true
         }
