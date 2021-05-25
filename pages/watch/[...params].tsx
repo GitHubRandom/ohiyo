@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import tippy from 'tippy.js'
 import { useRef } from 'react'
+import WatchFooter from '../../components/WatchFooter'
 
 // From all of this I learned how shit is the Anime Slayer API. Just sayin'. @ritzy
 
@@ -177,6 +178,7 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                     <AnimeDetails animeDetails={ details } />
                     {/*<RelatedContent related={ details.related_animes.data } />*/}
                 </div>
+                <WatchFooter />
             </div>
         </>
     )    

@@ -924,6 +924,25 @@ body {
     /* A fix for quality switcher showing on top of popup overlay. It shouldn't be set anyway */
 }
 
+.watch-footer {
+    display: flex;
+    justify-content: center;
+}
+
+.copyright {
+    color: rgb(54, 54, 54);
+    margin-bottom: 0;
+}
+
+.copyright-animayhem {
+    font-family: "Ninja Naruto";
+    color: inherit;
+}
+
+.copyright-animayhem:hover {
+    color: var(--accent-color);
+}
+
 @media only screen and (min-width: 1600px) {
     .content-page {
         max-width: 1000px
