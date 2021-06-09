@@ -69,12 +69,8 @@ class VideoPlayer extends React.Component {
     }
 
     componentDidUpdate() {
-        //this.player.destroy()
-        //this.initDPlayer()
-        this.player.switchVideo({
-            quality: this.props.sources,
-            defaultQuality: 0
-        })
+        this.player.destroy()
+        this.initDPlayer()
     }
 
     forwardTen() {
