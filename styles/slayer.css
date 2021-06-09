@@ -915,7 +915,7 @@ body {
     display: none;
 }
 
-.dplayer-quality {
+.dplayer-quality button {
     z-index: unset !important;
     /* A fix for quality switcher showing on top of popup overlay. It shouldn't be set anyway */
 }
