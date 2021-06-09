@@ -96,7 +96,7 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
                     item = "https://quiet-cove-27971.herokuapp.com/www.mediafire.com/?" + item
                     break
                 case key.startsWith("SF"):
-                    item = "/api/cors?link=https://www.solidfiles.com/v/" + item
+                    item = "/api/cors?link=http://www.solidfiles.com/v/" + item
                     break
                 case isOk:
                     method = 'POST'

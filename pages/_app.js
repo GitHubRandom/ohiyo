@@ -11,7 +11,6 @@ import Head from 'next/head';
 function MyApp({ Component, pageProps }) {
 
     const adBlockDetected = useDetectAdBlock()
-    const [pageReady, updatePageReady] = useState(true)
 
     NProgress.configure({
         minimum: 0.3,
@@ -21,15 +20,12 @@ function MyApp({ Component, pageProps }) {
     })
 
     Router.events.on('routeChangeStart', () => {
-        updatePageReady(false)
         NProgress.start()
     })
     Router.events.on('routeChangeComplete', () => {
-        updatePageReady(true)
         NProgress.done()
     })
     Router.events.on('routeChangeError', () => { 
-        updatePageReady(false)
         NProgress.done()
     })    
 
