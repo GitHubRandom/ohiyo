@@ -74,14 +74,14 @@ const WatchTopBar = ({ mal, animeId, episodesList, episodeTitle, episodeNumber, 
             الحلقات
             </motion.div> : null }
             { episodesList.length > 1 ?
-                <Popup id="episodes-popup" trigger={ episodesPopupTrigger } title="الحلقات">
+                <Popup id="episodes-popup" dismissOnRouterEvent={ true } trigger={ episodesPopupTrigger } title="الحلقات">
                     { ascending ? <>
                         <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
                             <span className="mdi mdi-sort-ascending"></span>تصاعدي
                         </div>
                         <div id="episodes-list" className="popup-list">
                             { episodesList.map((episode,index) => {
-                                return <Link scroll={ false } href={ "/watch/" + animeId + '-' + mal + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</a></Link>
+                                return <Link scroll={ false } href={ "/watch/" + animeId + '-' + mal + "/" + (index + 1) } key={ index }><a className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</a></Link>
                             })}
                         </div>
                         </>
@@ -91,7 +91,7 @@ const WatchTopBar = ({ mal, animeId, episodesList, episodeTitle, episodeNumber, 
                         </div>
                         <div id="episodes-list" className="popup-list">
                             { episodesList.map((episode,index) => {
-                                return <Link scroll={ false } href={ "/watch/" + animeId + '-' + mal + "/" + (index + 1) } key={ index }><a onClick={ () => dismissPopup() } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</a></Link>
+                                return <Link scroll={ false } href={ "/watch/" + animeId + '-' + mal + "/" + (index + 1) } key={ index }><a className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</a></Link>
                             }).reverse()}
                         </div>
                         </>

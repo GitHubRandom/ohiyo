@@ -1,13 +1,15 @@
 import React, { useState, useEffect, FunctionComponent, RefObject } from "react"
 import { AnimatePresence, motion } from 'framer-motion'
+import { Router } from "next/router"
 
 interface IPopup {
     trigger: RefObject<HTMLElement>,
     id: string,
-    title: string
+    title: string,
+    dismissOnRouterEvent?: boolean
 }
 
-const Popup = ({ children, trigger, id, title }: React.PropsWithChildren<IPopup>) => {
+const Popup = ({ children, trigger, id, title, dismissOnRouterEvent }: React.PropsWithChildren<IPopup>) => {
 
     const [ visible, updateVisibility ] = useState(false)
 
@@ -20,12 +22,15 @@ const Popup = ({ children, trigger, id, title }: React.PropsWithChildren<IPopup>
     }, [trigger])
 
     useEffect(() => {
-        if (visible) {
-            (document.querySelector("body") as HTMLElement).style.overflow = "hidden"
-        } else {
-            (document.querySelector("body") as HTMLElement).style.overflow = "unset"
+        console.log("useEffect !")
+        if (dismissOnRouterEvent) {
+            console.log("Attached !")
+            Router.events.on("routeChangeStart", () => {
+                console.log("Fired !")
+                updateVisibility(false)
+            })
         }
-    }, [visible])
+    },[])
 
     return (
         <AnimatePresence>
