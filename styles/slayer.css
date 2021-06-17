@@ -939,6 +939,32 @@ body {
     color: var(--accent-color);
 }
 
+.opening-hint {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    direction: rtl;
+    align-items: center;
+    background-color: var(--accent-color);
+    color: black;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.opening-hint-text p {
+    margin: 0;
+}
+
+.opening-hint-text p:last-child {
+    direction: ltr;
+    font-weight: bold;
+}
+
+.opening-hint-text p:first-child {
+    font-size: 10pt;
+}
+
 @media only screen and (min-width: 1600px) {
     .content-page {
         max-width: 1000px

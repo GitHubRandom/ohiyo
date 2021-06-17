@@ -26,10 +26,11 @@ interface TEpisodePlayer {
     episodeNumber: number,
     mal: string,
     episodeName: string,
-    setEpisodeTitle: (title: string) => void
+    setEpisodeTitle: (title: string) => void,
+    openingsInfo: string[]
 }
 
-const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, animeId, episodeNumber, mal }: TEpisodePlayer) => {
+const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, animeId, episodeNumber, mal, openingsInfo }: TEpisodePlayer) => {
 
     type quality = Record<string, string>[]
 
@@ -197,7 +198,7 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
             }
         })
         getServers(sources)
-        // Fetching episode title from MyAnimeList (via Jikan)
+        // Fetching episode title & openings info from MyAnimeList (via Jikan)
         fetch("https://api.jikan.moe/v3/anime/" + mal + "/episodes/" + Math.ceil(parseInt(episode.Episode) / 100))
             .then(res => res.json())
             .then(data => {
@@ -205,7 +206,7 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
                     let epData = data.episodes[(parseInt(episode.Episode) - 1) % 100]
                     setEpisodeTitle(epData.title)
                     updateTitle(epData.title)
-                } catch (err) { } // Fail silently
+                } catch (err) { return } // Fail silently
             })
             .catch(err => console.error(err))
         // Fetching intro timestamps
@@ -231,10 +232,29 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
         }
     }, [episodeNumber])
 
+    const findOpeningTheme = () => {
+        let theOpening = ""
+        if (openingsInfo.length > 1) {
+            theOpening = openingsInfo.find(opening => {
+                let episodesInterval = opening.match(/\d{1,3}-\d{0,3}/)
+                if (!episodesInterval) {
+                    return ""
+                }
+                let episodesIntervalLimits = episodesInterval[0].split('-')
+                let episodeNameNumber = episodeName.match(/\d{1,3}/)[0]
+                return (parseInt(episodeNameNumber) <= parseInt(episodesIntervalLimits[1]) || !episodesIntervalLimits[1].length) && parseInt(episodeNameNumber) >= parseInt(episodesIntervalLimits[0])
+            })
+        } else if (openingsInfo.length) {
+            theOpening = openingsInfo[0]
+        }
+        return theOpening !== undefined ? theOpening : ""
+    }
+
     return (
         <section className="anime-watch">
             { currentSource[0] && supportedServers.includes(currentSource[0].slice(0, 2)) && !status.includes("pending") ?
                 <VideoPlayer
+                    openingName={ findOpeningTheme().replace(/#\d{1,4}: /, "").replace(/\(eps \d{1,3}-\d{0,3}\)/, "") }
                     introInterval={introInterval}
                     sources={currentSource[0] != "" ? (currentSource[1] as Record<string, string>[]).sort((a, b) => parseInt(b.name.slice(0, -1)) - parseInt(a.name.slice(0, -1))) : []}
                 />
