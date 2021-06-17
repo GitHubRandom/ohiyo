@@ -103,22 +103,27 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
     const [ refreshed, updateRefreshed ] = useState<boolean>(false)
     const [ currentPage, updateCurrent ] = useState<number>(1)
     const hamburgerButton = useRef()
-    const [ stickyQuery, updateStickyQuery ] = useState<Record<string,string>>({})
+    const [ queryInit, updateQueryInit ] = useState<boolean>(false)
+    const [ actualQuery, updateActualQuery ] = useState<Record<string,any>>({})
     
     const updateSearch = (value: string) => {
-        let query: Record<string,string> = {}
-        if (value.length) {
-            query.search = value
+        if (value.length == 0) {
+            deleteQueryParam("search", true)
         }
-        router.push({
-            pathname: "/all",
-            query: { ...stickyQuery, ...query }
-        }, undefined, { scroll: false })
+        updateActualQuery({
+            ...actualQuery,
+            search: value,
+            page: 1
+        })
     }
 
     useEffect(() => {
         if (Object.keys(results).length) {
-            if ( results.status == "success" && page != currentPage ) {
+            if ( results.status == "success" && page == 1 ) {
+                updateResult(results)
+                updateCurrent(1)
+                updateRefreshed(true)
+            } else if ( results.status == "success" && page != currentPage ) {
                 updateResult(oldResults => {
                     return {
                         ...oldResults,
@@ -128,10 +133,6 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
                 })
                 updateCurrent(page)
                 updateRefreshed(true)
-            } else if ( results.status == "success" && page == 1 ) {
-                updateResult(results)
-                updateCurrent(1)
-                updateRefreshed(true)
             }
         }
     }, [results])
@@ -140,10 +141,7 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
         let observer = new IntersectionObserver(entries => {
             if (refreshed && entries[0] && entries[0].isIntersecting) {
                 updateRefreshed(false)
-                router.replace({
-                    pathname: "/all",
-                    query: { ...router.query, page: page + 1 }
-                }, undefined, { scroll: false })
+                updateActualQuery({ ...actualQuery, page: page + 1 })
             }
         })
         if (document.querySelector(".bottom-detector")) {
@@ -156,20 +154,28 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
     }, [page,refreshed])
 
     useEffect(() => {
+        if (!queryInit) {
+            updateQueryInit(true)
+            return
+        }
         if (router.isReady) {
-            let query: Record<string,string> = {}
-            if (router.query.studio) {
-                query.studio = router.query.studio as string
-            }
-            if (router.query.genre) {
-                query.genre = router.query.genre as string
-            }
             router.push({
                 pathname: "/all",
-                query: {...query, ...stickyQuery}
-            })
+                query: actualQuery
+            }, undefined, { scroll: false })
         }
-    }, [stickyQuery])
+    }, [actualQuery])
+
+    const deleteQueryParam = (param: string, reset: boolean) => {
+        if (actualQuery[param]) {
+            let q = { ...actualQuery }
+            if (reset) {
+                q.page = 1
+            }
+            delete q[param]
+            updateActualQuery(q)
+        }
+    }
 
     return (
         <>
@@ -202,10 +208,10 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
                             icon: "mdi mdi-filmstrip-box"
                         }
                     }} setTab={ (tab) => {
-                        if (tab == "movies") { 
-                            updateStickyQuery({ m: '1' }) 
+                        if (tab == "movies") {
+                            updateActualQuery({ ...actualQuery, m: 1, page: 1 })
                         } else {
-                            updateStickyQuery({})
+                            deleteQueryParam("m", true)
                         } 
                     }} selected={ movies ? "movies" : "series" } />
 
