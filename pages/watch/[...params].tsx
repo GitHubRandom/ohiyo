@@ -138,6 +138,7 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
 
     useEffect(() => {
         window.scrollTo(0, 60)
+        console.log(details)
     }, [episodeName])
 
     useEffect(() => {
@@ -158,7 +159,7 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                 <meta name="description" content={ `شاهد ${details.title} - ${episodeName} على Animayhem بجودة عالية` }/>
                 <meta property="og:title" content={ `${details.title} على Animayhem` }/>
                 <meta property="og:site_name" content="Animayhem"/>
-                <meta property="og:url" content={ router.pathname } />
+                <meta property="og:url" content={ "https://animayhem.ga" + router.asPath } />
                 <meta property="og:description" content={ details.synopsis } />
                 <meta property="og:type" content={ details.type == "Movie" ? "video.movie" : "video.episode" } />
                 <meta property="og:image" content={ details.image_url } />
@@ -174,7 +175,7 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                 <Navigation trigger={ hamburgerButton } secondary={ true } selected="none" shown={ false } />
                 <div className="watch-page">
                     <WatchTopBar mal={ details.mal_id } animeId={ details.anime_id } episodesList={ episodes } episodeTitle={ episodeTitle } episodeNumber={ episodeNumber } episodeName={ episodeName } animeTitle={ details.title } />
-                    <EpisodePlayer episodeName={ episodeName } animeName={ details.title } setEpisodeTitle={ (title) => updateEpisodeTitle(title) } mal={ details.mal_id } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />   
+                    <EpisodePlayer openingsInfo={ details.opening_themes } episodeName={ episodeName } animeName={ details.title } setEpisodeTitle={ (title) => updateEpisodeTitle(title) } mal={ details.mal_id } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />   
                     <AnimeDetails animeDetails={ details } />
                     {/*<RelatedContent related={ details.related_animes.data } />*/}
                 </div>
