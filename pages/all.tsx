@@ -69,7 +69,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     if (res && res.ok) {
         const data = await res.json()
-        console.log(data)
         if (Array.isArray(data) && data.length) {
             props.results = {
                 status: "success",
