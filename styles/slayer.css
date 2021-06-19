@@ -950,6 +950,15 @@ body {
     color: black;
     padding: 5px 10px;
     border-radius: 5px;
+    max-width: 300px;
+    transition: all 0.125s ease-in-out;
+}
+
+.opening-hint-icon {
+    background-color: var(--accent-color);
+    border-radius: 50px;
+    padding: 5px;
+    margin-left: 5px;
 }
 
 .opening-hint-text p {
@@ -959,6 +968,7 @@ body {
 .opening-hint-text p:last-child {
     direction: ltr;
     font-weight: bold;
+    text-align: right;
 }
 
 .opening-hint-text p:first-child {

@@ -15,6 +15,9 @@ class VideoPlayer extends React.Component {
         this.rewindTen = this.rewindTen.bind(this)
         this.forwardTen = this.forwardTen.bind(this)
         this.skipIntro = this.skipIntro.bind(this)
+        this.state = {
+            showIntro: false
+        }
     }
 
     initDPlayer() {
@@ -63,9 +66,9 @@ class VideoPlayer extends React.Component {
         }
     }
 
-    shouldComponentUpdate(nextProps,_) {
+    shouldComponentUpdate(nextProps,nextState) {
         return !((this.props.introInterval[0] != nextProps.introInterval[0] && this.props.introInterval[1] != nextProps.introInterval[1])
-            || nextProps.openingName != this.props.openingName) 
+            || nextProps.openingName != this.props.openingName || nextState.showIntro != this.state.showIntro) 
     }
 
     componentDidMount() {
@@ -105,14 +108,14 @@ class VideoPlayer extends React.Component {
                 <div ref={ this.videoAd } id="video-ad">
                 </div>
                 <div style={{ opacity: 0 }} ref={ this.openingHint } className="opening-hint">
-                    <div className="opening-hint-icon">
-                        <span className="mdi mdi-music-note"></span>
+                    <div onClick={ () => this.setState({ showIntro: !this.state.showIntro }) } className="opening-hint-icon">
+                        <span className="mdi mdi-music-note mdi-nm"></span>
                     </div>
                     <div className="opening-hint-text">
                         <p>
                             اسم المقدمة
                         </p>
-                        <p>
+                        <p onClick={ () => navigator.clipboard.writeText(this.props.openingName) }>
                             { this.props.openingName }
                         </p>
                     </div>
