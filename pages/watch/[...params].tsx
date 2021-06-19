@@ -134,12 +134,20 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
 
     const router = useRouter()
     const [ episodeTitle, updateEpisodeTitle ] = useState<string>("")
+    const [ currentEpisodeNumber, updateCurrentEpisodeNumber ] = useState<number>(episodeNumber)
+    const [ currentEpisodeName, updateCurrentEpisodeName ] = useState<string>(episodeName)
     const hamburgerButton = useRef()
 
     useEffect(() => {
         window.scrollTo(0, 60)
-        console.log(details)
-    }, [episodeName])
+        console.log(currentEpisodeNumber)
+        let currentEpisode = episodes[currentEpisodeNumber - 1]
+        if (details.type == "Movie") {
+            updateCurrentEpisodeName("الفلم")
+        } else {
+            updateCurrentEpisodeName(`الحلقة ${currentEpisode.Episode}${currentEpisode.ExtraEpisodes ? `-${currentEpisode.ExtraEpisodes}` : ""}`)
+        }
+    }, [currentEpisodeNumber])
 
     useEffect(() => {
         // Replace the current URL with "/anime_id/episode_number" if it's from episode_id
@@ -149,14 +157,22 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
     }, [episodeNumber])
 
     useEffect(() => {
+        router.push(`/watch/${details.anime_id}-${details.mal_id}/${currentEpisodeNumber}`, undefined, { shallow: true, scroll: false })
+    }, [currentEpisodeNumber])
+
+    const setEpisodeNumber = (newEpisodeNumber: number) => {
+        updateCurrentEpisodeNumber(newEpisodeNumber)
+    }
+
+    useEffect(() => {
         tippy("[data-tippy-content]")
     },[])
     
     return (
         <>
             <Head>
-                <title>{ `${details.title} - ${episodeName}` }</title>
-                <meta name="description" content={ `شاهد ${details.title} - ${episodeName} على Animayhem بجودة عالية` }/>
+                <title>{ `${details.title} - ${currentEpisodeName}` }</title>
+                <meta name="description" content={ `شاهد ${details.title} - ${currentEpisodeName} على Animayhem بجودة عالية` }/>
                 <meta property="og:title" content={ `${details.title} على Animayhem` }/>
                 <meta property="og:site_name" content="Animayhem"/>
                 <meta property="og:url" content={ "https://animayhem.ga" + router.asPath } />
@@ -174,8 +190,8 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                 <WatchNavigation hamburgerButtonRef={ hamburgerButton } />
                 <Navigation trigger={ hamburgerButton } secondary={ true } selected="none" shown={ false } />
                 <div className="watch-page">
-                    <WatchTopBar mal={ details.mal_id } animeId={ details.anime_id } episodesList={ episodes } episodeTitle={ episodeTitle } episodeNumber={ episodeNumber } episodeName={ episodeName } animeTitle={ details.title } />
-                    <EpisodePlayer episodeName={ episodeName } animeName={ details.title } setEpisodeTitle={ (title) => updateEpisodeTitle(title) } mal={ details.mal_id } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />   
+                    <WatchTopBar mal={ details.mal_id } animeId={ details.anime_id } episodesList={ episodes } episodeTitle={ episodeTitle } episodeNumber={ episodeNumber } episodeName={ currentEpisodeName } animeTitle={ details.title } />
+                    <EpisodePlayer setEpisodeNumber={ setEpisodeNumber } animeName={ details.title } setEpisodeTitle={ (title) => updateEpisodeTitle(title) } mal={ details.mal_id } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />   
                     <AnimeDetails animeDetails={ details } />
                     {/*<RelatedContent related={ details.related_animes.data } />*/}
                 </div>

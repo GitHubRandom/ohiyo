@@ -540,6 +540,7 @@ body {
     color: var(--accent-color);
     font-weight: bold;
     border: 1px solid var(--accent-color);
+    cursor: pointer;
 }
 
 .player-episode-skip.disabled {

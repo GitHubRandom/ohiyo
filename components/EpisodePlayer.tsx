@@ -25,11 +25,11 @@ interface TEpisodePlayer {
     animeId: string,
     episodeNumber: number,
     mal: string,
-    episodeName: string,
-    setEpisodeTitle: (title: string) => void
+    setEpisodeTitle: (title: string) => void,
+    setEpisodeNumber: (newEpisodeNumber: number) => void
 }
 
-const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, animeId, episodeNumber, mal }: TEpisodePlayer) => {
+const EpisodePlayer = ({ setEpisodeNumber, setEpisodeTitle, animeName, episodesList, animeId, episodeNumber, mal }: TEpisodePlayer) => {
 
     type quality = Record<string, string>[]
 
@@ -37,6 +37,7 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
     const [currentSource, updateCurrent] = useState<[string, string | Record<string, string>[]]>(["", ""])
     const [introInterval, updateIntroInterval] = useState<[number, number]>([0, 0])
     const [status, updateStatus] = useState<string[]>([])
+    const [currentEpisodeNumber, updateCurrentEpisodeNumber] = useState<number>(episodeNumber)
     const [episodeTitle, updateTitle] = useState<string>("")
     const downloadListTrigger = useRef()
 
@@ -189,7 +190,8 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
     }, [status])
 
     useEffect(() => {
-        let episode = episodesList[episodeNumber - 1]
+        let episode = episodesList[currentEpisodeNumber - 1]
+        setEpisodeNumber(currentEpisodeNumber)
         let sources: Record<string, string> = {}
         Object.keys(episode).map(key => {
             if (episode[key].length > 0 && (key.endsWith("LowQ") || key.endsWith("Link") || key.endsWith("hdQ"))) {
@@ -209,7 +211,7 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
             })
             .catch(err => console.error(err))
         // Fetching intro timestamps
-        fetch(encodeURI(`/api/skip?anime=${animeName}&num=${episodeNumber}&detail=${episode.Episode}`))
+        fetch(encodeURI(`/api/skip?anime=${animeName}&num=${currentEpisodeNumber}&detail=${episode.Episode}`))
             .then(res => {
                 if (res.ok) {
                     return res.json()
@@ -229,7 +231,7 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
             setEpisodeTitle("")
             updateTitle("")
         }
-    }, [episodeNumber])
+    }, [currentEpisodeNumber])
 
     return (
         <section className="anime-watch">
@@ -244,13 +246,17 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
                         : null}
                 </div>}
             <div className="player-settings">
-                {episodeNumber > 1 && episodesList.length != 0 ?
-                    <Link scroll={false} href={"/watch/" + animeId + "-" + mal + "/" + (episodeNumber - 1).toString()}>
+                {currentEpisodeNumber > 1 && episodesList.length != 0 ?
+                    /*<Link scroll={false} href={"/watch/" + animeId + "-" + mal + "/" + (episodeNumber - 1).toString()}>
                         <a data-tippy-content={episodesList[episodeNumber - 2]["episode_name"]} id="previous" className="player-episode-skip">
                             <span className="mdi mdi-chevron-right"></span>
                             الحلقة السابقة
                         </a>
-                    </Link>
+                    </Link>*/
+                    <div onClick={ () => updateCurrentEpisodeNumber(oldEpisodeNumber => oldEpisodeNumber - 1) } data-tippy-content={episodesList[currentEpisodeNumber - 2]["episode_name"]} id="previous" className="player-episode-skip">
+                            <span className="mdi mdi-chevron-right"></span>
+                            الحلقة السابقة
+                    </div>
                     :
                     <a id="previous" className="player-episode-skip disabled"><span className="mdi mdi-chevron-right"></span>الحلقة السابقة</a>
                 }
@@ -268,13 +274,17 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
                         : <span className="servers-loading-message"><span className="mdi mdi-loading mdi-spin"></span>جاري العمل على الخوادم</span>
                     }
                 </div>
-                {episodeNumber < episodesList.length ?
-                    <Link scroll={false} href={"/watch/" + animeId + "-" + mal + "/" + (episodeNumber + 1).toString()}>
+                {currentEpisodeNumber < episodesList.length ?
+                    /*<Link scroll={false} href={"/watch/" + animeId + "-" + mal + "/" + (episodeNumber + 1).toString()}>
                         <a data-tippy-content={episodesList[episodeNumber]["episode_name"]} id="next" className="player-episode-skip">
                             الحلقة القادمة
                             <span className="mdi mdi-chevron-left mdi-left"></span>
                         </a>
-                    </Link>
+                    </Link>*/
+                    <div onClick={ () => updateCurrentEpisodeNumber(oldEpisodeNumber => oldEpisodeNumber + 1) } data-tippy-content={episodesList[currentEpisodeNumber]["episode_name"]} id="next" className="player-episode-skip"> 
+                            الحلقة القادمة
+                            <span className="mdi mdi-chevron-left mdi-left"></span>
+                    </div>
                     :
                     <a id="next" className="player-episode-skip disabled">الحلقة القادمة<span className="mdi mdi-chevron-left mdi-left"></span></a>
                 }
@@ -291,7 +301,7 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
                                         return (
                                             <div key={ sourceKey } id={ source.name } className="download-link">
                                                 <p className="download-link-quality">{ source.name }</p>
-                                                <a className="link" href={ source.url } download={ animeName + "-" + episodeName + ".mp4" }>تحميل</a>
+                                                <a className="link" href={ source.url }>تحميل</a>
                                             </div>
                                         )
                                     })}
