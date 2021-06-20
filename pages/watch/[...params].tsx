@@ -140,7 +140,6 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
 
     useEffect(() => {
         window.scrollTo(0, 60)
-        console.log(currentEpisodeNumber)
         let currentEpisode = episodes[currentEpisodeNumber - 1]
         if (details.type == "Movie") {
             updateCurrentEpisodeName("الفلم")

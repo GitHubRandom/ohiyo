@@ -22,11 +22,8 @@ const Popup = ({ children, trigger, id, title, dismissOnRouterEvent }: React.Pro
     }, [trigger])
 
     useEffect(() => {
-        console.log("useEffect !")
         if (dismissOnRouterEvent) {
-            console.log("Attached !")
             Router.events.on("routeChangeStart", () => {
-                console.log("Fired !")
                 updateVisibility(false)
             })
         }

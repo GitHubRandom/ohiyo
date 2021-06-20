@@ -55,10 +55,6 @@ export default function Home({ newEpisodes, page }) {
     }, [newEpisodes])
 
     useEffect(() => {
-        console.log(`Page changed to ${page}`)
-    }, [page])
-
-    useEffect(() => {
         let observer = new IntersectionObserver(entries => {
             if (refreshed && entries[0] && entries[0].isIntersecting) {
                 updateRefreshed(false)
