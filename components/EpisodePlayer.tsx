@@ -20,25 +20,20 @@ const qualitiesMap = {
 }
 
 interface TEpisodePlayer {
-    episodesList: Record<string, any>[],
-    animeName: string,
-    animeId: string,
-    episodeNumber: number,
-    mal: string,
-    setEpisodeTitle: (title: string) => void,
-    setEpisodeNumber: (newEpisodeNumber: number) => void
+    episode: Record<string,any>,
+    introInterval: [number, number],
+    changeEpisodeNumber: (increment: boolean) => void,
+    firstEpisode: boolean,
+    lastEpisode: boolean
 }
 
-const EpisodePlayer = ({ setEpisodeNumber, setEpisodeTitle, animeName, episodesList, animeId, episodeNumber, mal }: TEpisodePlayer) => {
+const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpisode, lastEpisode }: TEpisodePlayer) => {
 
     type quality = Record<string, string>[]
 
-    const [episodeSources, updateSources] = useState<Record<string, quality | string>>({})
-    const [currentSource, updateCurrent] = useState<[string, string | Record<string, string>[]]>(["", ""])
-    const [introInterval, updateIntroInterval] = useState<[number, number]>([0, 0])
-    const [status, updateStatus] = useState<string[]>([])
-    const [currentEpisodeNumber, updateCurrentEpisodeNumber] = useState<number>(episodeNumber)
-    const [episodeTitle, updateTitle] = useState<string>("")
+    const [ episodeSources, updateSources ] = useState<Record<string, quality | string>>({})
+    const [ currentSource, updateCurrent ] = useState<[string, string | Record<string, string>[]]>(["", ""])
+    const [ status, updateStatus ] = useState<string[]>([])
     const downloadListTrigger = useRef()
 
     /**
@@ -46,7 +41,7 @@ const EpisodePlayer = ({ setEpisodeNumber, setEpisodeTitle, animeName, episodesL
      * @param status status of fetching (pending | failed | parsed)
      * @param index index of updated element
      */
-    function setStatus(status: string, index: number) {
+    const setStatus = (status: string, index: number): void => {
         updateStatus(oldStatus => {
             oldStatus.splice(index, 1, status)
             return [...oldStatus]
@@ -57,7 +52,7 @@ const EpisodePlayer = ({ setEpisodeNumber, setEpisodeTitle, animeName, episodesL
      * This function splits the different sources and decodes them
      * @param sources An stringified array of the different sources (object)
      */
-    function getServers(sources: Record<string, string>) {
+    const getServers = (sources: Record<string, string>): void => {
         let sourcesKeys = Object.keys(sources)
         updateStatus(Array(sourcesKeys.length).fill("pending"))
 
@@ -190,8 +185,6 @@ const EpisodePlayer = ({ setEpisodeNumber, setEpisodeTitle, animeName, episodesL
     }, [status])
 
     useEffect(() => {
-        let episode = episodesList[currentEpisodeNumber - 1]
-        setEpisodeNumber(currentEpisodeNumber)
         let sources: Record<string, string> = {}
         Object.keys(episode).map(key => {
             if (episode[key].length > 0 && (key.endsWith("LowQ") || key.endsWith("Link") || key.endsWith("hdQ"))) {
@@ -199,39 +192,11 @@ const EpisodePlayer = ({ setEpisodeNumber, setEpisodeTitle, animeName, episodesL
             }
         })
         getServers(sources)
-        // Fetching episode title from MyAnimeList (via Jikan)
-        fetch("https://api.jikan.moe/v3/anime/" + mal + "/episodes/" + Math.ceil(parseInt(episode.Episode) / 100))
-            .then(res => res.json())
-            .then(data => {
-                try {
-                    let epData = data.episodes.find((ep: Record<string,any>) => ep.episode_id == parseInt(episode.Episode))
-                    setEpisodeTitle(epData.title)
-                    updateTitle(epData.title)
-                } catch (err) { } // Fail silently
-            })
-            .catch(err => console.error(err))
-        // Fetching intro timestamps
-        fetch(encodeURI(`/api/skip?anime=${animeName}&num=${currentEpisodeNumber}&detail=${episode.Episode}`))
-            .then(res => {
-                if (res.ok) {
-                    return res.json()
-                } else {
-                    throw new Error("Timestamps not found")
-                }
-            })
-            .then(data => {
-                updateIntroInterval([parseInt(data.skip_from) / 1000, parseInt(data.skip_to) / 1000])
-            })
-            .catch(err => {
-                console.info("Timestamps not found !")
-            })
         return () => {
             updateSources({})
             updateCurrent(["", ""])
-            setEpisodeTitle("")
-            updateTitle("")
         }
-    }, [currentEpisodeNumber])
+    }, [episode])
 
     return (
         <section className="anime-watch">
@@ -246,14 +211,8 @@ const EpisodePlayer = ({ setEpisodeNumber, setEpisodeTitle, animeName, episodesL
                         : null}
                 </div>}
             <div className="player-settings">
-                {currentEpisodeNumber > 1 && episodesList.length != 0 ?
-                    /*<Link scroll={false} href={"/watch/" + animeId + "-" + mal + "/" + (episodeNumber - 1).toString()}>
-                        <a data-tippy-content={episodesList[episodeNumber - 2]["episode_name"]} id="previous" className="player-episode-skip">
-                            <span className="mdi mdi-chevron-right"></span>
-                            الحلقة السابقة
-                        </a>
-                    </Link>*/
-                    <div onClick={ () => updateCurrentEpisodeNumber(oldEpisodeNumber => oldEpisodeNumber - 1) } data-tippy-content={episodesList[currentEpisodeNumber - 2]["episode_name"]} id="previous" className="player-episode-skip">
+                { !firstEpisode ?
+                    <div onClick={ () => changeEpisodeNumber(false) } id="previous" className="player-episode-skip">
                             <span className="mdi mdi-chevron-right"></span>
                             الحلقة السابقة
                     </div>
@@ -274,14 +233,8 @@ const EpisodePlayer = ({ setEpisodeNumber, setEpisodeTitle, animeName, episodesL
                         : <span className="servers-loading-message"><span className="mdi mdi-loading mdi-spin"></span>جاري العمل على الخوادم</span>
                     }
                 </div>
-                {currentEpisodeNumber < episodesList.length ?
-                    /*<Link scroll={false} href={"/watch/" + animeId + "-" + mal + "/" + (episodeNumber + 1).toString()}>
-                        <a data-tippy-content={episodesList[episodeNumber]["episode_name"]} id="next" className="player-episode-skip">
-                            الحلقة القادمة
-                            <span className="mdi mdi-chevron-left mdi-left"></span>
-                        </a>
-                    </Link>*/
-                    <div onClick={ () => updateCurrentEpisodeNumber(oldEpisodeNumber => oldEpisodeNumber + 1) } data-tippy-content={episodesList[currentEpisodeNumber]["episode_name"]} id="next" className="player-episode-skip"> 
+                { !lastEpisode ?
+                    <div onClick={ () => changeEpisodeNumber(true) } id="next" className="player-episode-skip"> 
                             الحلقة القادمة
                             <span className="mdi mdi-chevron-left mdi-left"></span>
                     </div>

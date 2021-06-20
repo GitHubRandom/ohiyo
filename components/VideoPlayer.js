@@ -31,10 +31,7 @@ class VideoPlayer extends React.Component {
         this.player = new DPlayer({
             container: this.videoContainer.current,
             theme: '#fffb00',
-            video: {
-                quality: this.props.sources,
-                defaultQuality: 0
-            }
+            video
         })
         this.player.on('progress', () => {
             const currentProgress = this.player.video.currentTime
@@ -46,6 +43,7 @@ class VideoPlayer extends React.Component {
                 }
             }
         })
+        // Why TF did they add crossorigin attribute by default ?w
         document.querySelector(".dplayer-video").removeAttribute("crossorigin")
         this.videoContainer.current.appendChild(this.introButton.current)
         if (this.forward.current && this.rewind.current) {

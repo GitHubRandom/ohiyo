@@ -627,6 +627,7 @@ body {
     color: white;
     padding: 10px 0;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .tab.selected {

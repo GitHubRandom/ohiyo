@@ -126,7 +126,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 
-
     return { props }
 }
 
@@ -136,37 +135,69 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
     const [ episodeTitle, updateEpisodeTitle ] = useState<string>("")
     const [ currentEpisodeNumber, updateCurrentEpisodeNumber ] = useState<number>(episodeNumber)
     const [ currentEpisodeName, updateCurrentEpisodeName ] = useState<string>(episodeName)
+    const [ currentEpisode, updateCurrentEpisode ] = useState<Record<string,any>>(episodes[episodeNumber - 1])
+    const [ currentIntroInterval, updateCurrentIntroInterval ] = useState<[number,number]>([0,0])
     const hamburgerButton = useRef()
 
+    useEffect(() => { // Initialize Tippy
+        tippy("[data-tippy-content]")
+    },[])
+
     useEffect(() => {
-        window.scrollTo(0, 60)
-        let currentEpisode = episodes[currentEpisodeNumber - 1]
-        if (details.type == "Movie") {
-            updateCurrentEpisodeName("الفلم")
-        } else {
-            updateCurrentEpisodeName(`الحلقة ${currentEpisode.Episode}${currentEpisode.ExtraEpisodes ? `-${currentEpisode.ExtraEpisodes}` : ""}`)
-        }
+        // Update link (shallow) and episode object
+        window.scrollTo(0, 60) // Return to video
+        router.push(`/watch/${details.anime_id}-${details.mal_id}/${currentEpisodeNumber}`, undefined, { shallow: true, scroll: false })
+        let newCurrentEpisode = episodes[currentEpisodeNumber - 1]
+        updateCurrentEpisode(newCurrentEpisode)
     }, [currentEpisodeNumber])
 
     useEffect(() => {
-        // Replace the current URL with "/anime_id/episode_number" if it's from episode_id
+        // Replace the current URL with "/anime_id/episode_number"
         if (router.query.params[1] == "latest") {
             router.replace(`/watch/${details.anime_id}-${details.mal_id}/${episodeNumber}`, undefined, { shallow: true, scroll: false })
         }
     }, [episodeNumber])
 
     useEffect(() => {
-        router.push(`/watch/${details.anime_id}-${details.mal_id}/${currentEpisodeNumber}`, undefined, { shallow: true, scroll: false })
-    }, [currentEpisodeNumber])
-
-    const setEpisodeNumber = (newEpisodeNumber: number) => {
-        updateCurrentEpisodeNumber(newEpisodeNumber)
-    }
+        if (details.type == "Movie") {
+            updateCurrentEpisodeName("الفلم")
+        } else {
+            updateCurrentEpisodeName(`الحلقة ${currentEpisode.Episode}${currentEpisode.ExtraEpisodes ? `-${currentEpisode.ExtraEpisodes}` : ""}`)
+        }
+    }, [currentEpisode])
 
     useEffect(() => {
-        tippy("[data-tippy-content]")
-    },[])
-    
+        /**
+         * Update episodeTitle when currentEpisode changes
+         * Data is fetched from MyAnimeList via Jikan API
+         * */
+        fetch("https://api.jikan.moe/v3/anime/" + details.mal_id + "/episodes/" + Math.ceil(parseInt(currentEpisode.Episode) / 100))
+            .then(res => res.json())
+            .then(data => {
+                try {
+                    let epData = data.episodes.find((ep: Record<string,any>) => ep.episode_id == parseInt(currentEpisode.Episode))
+                    updateEpisodeTitle(epData.title)
+                } catch (err) { } // Fail silently
+            })
+            .catch(err => console.error(err))
+
+        // Fetching intro timestamps
+        fetch(encodeURI(`/api/skip?anime=${details.title}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`))
+            .then(res => {
+                if (res.ok) {
+                    return res.json()
+                } else {
+                    throw new Error("Timestamps not found")
+                }
+            })
+            .then(data => {
+                updateCurrentIntroInterval([parseInt(data.skip_from) / 1000, parseInt(data.skip_to) / 1000])
+            })
+            .catch(err => {
+                console.info("Timestamps not found !")
+            })
+    }, [currentEpisode])
+
     return (
         <>
             <Head>
@@ -189,8 +220,8 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                 <WatchNavigation hamburgerButtonRef={ hamburgerButton } />
                 <Navigation trigger={ hamburgerButton } secondary={ true } selected="none" shown={ false } />
                 <div className="watch-page">
-                    <WatchTopBar mal={ details.mal_id } animeId={ details.anime_id } episodesList={ episodes } episodeTitle={ episodeTitle } episodeNumber={ episodeNumber } episodeName={ currentEpisodeName } animeTitle={ details.title } />
-                    <EpisodePlayer setEpisodeNumber={ setEpisodeNumber } animeName={ details.title } setEpisodeTitle={ (title) => updateEpisodeTitle(title) } mal={ details.mal_id } episodesList={ episodes } animeId={ details.anime_id } episodeNumber={ episodeNumber } />   
+                    <WatchTopBar setEpisodeNumber={ updateCurrentEpisodeNumber } episodesList={ episodes } episodeTitle={ episodeTitle } episodeNumber={ episodeNumber } episodeName={ currentEpisodeName } animeTitle={ details.title } />
+                    <EpisodePlayer changeEpisodeNumber={ (increment: boolean) => updateCurrentEpisodeNumber(oldEpisodeNumber => increment ? oldEpisodeNumber + 1 : oldEpisodeNumber - 1) } episode={ currentEpisode } introInterval={ currentIntroInterval } firstEpisode={ currentEpisodeNumber == 1 } lastEpisode={ currentEpisodeNumber == episodes.length } />   
                     <AnimeDetails animeDetails={ details } />
                     {/*<RelatedContent related={ details.related_animes.data } />*/}
                 </div>

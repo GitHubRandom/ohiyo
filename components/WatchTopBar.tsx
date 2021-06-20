@@ -12,8 +12,7 @@ interface IWatchTopBar {
     episodeNumber: number,
     episodeTitle: string,
     episodesList: Record<string,string>[],
-    mal: string,
-    animeId: string
+    setEpisodeNumber: (newEpisodeNumber: number) => void
 }
 
 export const getEpisodeTags = (episode: Record<string,any>) => {
@@ -44,7 +43,7 @@ const episodeNameVariants = {
     },
 }
 
-const WatchTopBar = ({ mal, animeId, episodesList, episodeTitle, episodeNumber, episodeName, animeTitle }: IWatchTopBar) => {
+const WatchTopBar = ({ setEpisodeNumber, episodesList, episodeTitle, episodeNumber, episodeName, animeTitle }: IWatchTopBar) => {
 
     const [ ascending, updateEpisodesOrder ] = useState<boolean>(true)
     const episodesPopupTrigger = useRef()
@@ -55,12 +54,8 @@ const WatchTopBar = ({ mal, animeId, episodesList, episodeTitle, episodeNumber, 
         }
     }, [])
 
-    const reverseList = useCallback(() => {
+    const reverseList = () => {
         updateEpisodesOrder(!ascending)
-    }, [ascending])
-
-    const dismissPopup = () => {
-        (document.getElementsByClassName("popup")[0] as HTMLElement).style.display = "none"
     }
 
     return (
@@ -81,7 +76,7 @@ const WatchTopBar = ({ mal, animeId, episodesList, episodeTitle, episodeNumber, 
                         </div>
                         <div id="episodes-list" className="popup-list">
                             { episodesList.map((episode,index) => {
-                                return <Link scroll={ false } href={ "/watch/" + animeId + '-' + mal + "/" + (index + 1) } key={ index }><a className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</a></Link>
+                                return <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
                             })}
                         </div>
                         </>
@@ -91,7 +86,7 @@ const WatchTopBar = ({ mal, animeId, episodesList, episodeTitle, episodeNumber, 
                         </div>
                         <div id="episodes-list" className="popup-list">
                             { episodesList.map((episode,index) => {
-                                return <Link scroll={ false } href={ "/watch/" + animeId + '-' + mal + "/" + (index + 1) } key={ index }><a className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</a></Link>
+                                return <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
                             }).reverse()}
                         </div>
                         </>
