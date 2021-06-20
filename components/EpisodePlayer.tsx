@@ -204,7 +204,7 @@ const EpisodePlayer = ({ setEpisodeNumber, setEpisodeTitle, animeName, episodesL
             .then(res => res.json())
             .then(data => {
                 try {
-                    let epData = data.episodes[(parseInt(episode.Episode) - 1) % 100]
+                    let epData = data.episodes.find((ep: Record<string,any>) => ep.episode_id == parseInt(episode.Episode))
                     setEpisodeTitle(epData.title)
                     updateTitle(epData.title)
                 } catch (err) { } // Fail silently
