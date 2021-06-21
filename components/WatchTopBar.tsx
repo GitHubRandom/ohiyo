@@ -66,7 +66,6 @@ const WatchTopBar = ({ setEpisodeNumber, mal, type, episodesList, episodeNumber,
             updateEpisodeName(`الحلقة ${episode.Episode}${episode.ExtraEpisodes ? `-${episode.ExtraEpisodes}` : ""}`)
         }
 
-        console.log("Fetching episode title...")
         /**
          * Update episodeTitle when currentEpisode changes
          * Data is fetched from MyAnimeList via Jikan API
@@ -79,7 +78,6 @@ const WatchTopBar = ({ setEpisodeNumber, mal, type, episodesList, episodeNumber,
                 try {
                     let epData = data.episodes.find((ep: Record<string,any>) => ep.episode_id == parseInt(episode.Episode))
                     updateEpisodeTitle(epData.title)
-                    console.log("Updated episode data !")
                 } catch (err) { } // Fail silently
             })
             .catch(err => console.error(err))
