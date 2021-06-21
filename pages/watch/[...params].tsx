@@ -137,6 +137,8 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
     const [ currentEpisodeName, updateCurrentEpisodeName ] = useState<string>(episodeName)
     const [ currentEpisode, updateCurrentEpisode ] = useState<Record<string,any>>(episodes[episodeNumber - 1])
     const [ currentIntroInterval, updateCurrentIntroInterval ] = useState<[number,number]>([0,0])
+    const skipFetchController = useRef<AbortController>()
+    const titleFetchController = useRef<AbortController>()
     const hamburgerButton = useRef()
 
     useEffect(() => { // Initialize Tippy
@@ -149,6 +151,16 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
         router.push(`/watch/${details.anime_id}-${details.mal_id}/${currentEpisodeNumber}`, undefined, { shallow: true, scroll: false })
         let newCurrentEpisode = episodes[currentEpisodeNumber - 1]
         updateCurrentEpisode(newCurrentEpisode)
+        try {
+            if (skipFetchController.current) {
+                skipFetchController.current.abort()
+            }    
+        } catch (err) {}
+        try {
+            if (titleFetchController.current) {
+                titleFetchController.current.abort()
+            }
+        } catch (err) {}
     }, [currentEpisodeNumber])
 
     useEffect(() => {
@@ -171,7 +183,9 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
          * Update episodeTitle when currentEpisode changes
          * Data is fetched from MyAnimeList via Jikan API
          * */
-        fetch("https://api.jikan.moe/v3/anime/" + details.mal_id + "/episodes/" + Math.ceil(parseInt(currentEpisode.Episode) / 100))
+        const titleController = new AbortController()
+        titleFetchController.current = titleController
+        fetch("https://api.jikan.moe/v3/anime/" + details.mal_id + "/episodes/" + Math.ceil(parseInt(currentEpisode.Episode) / 100), { signal: titleController.signal })
             .then(res => res.json())
             .then(data => {
                 try {
@@ -182,7 +196,9 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
             .catch(err => console.error(err))
 
         // Fetching intro timestamps
-        fetch(encodeURI(`/api/skip?anime=${details.title}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`))
+        const introController = new AbortController()
+        skipFetchController.current = introController
+        fetch(encodeURI(`/api/skip?anime=${details.title}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`), { signal: introController.signal })
             .then(res => {
                 if (res.ok) {
                     return res.json()

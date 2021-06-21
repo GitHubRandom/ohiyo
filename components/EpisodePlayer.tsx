@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import VideoPlayer from './VideoPlayer'
-import Link from 'next/link'
 import Popup from "./Popup"
 
 const supportedServers = ["OK", "FR", "SF", "FD"]
@@ -33,7 +32,9 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
 
     const [ episodeSources, updateSources ] = useState<Record<string, quality | string>>({})
     const [ currentSource, updateCurrent ] = useState<[string, string | Record<string, string>[]]>(["", ""])
+    const [ switchCooldown, updateSwitchCooldown ] = useState<boolean>(true)
     const [ status, updateStatus ] = useState<string[]>([])
+    const controllers = useRef([])
     const downloadListTrigger = useRef()
 
     /**
@@ -49,13 +50,23 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
     }
 
     /**
+     * Cancels all fetch operations
+     */
+    const cancelFetches = () => {
+        controllers.current.forEach(controller => {
+            controller.abort()
+        })
+    }
+
+    /**
      * This function splits the different sources and decodes them
      * @param sources An stringified array of the different sources (object)
      */
     const getServers = (sources: Record<string, string>): void => {
         let sourcesKeys = Object.keys(sources)
         updateStatus(Array(sourcesKeys.length).fill("pending"))
-
+        controllers.current = Array(sourcesKeys.length).fill(new AbortController())
+        updateSwitchCooldown(true)
         function setUnsupportedServer(server: string, result: string, index: number) {
             updateSources(oldEpisodeSources => ({
                 ...oldEpisodeSources,
@@ -64,7 +75,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
             setStatus("parsed", index)
         }
 
-        sourcesKeys.forEach(async (key, index) => {
+        sourcesKeys.forEach((key, index) => {
             let item = sources[key]
             item = item.replace("http://", "https://")
             switch (true) {
@@ -101,9 +112,12 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
                 default:
                     break
             }
+            const controller = new AbortController()
+            controllers.current[index] = controller
             fetch(encodeURI(item), {
                 method: method,
-                headers: new Headers(headers)
+                headers: new Headers(headers),
+                signal: controller.signal
             })
                 .then((response) => {
                     if (isOk || isFd) {
@@ -193,6 +207,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
         })
         getServers(sources)
         return () => {
+            cancelFetches()
             updateSources({})
             updateCurrent(["", ""])
         }
@@ -211,8 +226,8 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
                         : null}
                 </div>}
             <div className="player-settings">
-                { !firstEpisode ?
-                    <div onClick={ () => changeEpisodeNumber(false) } id="previous" className="player-episode-skip">
+                { !firstEpisode && switchCooldown ?
+                    <div onClick={ () => { updateSwitchCooldown(false); changeEpisodeNumber(false) } } id="previous" className="player-episode-skip">
                             <span className="mdi mdi-chevron-right"></span>
                             الحلقة السابقة
                     </div>
@@ -233,8 +248,8 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
                         : <span className="servers-loading-message"><span className="mdi mdi-loading mdi-spin"></span>جاري العمل على الخوادم</span>
                     }
                 </div>
-                { !lastEpisode ?
-                    <div onClick={ () => changeEpisodeNumber(true) } id="next" className="player-episode-skip"> 
+                { !lastEpisode && switchCooldown ?
+                    <div onClick={ () => { updateSwitchCooldown(false); changeEpisodeNumber(true) } } id="next" className="player-episode-skip"> 
                             الحلقة القادمة
                             <span className="mdi mdi-chevron-left mdi-left"></span>
                     </div>
