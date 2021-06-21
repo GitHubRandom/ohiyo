@@ -25,6 +25,7 @@ export default async function handler(req, res) {
     const animeID = results.find(item => item.anime_name == animeName)?.anime_id
     if (!animeID) {
         res.status(404).send("404 Anime Not Found")
+        return
     }
     const episodesJSON = {
         more_info: "Yes",
@@ -35,6 +36,7 @@ export default async function handler(req, res) {
     })
     if (!episodesFetch) {
         res.status(404).send("404 Episodes Not Found")
+        return
     }
     try {
         let episodes = (await episodesFetch.json()).response?.data
@@ -48,9 +50,11 @@ export default async function handler(req, res) {
         }
         const episode = episodes.find(ep => ep.episode_name.includes(epNameNumber))
         const { skip_from, skip_to } = episode
-        res.status(200).send(JSON.stringify({ skip_from, skip_to }))    
+        res.status(200).send(JSON.stringify({ skip_from, skip_to }))   
+        return 
     } catch (err) {
         console.error(err)
         res.status(404).send("404 Episode Not Found" )
+        return
     }
 }

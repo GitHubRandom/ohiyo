@@ -488,6 +488,11 @@ body {
     margin-top: 5px;
 }
 
+.anime-details-trailer.disabled {
+    background-color: var(--accent-color-disabled);
+    cursor: not-allowed;
+}
+
 .anime-watch {
     overflow: hidden;
     justify-content: center;

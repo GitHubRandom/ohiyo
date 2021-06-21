@@ -111,11 +111,11 @@ const AnimeDetails = ({ animeDetails }: TAnimeDetails) => {
                         } }>
                         <span id="mal-rating" data-tippy-content="تقييم MAL" className="anime-details-score">
                             <span className="mdi mdi-star"></span>
-                            { animeDetails["score"] }
+                            { animeDetails.score }
                         </span>
                         </div>
                         { ready ? 
-                        <button ref={ trailerPopupTrigger } id="trailer-button" className="anime-details-trailer"><span className="mdi mdi-play"></span>العرض الدعائي</button> : null }
+                        <button ref={ trailerPopupTrigger } id="trailer-button" className={ animeDetails.trailer_url ? "anime-details-trailer" : "anime-details-trailer disabled" }><span className="mdi mdi-play"></span>العرض الدعائي</button> : null }
                     </div>
                     { ready ? 
                     <div className="anime-meta">
