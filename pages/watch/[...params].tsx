@@ -171,14 +171,16 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
     }, [episodeNumber])
 
     useEffect(() => {
+    }, [currentEpisode])
+
+    useEffect(() => {
+        // Update episodeName
         if (details.type == "Movie") {
             updateCurrentEpisodeName("الفلم")
         } else {
             updateCurrentEpisodeName(`الحلقة ${currentEpisode.Episode}${currentEpisode.ExtraEpisodes ? `-${currentEpisode.ExtraEpisodes}` : ""}`)
         }
-    }, [currentEpisode])
 
-    useEffect(() => {
         /**
          * Update episodeTitle when currentEpisode changes
          * Data is fetched from MyAnimeList via Jikan API
@@ -212,6 +214,11 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
             .catch(err => {
                 console.info("Timestamps not found !")
             })
+        return () => {
+            updateCurrentIntroInterval([0,0])
+            updateEpisodeTitle("")
+            updateCurrentEpisodeName("")
+        }
     }, [currentEpisode])
 
     return (
