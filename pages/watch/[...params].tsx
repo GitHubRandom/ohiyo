@@ -132,7 +132,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
 
     const router = useRouter()
-    const [ episodeTitle, updateEpisodeTitle ] = useState<string>("")
     const [ currentEpisodeNumber, updateCurrentEpisodeNumber ] = useState<number>(episodeNumber)
     const [ currentEpisodeName, updateCurrentEpisodeName ] = useState<string>(episodeName)
     const [ currentEpisode, updateCurrentEpisode ] = useState<Record<string,any>>(episodes[episodeNumber - 1])
@@ -174,29 +173,6 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
     }, [currentEpisode])
 
     useEffect(() => {
-        // Update episodeName
-        if (details.type == "Movie") {
-            updateCurrentEpisodeName("الفلم")
-        } else {
-            updateCurrentEpisodeName(`الحلقة ${currentEpisode.Episode}${currentEpisode.ExtraEpisodes ? `-${currentEpisode.ExtraEpisodes}` : ""}`)
-        }
-
-        /**
-         * Update episodeTitle when currentEpisode changes
-         * Data is fetched from MyAnimeList via Jikan API
-         * */
-        const titleController = new AbortController()
-        titleFetchController.current = titleController
-        fetch("https://api.jikan.moe/v3/anime/" + details.mal_id + "/episodes/" + Math.ceil(parseInt(currentEpisode.Episode) / 100), { signal: titleController.signal })
-            .then(res => res.json())
-            .then(data => {
-                try {
-                    let epData = data.episodes.find((ep: Record<string,any>) => ep.episode_id == parseInt(currentEpisode.Episode))
-                    updateEpisodeTitle(epData.title)
-                } catch (err) { } // Fail silently
-            })
-            .catch(err => console.error(err))
-
         // Fetching intro timestamps
         const introController = new AbortController()
         skipFetchController.current = introController
@@ -216,8 +192,6 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
             })
         return () => {
             updateCurrentIntroInterval([0,0])
-            updateEpisodeTitle("")
-            updateCurrentEpisodeName("")
         }
     }, [currentEpisode])
 
@@ -243,8 +217,21 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                 <WatchNavigation hamburgerButtonRef={ hamburgerButton } />
                 <Navigation trigger={ hamburgerButton } secondary={ true } selected="none" shown={ false } />
                 <div className="watch-page">
-                    <WatchTopBar setEpisodeNumber={ updateCurrentEpisodeNumber } episodesList={ episodes } episodeTitle={ episodeTitle } episodeNumber={ episodeNumber } episodeName={ currentEpisodeName } animeTitle={ details.title } />
-                    <EpisodePlayer changeEpisodeNumber={ (increment: boolean) => updateCurrentEpisodeNumber(oldEpisodeNumber => increment ? oldEpisodeNumber + 1 : oldEpisodeNumber - 1) } episode={ currentEpisode } introInterval={ currentIntroInterval } firstEpisode={ currentEpisodeNumber == 1 } lastEpisode={ currentEpisodeNumber == episodes.length } />   
+                    <WatchTopBar
+                        type={ details.type }
+                        setEpisodeNumber={ updateCurrentEpisodeNumber }
+                        mal={ details.mal_id }
+                        episodesList={ episodes }
+                        episodeNumber={ currentEpisodeNumber }
+                        animeTitle={ details.title } />
+
+                    <EpisodePlayer 
+                        changeEpisodeNumber={ (increment: boolean) => updateCurrentEpisodeNumber(oldEpisodeNumber => increment ? oldEpisodeNumber + 1 : oldEpisodeNumber - 1) }
+                        episode={ currentEpisode }
+                        introInterval={ currentIntroInterval }
+                        firstEpisode={ currentEpisodeNumber == 1 }
+                        lastEpisode={ currentEpisodeNumber == episodes.length } />   
+
                     <AnimeDetails animeDetails={ details } />
                     {/*<RelatedContent related={ details.related_animes.data } />*/}
                 </div>

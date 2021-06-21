@@ -7,11 +7,11 @@ import { useCallback } from "react"
 import Popup from "./Popup"
 
 interface IWatchTopBar {
-    episodeName: string,
     animeTitle: string,
     episodeNumber: number,
-    episodeTitle: string,
     episodesList: Record<string,string>[],
+    mal: string,
+    type: string,
     setEpisodeNumber: (newEpisodeNumber: number) => void
 }
 
@@ -43,9 +43,12 @@ const episodeNameVariants = {
     },
 }
 
-const WatchTopBar = ({ setEpisodeNumber, episodesList, episodeTitle, episodeNumber, episodeName, animeTitle }: IWatchTopBar) => {
+const WatchTopBar = ({ setEpisodeNumber, mal, type, episodesList, episodeNumber, animeTitle }: IWatchTopBar) => {
 
     const [ ascending, updateEpisodesOrder ] = useState<boolean>(true)
+    const [ episodeTitle, updateEpisodeTitle ] = useState<string>("")
+    const [ episodeName, updateEpisodeName ] = useState<string>("")
+    const titleFetchController = useRef<AbortController>()
     const episodesPopupTrigger = useRef()
 
     useEffect(() => {
@@ -53,6 +56,38 @@ const WatchTopBar = ({ setEpisodeNumber, episodesList, episodeTitle, episodeNumb
             document.title = `${ animeTitle } - ${episodeName}`
         }
     }, [])
+
+    useEffect(() => {
+        const episode = episodesList[episodeNumber - 1]
+        // Update episodeName
+        if (type == "Movie") {
+            updateEpisodeName("الفلم")
+        } else {
+            updateEpisodeName(`الحلقة ${episode.Episode}${episode.ExtraEpisodes ? `-${episode.ExtraEpisodes}` : ""}`)
+        }
+
+        console.log("Fetching episode title...")
+        /**
+         * Update episodeTitle when currentEpisode changes
+         * Data is fetched from MyAnimeList via Jikan API
+         * */
+        const titleController = new AbortController()
+        titleFetchController.current = titleController
+        fetch("https://api.jikan.moe/v3/anime/" + mal + "/episodes/" + Math.ceil(parseInt(episode.Episode) / 100), { signal: titleController.signal })
+            .then(res => res.json())
+            .then(data => {
+                try {
+                    let epData = data.episodes.find((ep: Record<string,any>) => ep.episode_id == parseInt(episode.Episode))
+                    updateEpisodeTitle(epData.title)
+                    console.log("Updated episode data !")
+                } catch (err) { } // Fail silently
+            })
+            .catch(err => console.error(err))
+        return () => {
+            titleFetchController.current.abort()
+            updateEpisodeTitle("")
+        }
+    }, [episodeNumber])
 
     const reverseList = () => {
         updateEpisodesOrder(!ascending)
