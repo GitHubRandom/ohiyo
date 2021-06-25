@@ -1,6 +1,5 @@
 import { GetServerSideProps } from 'next'
 import AnimeDetails from '../../components/AnimeDetails'
-import RelatedContent from '../../components/RelatedContent'
 import WatchTopBar from '../../components/WatchTopBar'
 import EpisodePlayer from '../../components/EpisodePlayer'
 import Navigation from '../../components/Navigation'
@@ -133,15 +132,30 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
 
     const router = useRouter()
     const [ currentEpisodeNumber, updateCurrentEpisodeNumber ] = useState<number>(episodeNumber)
-    const [ currentEpisodeName, updateCurrentEpisodeName ] = useState<string>(episodeName)
     const [ currentEpisode, updateCurrentEpisode ] = useState<Record<string,any>>(episodes[episodeNumber - 1])
     const [ currentIntroInterval, updateCurrentIntroInterval ] = useState<[number,number]>([0,0])
     const skipFetchController = useRef<AbortController>()
     const titleFetchController = useRef<AbortController>()
     const hamburgerButton = useRef()
 
-    useEffect(() => { // Initialize Tippy
+    function handleBack(url:string) {
+        // Router handler to fix the back stack
+        updateCurrentEpisodeNumber(oldEpisodeNumber => {
+            let splittedPath = url.split("/")
+            if (parseInt(splittedPath[3]) != oldEpisodeNumber) {
+                return parseInt(splittedPath[3])
+            } else {
+                return oldEpisodeNumber
+            }
+        })
+    }
+
+    useEffect(() => {
         tippy("[data-tippy-content]")
+        router.events.on("routeChangeComplete", handleBack)
+        return () => {
+            router.events.off("routeChangeComplete", handleBack)
+        } 
     },[])
 
     useEffect(() => {
@@ -170,9 +184,6 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
     }, [episodeNumber])
 
     useEffect(() => {
-    }, [currentEpisode])
-
-    useEffect(() => {
         // Fetching intro timestamps
         const introController = new AbortController()
         skipFetchController.current = introController
@@ -198,8 +209,8 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
     return (
         <>
             <Head>
-                <title>{ `${details.title} - ${currentEpisodeName}` }</title>
-                <meta name="description" content={ `شاهد ${details.title} - ${currentEpisodeName} على Animayhem بجودة عالية` }/>
+                <title>{ `${details.title}` }</title>
+                <meta name="description" content={ `شاهد ${details.title} على Animayhem بجودة عالية` }/>
                 <meta property="og:title" content={ `${details.title} على Animayhem` }/>
                 <meta property="og:site_name" content="Animayhem"/>
                 <meta property="og:url" content={ "https://animayhem.ga" + router.asPath } />
