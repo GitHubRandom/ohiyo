@@ -234,7 +234,9 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
                         mal={ details.mal_id }
                         episodesList={ episodes }
                         episodeNumber={ currentEpisodeNumber }
-                        animeTitle={ details.title } />
+                        animeTitle={ details.title }
+                        // Use english title as altTitle. Check if title_english is present in API response, and use title_synonyms if not.
+                        altTitle={ details.title_english ? details.title_english : ( details.title_synonyms && details.title_synonyms[0] ? details.title_synonyms[0] : "" ) } />
 
                     <EpisodePlayer 
                         changeEpisodeNumber={ (increment: boolean) => updateCurrentEpisodeNumber(oldEpisodeNumber => increment ? oldEpisodeNumber + 1 : oldEpisodeNumber - 1) }

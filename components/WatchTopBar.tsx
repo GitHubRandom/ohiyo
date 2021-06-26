@@ -1,9 +1,6 @@
 import React, { useEffect, useRef } from "react"
 import { motion, useCycle } from 'framer-motion'
 import { useState } from "react"
-import Link from 'next/link'
-import Router from 'next/router'
-import { useCallback } from "react"
 import Popup from "./Popup"
 
 interface IWatchTopBar {
@@ -12,6 +9,7 @@ interface IWatchTopBar {
     episodesList: Record<string,string>[],
     mal: string,
     type: string,
+    altTitle: string
     setEpisodeNumber: (newEpisodeNumber: number) => void
 }
 
@@ -43,7 +41,7 @@ const episodeNameVariants = {
     },
 }
 
-const WatchTopBar = ({ setEpisodeNumber, mal, type, episodesList, episodeNumber, animeTitle }: IWatchTopBar) => {
+const WatchTopBar = ({ setEpisodeNumber, mal, type, episodesList, episodeNumber, animeTitle, altTitle }: IWatchTopBar) => {
 
     const [ ascending, updateEpisodesOrder ] = useState<boolean>(true)
     const [ episodeTitle, updateEpisodeTitle ] = useState<string>("")
@@ -94,7 +92,7 @@ const WatchTopBar = ({ setEpisodeNumber, mal, type, episodesList, episodeNumber,
     return (
         <div className="top-bar">
             <div className="top-bar-text">
-                { animeTitle ? <h1 className="top-bar-anime-title">{ animeTitle }</h1> : <div className="anime-title-placeholder loading"></div>}
+                { animeTitle ? <h1 className="top-bar-anime-title" title={ altTitle ? altTitle : null }>{ animeTitle }</h1> : <div className="anime-title-placeholder loading"></div>}
                 { episodeName ? <motion.p variants={ episodeNameVariants } animate="visible" initial="hidden" className="top-bar-episode-name"><span className="episode-name">{ episodeName }{ getEpisodeTags(episodesList[episodeNumber - 1]) }</span>{ episodeTitle.length ? <><span style={{ marginTop: 2 }} className="mdi mdi-nm mdi-circle-medium"></span><span title="عنوان الحلقة" dir="ltr" className="episode-title">{ episodeTitle }</span></> : null }</motion.p> : <div className="episode-name-placeholder loading"></div> }
             </div>
             { episodesList.length > 1 ?
