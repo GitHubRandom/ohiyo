@@ -117,18 +117,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             }
             props.episodeNumber = parseInt(queryParams[1])
         }
-        if (props.details.type != "Movie" && props.details.type != "Special") {
-            let ep = episodesData[props.episodeNumber - 1]
-            props.episodeName = `الحلقة ${ep.Episode}${ep.ExtraEpisodes ? `-${ep.ExtraEpisodes}` : ""}`
-        } else {
-            props.episodeName = "الفلم"
-        }
     }
 
     return { props }
 }
 
-const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
+const Watch = ({ details, episodes, episodeNumber }) => {
 
     const router = useRouter()
     const [ currentEpisodeNumber, updateCurrentEpisodeNumber ] = useState<number>(episodeNumber)
