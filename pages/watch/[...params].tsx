@@ -136,6 +136,10 @@ const Watch = ({ details, episodes, episodeNumber }) => {
         // Router handler to fix the back stack
         updateCurrentEpisodeNumber(oldEpisodeNumber => {
             let splittedPath = url.split("/")
+            if (splittedPath[3] == "latest") {
+                router.back()
+                return oldEpisodeNumber
+            }
             if (parseInt(splittedPath[3]) != oldEpisodeNumber) {
                 return parseInt(splittedPath[3])
             } else {
