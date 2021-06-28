@@ -106,27 +106,26 @@ const WatchTopBar = ({ setEpisodeNumber, mal, type, episodesList, episodeNumber,
                 </motion.div> : null }
                 { episodesList.length > 1 ?
                     <Popup id="episodes-popup" dismissOnRouterEvent={ true } trigger={ episodesPopupTrigger } title="الحلقات">
-                        { ascending ? <>
+                        <>
                             <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
-                                <span className="mdi mdi-sort-ascending"></span>تصاعدي
+                                { ascending ?
+                                    <><span className="mdi mdi-sort-ascending"></span>تصاعدي</>
+                                :
+                                    <><span className="mdi mdi-sort-descending"></span>تنازلي</>
+                                }
                             </div>
                             <div id="episodes-list" className="popup-list">
-                                { episodesList.map((episode,index) => {
-                                    return <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
-                                })}
+                                { ascending ?
+                                    episodesList.map((episode,index) => {
+                                        return <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
+                                    })
+                                :
+                                    episodesList.map((episode,index) => {
+                                        return <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
+                                    }).reverse()
+                                }
                             </div>
-                            </>
-                        : <>
-                            <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
-                                <span className="mdi mdi-sort-descending"></span>تنازلي
-                            </div>
-                            <div id="episodes-list" className="popup-list">
-                                { episodesList.map((episode,index) => {
-                                    return <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
-                                }).reverse()}
-                            </div>
-                            </>
-                        }
+                        </>
                     </Popup> : null }
             </div>
         </>
