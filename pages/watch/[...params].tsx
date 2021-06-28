@@ -179,7 +179,7 @@ const Watch = ({ details, episodes, episodeNumber }) => {
         if (router.query.params[1] == "latest") {
             router.replace(`/watch/${details.anime_id}-${details.mal_id}/${episodeNumber}`, undefined, { shallow: true, scroll: false })
         }
-    }, [episodeNumber])
+    }, [])
 
     useEffect(() => {
         // Fetching intro timestamps
