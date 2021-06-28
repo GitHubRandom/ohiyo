@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react"
-import { motion, useCycle } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useState } from "react"
+import Head from 'next/head'
 import Popup from "./Popup"
 
 interface IWatchTopBar {
@@ -90,40 +91,45 @@ const WatchTopBar = ({ setEpisodeNumber, mal, type, episodesList, episodeNumber,
     }
 
     return (
-        <div className="top-bar">
-            <div className="top-bar-text">
-                { animeTitle ? <h1 className="top-bar-anime-title" title={ altTitle ? altTitle : null }>{ animeTitle }</h1> : <div className="anime-title-placeholder loading"></div>}
-                { episodeName ? <motion.p variants={ episodeNameVariants } animate="visible" initial="hidden" className="top-bar-episode-name"><span className="episode-name">{ episodeName }{ getEpisodeTags(episodesList[episodeNumber - 1]) }</span>{ episodeTitle.length ? <><span style={{ marginTop: 2 }} className="mdi mdi-nm mdi-circle-medium"></span><span title="عنوان الحلقة" dir="ltr" className="episode-title">{ episodeTitle }</span></> : null }</motion.p> : <div className="episode-name-placeholder loading"></div> }
+        <>
+            <Head>
+                <title>{ `${animeTitle} - ${episodeName}` }</title>
+            </Head>
+            <div className="top-bar">
+                <div className="top-bar-text">
+                    { animeTitle ? <h1 className="top-bar-anime-title" title={ altTitle ? altTitle : null }>{ animeTitle }</h1> : <div className="anime-title-placeholder loading"></div>}
+                    { episodeName ? <motion.p variants={ episodeNameVariants } animate="visible" initial="hidden" className="top-bar-episode-name"><span className="episode-name">{ episodeName }{ getEpisodeTags(episodesList[episodeNumber - 1]) }</span>{ episodeTitle.length ? <><span style={{ marginTop: 2 }} className="mdi mdi-nm mdi-circle-medium"></span><span title="عنوان الحلقة" dir="ltr" className="episode-title">{ episodeTitle }</span></> : null }</motion.p> : <div className="episode-name-placeholder loading"></div> }
+                </div>
+                { episodesList.length > 1 ?
+                <motion.div ref={ episodesPopupTrigger } initial={{ scale: 0 }} animate={{ scale: 1.0 }} transition={{ delay: 0.5 }} id="episodes-button" className="floating-button"><span className="mdi mdi-cards-variant"></span>
+                الحلقات
+                </motion.div> : null }
+                { episodesList.length > 1 ?
+                    <Popup id="episodes-popup" dismissOnRouterEvent={ true } trigger={ episodesPopupTrigger } title="الحلقات">
+                        { ascending ? <>
+                            <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
+                                <span className="mdi mdi-sort-ascending"></span>تصاعدي
+                            </div>
+                            <div id="episodes-list" className="popup-list">
+                                { episodesList.map((episode,index) => {
+                                    return <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
+                                })}
+                            </div>
+                            </>
+                        : <>
+                            <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
+                                <span className="mdi mdi-sort-descending"></span>تنازلي
+                            </div>
+                            <div id="episodes-list" className="popup-list">
+                                { episodesList.map((episode,index) => {
+                                    return <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
+                                }).reverse()}
+                            </div>
+                            </>
+                        }
+                    </Popup> : null }
             </div>
-            { episodesList.length > 1 ?
-            <motion.div ref={ episodesPopupTrigger } initial={{ scale: 0 }} animate={{ scale: 1.0 }} transition={{ delay: 0.5 }} id="episodes-button" className="floating-button"><span className="mdi mdi-cards-variant"></span>
-            الحلقات
-            </motion.div> : null }
-            { episodesList.length > 1 ?
-                <Popup id="episodes-popup" dismissOnRouterEvent={ true } trigger={ episodesPopupTrigger } title="الحلقات">
-                    { ascending ? <>
-                        <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
-                            <span className="mdi mdi-sort-ascending"></span>تصاعدي
-                        </div>
-                        <div id="episodes-list" className="popup-list">
-                            { episodesList.map((episode,index) => {
-                                return <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
-                            })}
-                        </div>
-                        </>
-                    : <>
-                        <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
-                            <span className="mdi mdi-sort-descending"></span>تنازلي
-                        </div>
-                        <div id="episodes-list" className="popup-list">
-                            { episodesList.map((episode,index) => {
-                                return <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
-                            }).reverse()}
-                        </div>
-                        </>
-                    }
-                </Popup> : null }
-        </div>
+        </>
     )
 }
 

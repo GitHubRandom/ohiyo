@@ -209,7 +209,6 @@ const Watch = ({ details, episodes, episodeNumber, episodeName }) => {
     return (
         <>
             <Head>
-                <title>{ `${details.title}` }</title>
                 <meta name="description" content={ `شاهد ${details.title} على Animayhem بجودة عالية` }/>
                 <meta property="og:title" content={ `${details.title} على Animayhem` }/>
                 <meta property="og:site_name" content="Animayhem"/>
