@@ -77,7 +77,7 @@ export default function Movies({ newMovies, page }) {
     return (
         <>
             <Head>
-                <title>Animayhem - آخر الأفلام</title>
+                <title>آخر الأفلام</title>
                 <meta name="keywords" content="anime,animayhem,anime slayer,translated,movies,arabic,slayer,أفلام,أنمي,مترجم,أنمي سلاير,أنمايهم"/>
                 <meta name="description" content="شاهد آخر أفلام الأنمي المترجمة بجودة عالية على موقعنا"/>
                 <meta property="og:title" content="Animayhem - أنمي مترجم"/>
