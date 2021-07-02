@@ -31,18 +31,8 @@ function MyApp({ Component, pageProps }) {
 
     return (
         <>
-        { !adBlockDetected || process.env.NODE_ENV === "development" ? <>
+        { !adBlockDetected || process.env.NODE_ENV === "development" ?
             <Component {...pageProps} />
-            <script dangerouslySetInnerHTML={{
-                __html: `
-                var uid = '317440';
-                var wid = '617624';
-                var pop_fback = 'up';
-                var pop_tag = document.createElement('script');pop_tag.src='//cdn.popcash.net/show.js';document.body.appendChild(pop_tag);
-                pop_tag.onerror = function() {pop_tag = document.createElement('script');pop_tag.src='//cdn2.popcash.net/show.js';document.body.appendChild(pop_tag)};
-                `
-            }}>
-            </script></>
         : <AntiADB /> }</>
     )
 }
