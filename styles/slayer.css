@@ -668,6 +668,11 @@ body {
     bottom: 0;
 }
 
+.anime-video-overlay {
+    height: 100%;
+    width: 100%;
+}
+
 .iframe-video-player {
     position: relative;
     border-radius: 5px;
@@ -950,15 +955,33 @@ body {
     position: absolute;
     top: 20px;
     right: 20px;
-    display: flex;
     direction: rtl;
-    align-items: center;
-    background-color: var(--accent-color);
     color: black;
-    padding: 5px 10px;
     border-radius: 5px;
     max-width: 300px;
     transition: all 0.125s ease-in-out;
+    background-color: #aed581;
+    overflow: hidden;
+}
+
+.opening-hint-container {
+    background-color: var(--accent-color);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+}
+
+.opening-hint-copy-confirm {
+    background-color: #aed581;
+    color: white;
+    padding: 0 10px;
+    font-size: 10pt;
+    height: 0;
+    display: flex;
+    align-items: center;
+    transition: all 0.125s ease-in-out;
+    overflow: hidden;
 }
 
 .opening-hint-icon {
