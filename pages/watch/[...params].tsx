@@ -235,7 +235,8 @@ const Watch = ({ details, episodes, episodeNumber }) => {
                         // Use english title as altTitle. Check if title_english is present in API response, and use title_synonyms if not.
                         altTitle={ details.title_english ? details.title_english : ( details.title_synonyms && details.title_synonyms[0] ? details.title_synonyms[0] : "" ) } />
 
-                    <EpisodePlayer 
+                    <EpisodePlayer
+                        openingsInfo={ details.opening_themes }
                         changeEpisodeNumber={ (increment: boolean) => updateCurrentEpisodeNumber(oldEpisodeNumber => increment ? oldEpisodeNumber + 1 : oldEpisodeNumber - 1) }
                         episode={ currentEpisode }
                         introInterval={ currentIntroInterval }

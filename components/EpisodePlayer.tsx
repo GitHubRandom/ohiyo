@@ -210,7 +210,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
         })
         getServers(sources)
         let episodeNameNumber = parseInt(episode.Episode)
-        if (openingsInfo && ((episodeNameNumber <= openingLifeSpan[1] || isNaN(openingLifeSpan[1]) && episodeNameNumber >= openingLifeSpan[0])) ) {
+        if (openingsInfo && !((episodeNameNumber <= openingLifeSpan[1] || isNaN(openingLifeSpan[1]) && episodeNameNumber >= openingLifeSpan[0])) ) {
             let theOpening = ""
             if (openingsInfo.length > 1) {
                 theOpening = openingsInfo.find(opening => {
