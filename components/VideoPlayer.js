@@ -11,9 +11,13 @@ class VideoPlayer extends React.Component {
         this.forward = React.createRef()
         this.rewind = React.createRef()
         this.videoAd = React.createRef()
+        this.openingHint = React.createRef()
         this.rewindTen = this.rewindTen.bind(this)
         this.forwardTen = this.forwardTen.bind(this)
         this.skipIntro = this.skipIntro.bind(this)
+        this.state = {
+            showIntro: false
+        }
     }
 
     initDPlayer() {
@@ -38,8 +42,10 @@ class VideoPlayer extends React.Component {
             if (this.props.introInterval[0] != this.props.introInterval[1]) {
                 if (currentProgress >= this.props.introInterval[0] && currentProgress <= this.props.introInterval[1]) {
                     this.introButton.current.style.display = "block"
+                    if (this.props.openingName.length) this.openingHint.current.style.opacity = "1"
                 } else if (this.introButton.current.style.display == "block") {
                     this.introButton.current.style.display = "none"
+                    if (this.props.openingName.length) this.openingHint.current.style.opacity = "0"
                 }
             }
         })
@@ -53,13 +59,14 @@ class VideoPlayer extends React.Component {
         if (this.videoAd.current) {
             this.videoContainer.current.appendChild(this.videoAd.current)
         }
+        if (this.openingHint) {
+            this.videoContainer.current.appendChild(this.openingHint.current)
+        }
     }
 
-    shouldComponentUpdate(nextProps,_) {
-        if (this.props.introInterval[0] != nextProps.introInterval[0] && this.props.introInterval[1] != nextProps.introInterval[1]) {
-            return false
-        }
-        return true
+    shouldComponentUpdate(nextProps,nextState) {
+        return !((this.props.introInterval[0] != nextProps.introInterval[0] && this.props.introInterval[1] != nextProps.introInterval[1])
+            || nextProps.openingName != this.props.openingName || nextState.showIntro != this.state.showIntro) 
     }
 
     componentDidMount() {
@@ -97,6 +104,19 @@ class VideoPlayer extends React.Component {
                     تخطي المقدمة
                 </button>
                 <div ref={ this.videoAd } id="video-ad">
+                </div>
+                <div style={{ opacity: 0 }} ref={ this.openingHint } className="opening-hint">
+                    <div onClick={ () => this.setState({ showIntro: !this.state.showIntro }) } className="opening-hint-icon">
+                        <span className="mdi mdi-music-note mdi-nm"></span>
+                    </div>
+                    <div className="opening-hint-text">
+                        <p>
+                            اسم المقدمة
+                        </p>
+                        <p onClick={ () => navigator.clipboard.writeText(this.props.openingName) }>
+                            { this.props.openingName }
+                        </p>
+                    </div>
                 </div>
                 { /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? <>
                     <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ this.forwardTen } ref={ this.forward } id="forward" className="control-overlay">

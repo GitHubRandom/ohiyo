@@ -23,13 +23,16 @@ interface TEpisodePlayer {
     introInterval: [number, number],
     changeEpisodeNumber: (increment: boolean) => void,
     firstEpisode: boolean,
-    lastEpisode: boolean
+    lastEpisode: boolean,
+    openingsInfo?: string[]
 }
 
-const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpisode, lastEpisode }: TEpisodePlayer) => {
+const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpisode, lastEpisode, openingsInfo }: TEpisodePlayer) => {
 
     type quality = Record<string, string>[]
 
+    const [ openingTheme, updateOpening ] = useState<string>("")
+    const [ openingLifeSpan, updateOpeningLifeSpan ] = useState<[number,number]>([NaN,NaN])
     const [ episodeSources, updateSources ] = useState<Record<string, quality | string>>({})
     const [ currentSource, updateCurrent ] = useState<[string, string | Record<string, string>[]]>(["", ""])
     const [ switchCooldown, updateSwitchCooldown ] = useState<boolean>(true)
@@ -206,6 +209,23 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
             }
         })
         getServers(sources)
+        let episodeNameNumber = parseInt(episode.Episode)
+        if (openingsInfo && ((episodeNameNumber <= openingLifeSpan[1] || isNaN(openingLifeSpan[1]) && episodeNameNumber >= openingLifeSpan[0])) ) {
+            let theOpening = ""
+            if (openingsInfo.length > 1) {
+                theOpening = openingsInfo.find(opening => {
+                    let episodesInterval = opening.match(/\d{1,3}-\d{0,3}/)
+                    if (episodesInterval) {
+                        let episodesIntervalLimits = episodesInterval[0].split('-')
+                        updateOpeningLifeSpan([parseInt(episodesIntervalLimits[0]), parseInt(episodesIntervalLimits[1])])
+                        return (episodeNameNumber <= parseInt(episodesIntervalLimits[1]) || !episodesIntervalLimits[1].length) && episodeNameNumber >= parseInt(episodesIntervalLimits[0])
+                    }
+                })
+            } else if (openingsInfo.length) {
+                theOpening = openingsInfo[0]
+            }
+            return theOpening !== undefined ? updateOpening(theOpening.replace(/#\d{1,4}: /, "").replace(/\(eps \d{1,3}-\d{0,3}\)/, "")) : updateOpening("")
+        }
         return () => {
             cancelFetches()
             updateSources({})
@@ -217,6 +237,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
         <section className="anime-watch">
             { currentSource[0] && supportedServers.includes(currentSource[0].slice(0, 2)) && !status.includes("pending") ?
                 <VideoPlayer
+                    openingName={ openingTheme }
                     introInterval={introInterval}
                     sources={currentSource[0] != "" ? (currentSource[1] as Record<string, string>[]).sort((a, b) => parseInt(b.name.slice(0, -1)) - parseInt(a.name.slice(0, -1))) : []}
                 />
