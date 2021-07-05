@@ -27,13 +27,15 @@ interface TEpisodePlayer {
     mal: string,
     episodeName: string,
     setEpisodeTitle: (title: string) => void,
-    openingsInfo: string[]
+    openingsInfo?: string[]
 }
 
 const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, animeId, episodeNumber, mal, openingsInfo }: TEpisodePlayer) => {
 
     type quality = Record<string, string>[]
 
+    const [openingTheme, updateOpening] = useState<string>("")
+    const [openingLifeSpan, updateOpeningLifeSpan] = useState<[number,number]>([NaN,NaN])
     const [episodeSources, updateSources] = useState<Record<string, quality | string>>({})
     const [currentSource, updateCurrent] = useState<[string, string | Record<string, string>[]]>(["", ""])
     const [introInterval, updateIntroInterval] = useState<[number, number]>([0, 0])
@@ -224,6 +226,23 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
             .catch(err => {
                 console.info("Timestamps not found !")
             })
+        let episodeNameNumber = parseInt(episodeName.match(/\d{1,3}/)[0])
+        if (openingsInfo && ((episodeNameNumber <= openingLifeSpan[1] || isNaN(openingLifeSpan[1]) && episodeNameNumber >= openingLifeSpan[0])) ) {
+            let theOpening = ""
+            if (openingsInfo.length > 1) {
+                theOpening = openingsInfo.find(opening => {
+                    let episodesInterval = opening.match(/\d{1,3}-\d{0,3}/)
+                    if (episodesInterval) {
+                        let episodesIntervalLimits = episodesInterval[0].split('-')
+                        updateOpeningLifeSpan([parseInt(episodesIntervalLimits[0]), parseInt(episodesIntervalLimits[1])])
+                        return (episodeNameNumber <= parseInt(episodesIntervalLimits[1]) || !episodesIntervalLimits[1].length) && episodeNameNumber >= parseInt(episodesIntervalLimits[0])
+                    }
+                })
+            } else if (openingsInfo.length) {
+                theOpening = openingsInfo[0]
+            }
+            return theOpening !== undefined ? updateOpening(theOpening.replace(/#\d{1,4}: /, "").replace(/\(eps \d{1,3}-\d{0,3}\)/, "")) : updateOpening("")
+        }
         return () => {
             updateSources({})
             updateCurrent(["", ""])
@@ -232,29 +251,11 @@ const EpisodePlayer = ({ episodeName, setEpisodeTitle, animeName, episodesList, 
         }
     }, [episodeNumber])
 
-    const findOpeningTheme = () => {
-        let theOpening = ""
-        if (openingsInfo.length > 1) {
-            theOpening = openingsInfo.find(opening => {
-                let episodesInterval = opening.match(/\d{1,3}-\d{0,3}/)
-                if (!episodesInterval) {
-                    return ""
-                }
-                let episodesIntervalLimits = episodesInterval[0].split('-')
-                let episodeNameNumber = episodeName.match(/\d{1,3}/)[0]
-                return (parseInt(episodeNameNumber) <= parseInt(episodesIntervalLimits[1]) || !episodesIntervalLimits[1].length) && parseInt(episodeNameNumber) >= parseInt(episodesIntervalLimits[0])
-            })
-        } else if (openingsInfo.length) {
-            theOpening = openingsInfo[0]
-        }
-        return theOpening !== undefined ? theOpening : ""
-    }
-
     return (
         <section className="anime-watch">
             { currentSource[0] && supportedServers.includes(currentSource[0].slice(0, 2)) && !status.includes("pending") ?
                 <VideoPlayer
-                    openingName={ findOpeningTheme().replace(/#\d{1,4}: /, "").replace(/\(eps \d{1,3}-\d{0,3}\)/, "") }
+                    openingName={ openingTheme }
                     introInterval={introInterval}
                     sources={currentSource[0] != "" ? (currentSource[1] as Record<string, string>[]).sort((a, b) => parseInt(b.name.slice(0, -1)) - parseInt(a.name.slice(0, -1))) : []}
                 />
