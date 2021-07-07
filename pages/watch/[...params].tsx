@@ -162,16 +162,21 @@ const Watch = ({ details, episodes, episodeNumber }) => {
         router.push(`/watch/${details.anime_id}-${details.mal_id}/${currentEpisodeNumber}`, undefined, { shallow: true, scroll: false })
         let newCurrentEpisode = episodes[currentEpisodeNumber - 1]
         updateCurrentEpisode(newCurrentEpisode)
+        // Cancel intro interval fetch if any
         try {
             if (skipFetchController.current) {
                 skipFetchController.current.abort()
             }    
         } catch (err) {}
+        // Cancel intro interval fetch if any
         try {
             if (titleFetchController.current) {
                 titleFetchController.current.abort()
             }
         } catch (err) {}
+        return () => {
+            updateCurrentEpisode({})
+        }
     }, [currentEpisodeNumber])
 
     useEffect(() => {
@@ -244,7 +249,6 @@ const Watch = ({ details, episodes, episodeNumber }) => {
                         lastEpisode={ currentEpisodeNumber == episodes.length } />   
 
                     <AnimeDetails animeDetails={ details } />
-                    {/*<RelatedContent related={ details.related_animes.data } />*/}
                 </div>
                 <WatchFooter />
             </div>
