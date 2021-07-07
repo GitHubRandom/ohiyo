@@ -18,9 +18,6 @@ class VideoPlayer extends React.Component {
         this.forwardTen = this.forwardTen.bind(this)
         this.skipIntro = this.skipIntro.bind(this)
         this.showCopyConfirm = this.showCopyConfirm.bind(this)
-        this.state = {
-            showIntro: false
-        }
     }
 
     initDPlayer() {
@@ -52,14 +49,14 @@ class VideoPlayer extends React.Component {
                 }
             }
         })
-        // Why TF did they add crossorigin attribute by default ?w
+        // Why TF did they add crossorigin attribute by default ?
         document.querySelector(".dplayer-video").removeAttribute("crossorigin")
         this.videoContainer.current.appendChild(this.videoOverlay.current)
     }
 
     shouldComponentUpdate(nextProps,nextState) {
         return !((this.props.introInterval[0] != nextProps.introInterval[0] && this.props.introInterval[1] != nextProps.introInterval[1])
-            || nextProps.openingName != this.props.openingName || nextState.showIntro != this.state.showIntro) 
+            || nextProps.openingName != this.props.openingName) 
     }
 
     componentDidMount() {
@@ -110,7 +107,7 @@ class VideoPlayer extends React.Component {
                     </div>
                     <div style={{ opacity: 0 }} ref={ this.openingHint } className="opening-hint">
                         <div className="opening-hint-container">
-                            <div onClick={ () => this.setState({ showIntro: !this.state.showIntro }) } className="opening-hint-icon">
+                            <div className="opening-hint-icon">
                                 <span className="mdi mdi-music-note mdi-nm"></span>
                             </div>
                             <div className="opening-hint-text">
