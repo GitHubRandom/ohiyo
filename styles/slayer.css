@@ -807,8 +807,22 @@ body {
     margin-top: 25px;
 }
 
+.episode-popup-parameters {
+    display: flex;
+    align-items: center;
+}
+
+.episode-popup-search {
+    background-color: #131313;
+    border: none;
+    padding: 7px 5px;
+    margin-right: 10px;
+    vertical-align: middle;
+    border-radius: 5px;
+    color: white;
+}
+
 .dark-button {
-    margin-top: 25px;
     padding: 5px 15px;
     border-radius: 5px;
     background-color: #131313;
