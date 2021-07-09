@@ -47,6 +47,8 @@ const WatchTopBar = ({ setEpisodeNumber, mal, type, episodesList, episodeNumber,
     const [ ascending, updateEpisodesOrder ] = useState<boolean>(true)
     const [ episodeTitle, updateEpisodeTitle ] = useState<string>("")
     const [ episodeName, updateEpisodeName ] = useState<string>("")
+    const [ episodeSearch, updateEpisodeSearch ] = useState<string>("")
+    const episodeSearchInput = useRef<HTMLInputElement>()
     const titleFetchController = useRef<AbortController>()
     const episodesPopupTrigger = useRef()
 
@@ -105,24 +107,31 @@ const WatchTopBar = ({ setEpisodeNumber, mal, type, episodesList, episodeNumber,
                 الحلقات
                 </motion.div> : null }
                 { episodesList.length > 1 ?
-                    <Popup id="episodes-popup" dismissOnRouterEvent={ true } trigger={ episodesPopupTrigger } title="الحلقات">
+                    <Popup onShow={ () => { if (episodeSearchInput.current) { episodeSearchInput.current.focus() } } } id="episodes-popup" dismissOnRouterEvent={ true } trigger={ episodesPopupTrigger } title="الحلقات">
                         <>
-                            <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
-                                { ascending ?
-                                    <><span className="mdi mdi-sort-ascending"></span>تصاعدي</>
-                                :
-                                    <><span className="mdi mdi-sort-descending"></span>تنازلي</>
-                                }
+                            <div className="episode-popup-parameters">
+                                <div onClick={ () => reverseList() } style={{ display: "inline" }} className="dark-button episodes-popup-order">
+                                    { ascending ?
+                                        <><span className="mdi mdi-sort-ascending"></span>تصاعدي</>
+                                    :
+                                        <><span className="mdi mdi-sort-descending"></span>تنازلي</>
+                                    }
+                                </div>
+                                <input placeholder="البحث عن الحلقة" ref={ episodeSearchInput } onInput={ (e: React.ChangeEvent<HTMLInputElement>) => updateEpisodeSearch(e.target.value) } type="text" name="episode" className="episode-popup-search" />
                             </div>
                             <div id="episodes-list" className="popup-list">
                                 { ascending ?
                                     episodesList.map((episode,index) => {
-                                        return <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
+                                        return episode.Episode.includes(episodeSearch) || ( episode.ExtraEpisodes && episode.ExtraEpisodes.includes(episodeSearch) ) ?
+                                                    <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
+                                                : <React.Fragment key={ index }></React.Fragment>
                                     })
                                 :
                                     episodesList.map((episode,index) => {
-                                        return <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
-                                    }).reverse()
+                                        return episode.Episode.includes(episodeSearch) || ( episode.ExtraEpisodes && episode.ExtraEpisodes.includes(episodeSearch) ) ?
+                                                    <div key={ index } onClick={ () => setEpisodeNumber(index + 1) } className="episode-link">{ `الحلقة ${episode.Episode}${episode.ExtraEpisodes.length ? `-${episode.ExtraEpisodes}` : ""}` }{ getEpisodeTags(episode) }</div>
+                                                    : <React.Fragment key={ index }></React.Fragment>
+                                        }).reverse()
                                 }
                             </div>
                         </>
