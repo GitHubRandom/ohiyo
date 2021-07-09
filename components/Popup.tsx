@@ -7,9 +7,11 @@ interface IPopup {
     id: string,
     title: string,
     dismissOnRouterEvent?: boolean
+    onShow?: () => void,
+    onDismiss?: () => void
 }
 
-const Popup = ({ children, trigger, id, title, dismissOnRouterEvent }: React.PropsWithChildren<IPopup>) => {
+const Popup = ({ children, trigger, id, title, dismissOnRouterEvent, onShow, onDismiss }: React.PropsWithChildren<IPopup>) => {
 
     const [ visible, updateVisibility ] = useState(false)
 
@@ -20,6 +22,14 @@ const Popup = ({ children, trigger, id, title, dismissOnRouterEvent }: React.Pro
             }) 
         }
     }, [trigger])
+    
+    useEffect(() => {
+        if (visible && onShow) {
+            onShow()
+        } else if (!visible && onDismiss) {
+            onDismiss()
+        } 
+    }, [visible])
 
     useEffect(() => {
         if (dismissOnRouterEvent) {
