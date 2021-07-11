@@ -314,7 +314,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
             var regex = /href="(https?:\/\/download\d{1,6}\.mediafire\.com.*?\.mp4)"/
             var matches = data.match(regex)
             if (matches) {
-                return ["FR", [{ type: "normal", url: "https://quiet-cove-27971.herokuapp.com/" + matches[1], name: qualitiesMap[qual] }]]
+                return [key, [{ type: "normal", url: "https://quiet-cove-27971.herokuapp.com/" + matches[1], name: qualitiesMap[qual] }]]
             }
         } else if (key.startsWith("SF")) {
             var regex = /"downloadUrl":"(.+solidfilesusercontent.com.+?)"/
