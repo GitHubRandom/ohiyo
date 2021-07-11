@@ -188,13 +188,11 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
         if (Object.keys(episodeSources) && !status.includes('pending')) {
             let selected = Object.keys(episodeSources)[0]
             for (var key in episodeSources) {
-                if (key == "FRFhdQ" || key == "FRLowQ" || key == "FRLink") {
+                if ( key == "FRFhdQ" || key == "FRLink" || key == "SFLink" ||
+                ( key.startsWith("OU") && selected != "FRLink" ) ||
+                ( key.startsWith("FD") && selected != "FRLink" ) ) {
                     selected = key
-                    break
-                } else if (key.startsWith("OU")) {
-                    selected = key
-                } else if (key.startsWith("FD")) {
-                    selected = key
+                    if (key == "FRFhdQ") break
                 }
             }
             updateCurrent([selected, episodeSources[selected]])
