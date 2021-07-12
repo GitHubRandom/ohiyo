@@ -138,6 +138,7 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
 
     useEffect(() => {
         let observer = new IntersectionObserver(entries => {
+            console.log(actualQuery)
             if (refreshed && entries[0] && entries[0].isIntersecting) {
                 updateRefreshed(false)
                 updateActualQuery({ ...actualQuery, page: page + 1 })
@@ -150,11 +151,17 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
         return () => {
             observer.disconnect()
         }
-    }, [page,refreshed])
+    }, [page,refreshed,actualQuery])
 
     useEffect(() => {
         if (!queryInit) {
             updateQueryInit(true)
+            let initialQuery:Record<string,any> = {}
+            if (genreSelected) initialQuery.genre = genreSelected
+            if (studioSelected) initialQuery.studio = studioSelected
+            if (genreSelected || studioSelected) {
+                updateActualQuery({ ...actualQuery, ...initialQuery })
+            }
             return
         }
         if (router.isReady) {
