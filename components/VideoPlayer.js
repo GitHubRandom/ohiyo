@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, memo } from 'react'
 
 const VideoPlayer = ({ introInterval, sources, openingName }) => {
 
@@ -23,7 +23,9 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
             theme: '#fffb00',
             video
         })
+        // DPlayer puts crossorigin attribute by default
         document.querySelector(".dplayer-video").removeAttribute("crossorigin")
+        // Reimplement overlay elements (DPlayer removes all container's children).
         videoPlayerContainer.current.appendChild(videoOverlay.current)    
         return () => {
             // Clean effect
@@ -106,4 +108,4 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
 
 }
 
-export default VideoPlayer
+export default memo(VideoPlayer)

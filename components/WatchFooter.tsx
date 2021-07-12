@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import React from 'react'
 
 const WatchFooter = () => {
     return (
@@ -8,4 +9,4 @@ const WatchFooter = () => {
     )
 }
 
-export default WatchFooter
+export default React.memo(WatchFooter)

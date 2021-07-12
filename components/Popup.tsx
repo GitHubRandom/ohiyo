@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FunctionComponent, RefObject } from "react"
+import React, { useState, useEffect, RefObject } from "react"
 import { AnimatePresence, motion } from 'framer-motion'
 import { Router } from "next/router"
 

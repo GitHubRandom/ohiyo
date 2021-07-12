@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import React from 'react'
 import { RefObject } from 'react'
 import { MENU_ENTRIES } from "../utils/Constants"
 
@@ -22,4 +23,4 @@ const WatchNavigation = ({ hamburgerButtonRef }: IWatchNavigation) => {
     )
 }
 
-export default WatchNavigation
+export default React.memo(WatchNavigation)
