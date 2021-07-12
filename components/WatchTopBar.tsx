@@ -53,12 +53,6 @@ const WatchTopBar = ({ setEpisodeNumber, mal, type, episodesList, episodeNumber,
     const episodesPopupTrigger = useRef()
 
     useEffect(() => {
-        if (episodeName && animeTitle) {
-            document.title = `${ animeTitle } - ${episodeName}`
-        }
-    }, [])
-
-    useEffect(() => {
         const episode = episodesList[episodeNumber - 1]
         // Update episodeName
         if (type == "Movie") {
@@ -95,7 +89,7 @@ const WatchTopBar = ({ setEpisodeNumber, mal, type, episodesList, episodeNumber,
     return (
         <>
             <Head>
-                <title>{ `${animeTitle} - ${episodeName}` }</title>
+                <title>{ animeTitle + (episodeName.length ? " - " + episodeName : "") }</title>
             </Head>
             <div className="top-bar">
                 <div className="top-bar-text">
