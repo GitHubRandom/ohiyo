@@ -200,11 +200,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
     }, [status])
 
     useEffect(() => {
-        cancelFetches()
-        updateSources({})
-        updateCurrent(["",""])
         let sources: Record<string, string> = {}
-        console.log("Executing effect...")
         Object.keys(episode).map(key => {
             if (episode[key].length > 0 && (key.endsWith("LowQ") || key.endsWith("Link") || key.endsWith("hdQ"))) {
                 sources[key] = episode[key]
@@ -226,7 +222,12 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
             } else if (openingsInfo.length) {
                 theOpening = openingsInfo[0]
             }
-            return theOpening !== undefined ? updateOpening(theOpening.replace(/#\d{1,4}: /, "").replace(/\(eps \d{1,3}-\d{0,3}\)/, "")) : updateOpening("")
+            theOpening !== undefined ? updateOpening(theOpening.replace(/#\d{1,4}: /, "").replace(/\(eps \d{1,3}-\d{0,3}\)/, "")) : updateOpening("")
+        }
+        return () => {
+            cancelFetches()
+            updateSources({})
+            updateCurrent(["",""])    
         }
     }, [episode])
 

@@ -1,137 +1,109 @@
-import next from 'next'
-import React from 'react'
+import { useRef, useEffect, useState } from 'react'
 
+const VideoPlayer = ({ introInterval, sources, openingName }) => {
 
-class VideoPlayer extends React.Component {
+    const [ inIntro, setInIntro ] = useState(false)
+    const [ showCopyConfirm, setShowCopyConfirm ] = useState(false)
+    const player = useRef() // DPlayer
+    const videoPlayerContainer = useRef()
+    const videoOverlay = useRef()
 
-    constructor(props) {
-        super(props)
-        this.videoOverlay = React.createRef()
-        this.introButton = React.createRef()
-        this.videoContainer = React.createRef()
-        this.forward = React.createRef()
-        this.rewind = React.createRef()
-        this.videoAd = React.createRef()
-        this.openingHint = React.createRef()
-        this.copyConfirm = React.createRef()
-        this.rewindTen = this.rewindTen.bind(this)
-        this.forwardTen = this.forwardTen.bind(this)
-        this.skipIntro = this.skipIntro.bind(this)
-        this.showCopyConfirm = this.showCopyConfirm.bind(this)
-    }
-
-    initDPlayer() {
-        let video = {
-            quality: this.props.sources,
+    // Destroy & initialize player when sources changes
+    useEffect(() => {
+        let video = sources.length == 1 ? {
+            url: sources[0].url,
+            type: "normal"
+        } : {
+            quality: sources,
             defaultQuality: 0
         }
-        if (this.props.sources.length == 1) {
-            video = {
-                url: this.props.sources[0].url,
-                type: "normal"
-            }
-        }
         const DPlayer = require('dplayer')
-        this.player = new DPlayer({
-            container: this.videoContainer.current,
+        player.current = new DPlayer({
+            container: videoPlayerContainer.current,
             theme: '#fffb00',
             video
         })
-        this.player.on('progress', () => {
-            const currentProgress = this.player.video.currentTime
-            if (this.props.introInterval[0] != this.props.introInterval[1]) {
-                if (currentProgress >= this.props.introInterval[0] && currentProgress <= this.props.introInterval[1]) {
-                    this.introButton.current.style.display = "block"
-                    if (this.props.openingName.length) this.openingHint.current.style.opacity = "1"
-                } else if (this.introButton.current.style.display == "block") {
-                    this.introButton.current.style.display = "none"
-                    if (this.props.openingName.length) this.openingHint.current.style.opacity = "0"
+        document.querySelector(".dplayer-video").removeAttribute("crossorigin")
+        videoPlayerContainer.current.appendChild(videoOverlay.current)    
+        return () => {
+            // Clean effect
+            setInIntro(false)
+            player.current.destroy()
+        }
+    }, [sources])
+
+    useEffect(() => {
+        let introCheck = window.setInterval(() => {
+            if (player.current) {
+                const currentTime = player.current.video.currentTime
+                if (currentTime >= introInterval[0] && currentTime < introInterval[1]) {
+                    console.log("In !")
+                    setInIntro(true)
+                } else if (inIntro) {
+                    console.log("Out !")
+                    setInIntro(false)
                 }
             }
-        })
-        // Why TF did they add crossorigin attribute by default ?
-        document.querySelector(".dplayer-video").removeAttribute("crossorigin")
-        this.videoContainer.current.appendChild(this.videoOverlay.current)
-    }
-
-    shouldComponentUpdate(nextProps,nextState) {
-        return !((this.props.introInterval[0] != nextProps.introInterval[0] && this.props.introInterval[1] != nextProps.introInterval[1])
-            || nextProps.openingName != this.props.openingName) 
-    }
-
-    componentDidMount() {
-        this.initDPlayer()
-    }
-
-    componentDidUpdate() {
-        this.player.destroy()
-        this.initDPlayer()
-    }
-
-    forwardTen() {
-        this.player.seek(this.player.video.currentTime + 10)
-    }
-
-    rewindTen() {
-        this.player.seek(this.player.video.currentTime - 10)
-    }
-
-    skipIntro() {
-        if (this.props.introInterval != undefined && this.props.introInterval.length != 0) {
-            this.player.seek(this.props.introInterval[1])
-            this.introButton.current.style.display = 'none'
+        }, 1000)
+        return () => {
+            clearInterval(introCheck)
         }
-    }
+    }, [introInterval, inIntro])
 
-    componentWillUnmount() {
-        this.player.destroy()
-    }
-
-    showCopyConfirm() {
-        if (this.copyConfirm.current) {
-            this.copyConfirm.current.style.height = "20px"
+    // An effect for timing out copying opening name confirmation.
+    useEffect(() => {
+        if (showCopyConfirm) {
             setTimeout(() => {
-                this.copyConfirm.current.style.height = "0"
+                setShowCopyConfirm(false)
             }, 2000)
         }
+    }, [showCopyConfirm])
+
+    const skipIntro = () => {
+        if (player.current && introInterval[0] != introInterval[1]) player.current.seek(introInterval[1])
     }
 
-    render() {
-        return (
-            <div dir="ltr" ref={ this.videoContainer } className="anime-video-player">
-                <div ref={ this.videoOverlay } className="anime-video-overlay">
-                    <button onClick={ this.skipIntro } ref={ this.introButton } style={{ display: "none" }} type="button" id="episode-skip-intro">
-                        تخطي المقدمة
-                    </button>
-                    <div ref={ this.videoAd } id="video-ad">
+    const forwardTen = () => {
+        if (player.current) player.current.seek(player.current.video.currentTime + 10)
+    }
+
+    const rewindTen = () => {
+        if (player.current) player.current.seek(player.current.video.currentTime - 10)
+    }
+
+    return (
+        <div dir="ltr" ref={ videoPlayerContainer } className="anime-video-player">
+            <div ref={ videoOverlay } className="anime-video-overlay">
+                <button onClick={ skipIntro } style={{ display: inIntro ? "block" : "none" }} type="button" id="episode-skip-intro">
+                    تخطي المقدمة
+                </button>
+                <div style={{ opacity: inIntro && openingName.length ? 1 : 0 }} className="opening-hint">
+                    <div className="opening-hint-container">
+                        <div className="opening-hint-icon">
+                            <span className="mdi mdi-music-note mdi-nm"></span>
+                        </div>
+                        <div className="opening-hint-text">
+                            <p>
+                                اسم المقدمة
+                            </p>
+                            <p onClick={ () => { navigator.clipboard.writeText(openingName); setShowCopyConfirm(true) } }>
+                                { openingName }
+                            </p>
+                        </div>
                     </div>
-                    <div style={{ opacity: 0 }} ref={ this.openingHint } className="opening-hint">
-                        <div className="opening-hint-container">
-                            <div className="opening-hint-icon">
-                                <span className="mdi mdi-music-note mdi-nm"></span>
-                            </div>
-                            <div className="opening-hint-text">
-                                <p>
-                                    اسم المقدمة
-                                </p>
-                                <p onClick={ () => { navigator.clipboard.writeText(this.props.openingName); this.showCopyConfirm() } }>
-                                    { this.props.openingName }
-                                </p>
-                            </div>
-                        </div>
-                        <div ref={ this.copyConfirm } className="opening-hint-copy-confirm">
-                            <span className="mdi mdi-content-copy"></span>تم النسخ
-                        </div>
+                    <div style={{ height: showCopyConfirm ? "20px" : "0" }} className="opening-hint-copy-confirm">
+                        <span className="mdi mdi-content-copy"></span>تم النسخ
                     </div>
                     { /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? <>
-                        <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ this.forwardTen } ref={ this.forward } id="forward" className="control-overlay">
+                        <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ forwardTen } id="forward" className="control-overlay">
                         </div>  
-                        <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ this.rewindTen } ref={ this.rewind } id="rewind" className="control-overlay">
+                        <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ rewindTen }  id="rewind" className="control-overlay">
                         </div></> : null }
                 </div>
             </div>
-        )
-    }
+        </div>    
+    )
+
 }
 
 export default VideoPlayer
