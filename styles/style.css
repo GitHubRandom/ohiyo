@@ -100,12 +100,14 @@ body {
 
 #__next {
     display: flex;
+    display: -ms-flexbox;
     min-height: 100vh;
     background-color: var(--primary-color);
 }
 
 .watch-menu {
     display: flex;
+    display: -ms-flexbox;
     align-items: center;
     justify-content: space-between;
     width: calc(65% + 250px);
@@ -114,6 +116,7 @@ body {
 
 .logo-section {
     display: flex;
+    display: -ms-flexbox;
     justify-content: center;
     align-items: center;
     position: absolute;
@@ -132,6 +135,7 @@ body {
 
 .watch-menu .menu-section {
     display: flex;
+    display: -ms-flexbox;
 }
 
 .watch-menu .menu-section .menu-item {
@@ -148,6 +152,7 @@ body {
     flex-shrink: 0;
     height: 100vh;
     display: flex;
+    display: -ms-flexbox;
     justify-content: center;
     align-items: center;
     transition: right 0.125s ease-out;
@@ -187,6 +192,7 @@ body {
 
 .menu-section .menu-item {
     display: flex;
+    display: -ms-flexbox;
     border-radius: 5px;
     color: white;
     margin: 10px;
@@ -209,6 +215,7 @@ body {
 .error-message {
     height: 60vh;
     display: flex;
+    display: -ms-flexbox;
     justify-content: center;
     align-items: center;
     font-size: 25pt;
@@ -232,12 +239,14 @@ body {
 
 .anime-list-header {
     display: flex;
+    display: -ms-flexbox;
     justify-content: space-between;
     align-items: center;
 }
 
 .anime-search-container {
     display: flex;
+    display: -ms-flexbox;
     justify-content: center;
     align-items: center;
 }
@@ -281,6 +290,7 @@ body {
 
 .anime-filter-checkboxes {
     display: flex;
+    display: -ms-flexbox;
     flex-wrap: wrap;
 }
 
@@ -291,6 +301,7 @@ body {
 
 .content-list {
     display: grid;
+    display: -ms-flexbox;
     gap: 15px;
     grid-template-columns: repeat(auto-fill, 150px);
     justify-content: space-between;
@@ -300,6 +311,7 @@ body {
 .content {
     border-radius: 5px;
     display: block;
+    max-width: 150px;
 }
 
 .anime-cover {
@@ -356,6 +368,7 @@ body {
 .top-bar {
     grid-area: topbar;
     display: flex;
+    display: -ms-flexbox;
     justify-content: space-between;
     align-items: center;
 }
@@ -450,6 +463,7 @@ body {
 
 .anime-details-categories {
     display: flex;
+    display: -ms-flexbox;
     flex-wrap: wrap;
 }
 
@@ -501,6 +515,7 @@ body {
 
 .servers-category {
     display: flex;
+    display: -ms-flexbox;
 }
 
 .servers-category:not(:last-child) {
@@ -537,6 +552,7 @@ body {
 .server-settings {
     color: white;
     display: flex;
+    display: -ms-flexbox;
 }
 
 .player-episode-skip {
@@ -559,6 +575,7 @@ body {
     font-weight: bold;
     border-radius: 0 0 10px 10px;
     display: flex;
+    display: -ms-flexbox;
     padding: 10px 0;
     justify-content: space-between;
     align-items: center;
@@ -607,6 +624,7 @@ body {
 
 .tab-container {
     display: flex;
+    display: -ms-flexbox;
     justify-content: center;
     margin-bottom: 20px;
 }
@@ -692,6 +710,7 @@ body {
 
 .soon-screen {
     display: flex;
+    display: -ms-flexbox;
     justify-content: center;
     align-items: center;
     font-size: 25pt;
@@ -709,12 +728,14 @@ body {
     right: 0;
     background-color: #0009;
     display: flex;
+    display: -ms-flexbox;
     justify-content: center;
     align-items: center;
 }
 
 .popup-header {
     display: flex;
+    display: -ms-flexbox;
     justify-content: space-between;
     align-items: center;
 }
@@ -795,6 +816,7 @@ body {
 .fourofour-buttons,
 .bl-buttons {
     display: flex;
+    display: -ms-flexbox;
 }
 
 .fourofour a {
@@ -809,6 +831,7 @@ body {
 
 .episode-popup-parameters {
     display: flex;
+    display: -ms-flexbox;
     align-items: center;
 }
 
@@ -849,6 +872,7 @@ body {
     min-height: 100vh;
     width: 100vw;
     display: flex;
+    display: -ms-flexbox;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -907,6 +931,7 @@ body {
 
 .download-link {
     display: flex;
+    display: -ms-flexbox;
     justify-content: space-between;
     align-items: center;
 }
@@ -948,6 +973,7 @@ body {
 
 .watch-footer {
     display: flex;
+    display: -ms-flexbox;
     justify-content: center;
 }
 
@@ -982,6 +1008,7 @@ body {
     background-color: var(--accent-color);
     border-radius: 5px;
     display: flex;
+    display: -ms-flexbox;
     align-items: center;
     padding: 5px 10px;
 }
@@ -993,6 +1020,7 @@ body {
     font-size: 10pt;
     height: 0;
     display: flex;
+    display: -ms-flexbox;
     align-items: center;
     transition: all 0.125s ease-in-out;
     overflow: hidden;
@@ -1037,6 +1065,7 @@ body {
     }
     .main-menu.secondary {
         display: flex;
+        display: -ms-flexbox;
     }
     .main-menu section {
         position: absolute;
@@ -1069,6 +1098,7 @@ body {
     }
     .anime-details-info {
         display: flex;
+        display: -ms-flexbox;
     }
     .anime-details-synopsis {
         margin: 0;
