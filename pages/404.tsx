@@ -17,7 +17,7 @@ const FourOFour = () => {
                 <p>لا توجد صفحة في هذا الرابط</p>
                 <div className="fourofour-buttons">
                     <div onClick={ () => router.back() } className="fourofour-back-button dark-button"><span className="mdi mdi-keyboard-backspace mdi-flip-h"></span>العودة</div>
-                    <Link href="/"><a className="dark-button"><span className="mdi mdi-home"></span>الصفحة الرئيسة</a></Link>
+                    <Link href="/"><a className="fourofour-home-button dark-button"><span className="mdi mdi-home"></span>الصفحة الرئيسة</a></Link>
                 </div>
                 <div className="fourofour-watermark">Animayhem</div>
             </div>
