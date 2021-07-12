@@ -846,6 +846,7 @@ body {
 }
 
 .dark-button {
+    margin-top: 25px;
     padding: 5px 15px;
     border-radius: 5px;
     background-color: #131313;
