@@ -212,17 +212,17 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
             let theOpening = ""
             if (openingsInfo.length > 1) {
                 theOpening = openingsInfo.find(opening => {
-                    let episodesInterval = opening.match(/\d{1,3}-\d{0,3}/)
+                    let episodesInterval = opening.match(/\d{1,3}-\d{0,3}\?{0,3}/)
                     if (episodesInterval) {
                         let episodesIntervalLimits = episodesInterval[0].split('-')
                         updateOpeningLifeSpan([parseInt(episodesIntervalLimits[0]), parseInt(episodesIntervalLimits[1])])
-                        return (episodeNameNumber <= parseInt(episodesIntervalLimits[1]) || !episodesIntervalLimits[1].length) && episodeNameNumber >= parseInt(episodesIntervalLimits[0])
+                        return (episodeNameNumber <= parseInt(episodesIntervalLimits[1]) || isNaN(parseInt(episodesIntervalLimits[1]))) && episodeNameNumber >= parseInt(episodesIntervalLimits[0])
                     }
                 })
             } else if (openingsInfo.length) {
                 theOpening = openingsInfo[0]
             }
-            theOpening !== undefined ? updateOpening(theOpening.replace(/#\d{1,4}: /, "").replace(/\(eps \d{1,3}-\d{0,3}\)/, "")) : updateOpening("")
+            theOpening !== undefined ? updateOpening(theOpening.replace(/#\d{1,4}: /, "").replace(/\(eps \d{1,3}-\d{0,3}\?{0,3}\)/, "")) : updateOpening("")
         }
         return () => {
             cancelFetches()
