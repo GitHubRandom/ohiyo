@@ -39,10 +39,8 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
             if (player.current) {
                 const currentTime = player.current.video.currentTime
                 if (currentTime >= introInterval[0] && currentTime < introInterval[1]) {
-                    console.log("In !")
                     setInIntro(true)
                 } else if (inIntro) {
-                    console.log("Out !")
                     setInIntro(false)
                 }
             }
