@@ -619,11 +619,19 @@ body {
     transition: all 0.125s ease-in-out;
     cursor: pointer;
     z-index: 2;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 #episode-skip-intro:hover {
     background-color: var(--accent-color);
     color: black;
+}
+
+.skip-intro-shortcut {
+    font-size: 8pt;
+    color: #b4b4b4;
 }
 
 .trailer-popup {
