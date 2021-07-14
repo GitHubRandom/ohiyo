@@ -212,10 +212,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
             let theOpening = ""
             if (openingsInfo.length > 1) {
                 theOpening = openingsInfo.find(opening => {
-                    console.log(opening)
                     let episodesInterval = opening.match(/\(eps\s(.+?)\)/)
-                    console.log(episodesInterval)
-                    console.log(episodeNameNumber)
                     if (episodesInterval) {
                         let episodesIntervalLimits = episodesInterval[1].split('-')
                         updateOpeningLifeSpan([parseInt(episodesIntervalLimits[0]), parseInt(episodesIntervalLimits[1])])
