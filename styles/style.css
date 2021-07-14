@@ -597,13 +597,21 @@ body {
     font-weight: bold;
 }
 
+.dismiss-skip {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 5px 5px 0 0 !important;
+    display: flex;
+    align-items: center;
+}
 
 #episode-skip-intro {
     border-radius: 5px;
     background-color: #0000004f;
     color: white;
     border: none;
-    padding: 9px 25px;
+    padding: 9px 35px;
     bottom: 50px;
     right: 15px;
     position: absolute;
