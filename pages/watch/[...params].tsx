@@ -7,7 +7,6 @@ import WatchNavigation from '../../components/WatchNavigation'
 import Head from 'next/head'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import tippy from 'tippy.js'
 import { useRef } from 'react'
 import WatchFooter from '../../components/WatchFooter'
 
@@ -149,7 +148,6 @@ const Watch = ({ details, episodes, episodeNumber }) => {
     }
 
     useEffect(() => {
-        tippy("[data-tippy-content]")
         router.events.on("routeChangeComplete", handleBack)
         return () => {
             router.events.off("routeChangeComplete", handleBack)

@@ -2,7 +2,9 @@ import React, { useCallback, useRef, useState } from "react"
 import ExpandableText from "./ExpandableText"
 import Link from 'next/link'
 import Popup from "./Popup"
+import tippy from "tippy.js"
 import { motion } from "framer-motion"
+import { useEffect } from "react"
 
 export const animeGenres: Record<string,any> = {
     Action: "أكشن",
@@ -77,10 +79,14 @@ interface TAnimeDetails {
 
 const AnimeDetails = ({ animeDetails }: TAnimeDetails) => {
 
-    const [ ascending, updateEpisodesOrder ] = useState<boolean>(true)
     const trailerPopupTrigger = useRef()
 
-    function getRate(rate:string) {
+    useEffect(() => {
+        // Reinit tippy every re-render
+        tippy("[data-tippy-content]")
+    })
+
+    const getRate = (rate:string) => {
         switch (true) {
             case rate.includes("PG-13"):
                 return "13+"
@@ -95,7 +101,7 @@ const AnimeDetails = ({ animeDetails }: TAnimeDetails) => {
         }
     }
 
-    function render() {
+    const render = () => {
         var ready = Object.keys(animeDetails).length != 0
         return (
             <motion.section animate={{ translateX: 0, opacity: 1 }} initial={{ translateX: 20, opacity: 0 }} transition={{ delay: 0.5 }} className="anime-details">
