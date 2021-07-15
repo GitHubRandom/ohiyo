@@ -17,7 +17,6 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
          * The event is needed to check if skip intro was actually clicked or
          * the dismiss button.
          *  */ 
-        console.log(byKeyPress)
         if (player.current && introInterval[0] != introInterval[1] && event.target.tagName.toLowerCase() === 'button') player.current.seek(introInterval[1])
     }
 
