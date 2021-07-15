@@ -629,6 +629,10 @@ body {
     color: black;
 }
 
+#episode-skip-intro:hover .skip-intro-shortcut {
+    color: #303030;
+}
+
 .skip-intro-shortcut {
     font-size: 8pt;
     color: #b4b4b4;
