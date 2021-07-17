@@ -7,7 +7,6 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
     const [ showCopyConfirm, setShowCopyConfirm ] = useState(false)
     const [ dismiss, setDismiss ] = useState(false)
     const [ UIShown, setUIShown ] = useState(false)
-    const [ mobileDevice, setMobileDevice ] = useState(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
     const player = useRef() // DPlayer
     const videoPlayerContainer = useRef()
     const videoOverlay = useRef()
@@ -17,7 +16,7 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
          * The event is needed to check if skip intro was actually clicked or
          * the dismiss button.
          *  */ 
-        if (player.current && introInterval[0] != introInterval[1] && event.target.tagName.toLowerCase() === 'button') player.current.seek(introInterval[1])
+        if (player.current && introInterval[0] != introInterval[1] && !event.target.classList.contains('dismiss-skip')) player.current.seek(introInterval[1])
     }
 
     const forwardTen = () => {
@@ -29,6 +28,8 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
         // Rewind video 10 secs
         if (player.current) player.current.seek(player.current.video.currentTime - 10)
     }
+
+    const isMobileDevice = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
     useEffect(() => {
         // Reinit tippy every re-render
@@ -138,10 +139,10 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
     return (
         <div dir="ltr" ref={ videoPlayerContainer } className="anime-video-player">
             <div ref={ videoOverlay } className="anime-video-overlay">
-                <button dir="rtl" onClick={ (event) => skipIntro(event) } style={{ display: inIntro && UIShown ? "flex" : "none" }} type="button" id="episode-skip-intro">
+                <button dir="rtl" onClick={ event => skipIntro(event) } style={{ display: inIntro && UIShown ? "flex" : "none" }} type="button" id="episode-skip-intro">
                     <span data-tippy-content="إلغاء" onClick={ () => setDismiss(true) } className="mdi mdi-close dismiss-skip"></span>
                     <span className="skip-intro-text">تخطي المقدمة</span>
-                    { !mobileDevice ? <span className="skip-intro-shortcut">Enter</span> : null}
+                    { !isMobileDevice() ? <span className="skip-intro-shortcut">Enter</span> : null}
                 </button>
                 <div style={{ opacity: inIntro && UIShown && openingName.length ? 1 : 0 }} className="opening-hint">
                     <div className="opening-hint-container">
@@ -160,12 +161,12 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
                     <div style={{ height: showCopyConfirm ? "20px" : "0" }} className="opening-hint-copy-confirm">
                         <span className="mdi mdi-content-copy"></span>تم النسخ
                     </div>
-                    { mobileDevice ? <>
-                        <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ forwardTen } id="forward" className="control-overlay">
-                        </div>  
-                        <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ rewindTen }  id="rewind" className="control-overlay">
-                        </div></> : null }
                 </div>
+                { isMobileDevice ? <>
+                    <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ forwardTen } id="forward" className="control-overlay">
+                    </div>  
+                    <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ rewindTen }  id="rewind" className="control-overlay">
+                    </div></> : null }
             </div>
         </div>    
     )
