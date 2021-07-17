@@ -1,8 +1,13 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import VideoPlayer from './VideoPlayer'
+import { decodeHTML, decodeJSON } from '../utils/ServerDecoder'
 import Popup from "./Popup"
 
-const supportedServers = ["OK", "FR", "SF", "FD"]
+const nativeServers = ["OK", "FR", "SF", "FD"]
+
+ // Native player servers + iframe servers
+const supportedServers = nativeServers.concat(["MS", "MA", "GD"])
+
 const serverKeys = {
     OK: "Ok.ru",
     FR: "Mediafire",
@@ -12,11 +17,28 @@ const serverKeys = {
     MA: "Mega",
     GD: "G.Drive"
 }
-const qualitiesMap = {
-    hdQ: "1080p",
-    owQ: "480p",
-    ink: "720p"
+
+const getFetchMethod = (serverKey:string):string => {
+    const postMethod = ["OK", "FD"]
+    return postMethod.includes(serverKey) ? "POST" : "GET"
 }
+
+const getFormattedEndpoint = (serverKey:string, item: string):string => {
+    const prefixes = {
+        MA: "https://mega.nz/embed/",
+        GD: "https://drive.google.com/file/d/",
+        MS: "https://embed.mystream.to/",
+        FD: "https://quiet-cove-27971.herokuapp.com/www.fembed.com/api/source/",
+        FR: "https://quiet-cove-27971.herokuapp.com/www.mediafire.com/?",
+        SF: "/api/cors?link=http://www.solidfiles.com/v/",
+        OK: "https://cors.bridged.cc/https://ok.ru/dk?cmd=videoPlayerMetadata&mid="
+    }
+    const prefix = prefixes.hasOwnProperty(serverKey) ? prefixes[serverKey] : ""
+    const suffix = serverKey == "GD" ? "/preview" : ""
+    return prefix + item + suffix
+}
+
+const shouldDecodeJSON = (serverKey:string):boolean => serverKey == "OK" || serverKey == "FD"
 
 interface TEpisodePlayer {
     episode: Record<string,any>,
@@ -63,14 +85,14 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
 
     /**
      * This function splits the different sources and decodes them
-     * @param sources An stringified array of the different sources (object)
+     * @param sources An object of available sources
      */
     const getServers = (sources: Record<string, string>): void => {
-        let sourcesKeys = Object.keys(sources)
+        const sourcesKeys = Object.keys(sources)
         updateStatus(Array(sourcesKeys.length).fill("pending"))
         controllers.current = Array(sourcesKeys.length).fill(new AbortController())
         updateSwitchCooldown(true)
-        function setUnsupportedServer(server: string, result: string, index: number) {
+        const setUnsupportedServer = (server: string, result: string, index: number) => {
             updateSources(oldEpisodeSources => ({
                 ...oldEpisodeSources,
                 [server]: result
@@ -79,86 +101,61 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
         }
 
         sourcesKeys.forEach((key, index) => {
-            let item = sources[key]
-            item = item.replace("http://", "https://")
-            switch (true) {
-                //case key.startsWith("FD"):
-                    //setUnsupportedServer(key, "https://fembed.com/v/" + item, index); return
-                case key.startsWith("MA"):
-                    setUnsupportedServer(key, "https://mega.nz/embed/" + item, index); return
-                case key.startsWith("MS"):
-                    setUnsupportedServer(key, "https://embed.mystream.to/" + item, index); return
-                case key.startsWith("GD"):
-                    setUnsupportedServer(key, "https://drive.google.com/file/d/" + item + "/preview", index); return
-                default:
-                    break;
+            const item = sources[key].replace("http://", "https://") // Force HTTPS
+            const serverKey = key.substr(0,2) // Slice key to get server
+            if (!supportedServers.includes(serverKey)) {
+                setStatus('failed', index)
+                return // Cancel if server is not supported
             }
-            let isOk = key.startsWith("OK")
-            let isFd = key.startsWith("FD")
-            let headers = { 'User-Agent': navigator.userAgent }
-            let method = 'GET'
-            switch (true) {
-                case isFd:
-                    item = "https://quiet-cove-27971.herokuapp.com/www.fembed.com/api/source/" + item
-                    method = 'POST'
-                    break
-                case key.startsWith("FR"):
-                    item = "https://quiet-cove-27971.herokuapp.com/www.mediafire.com/?" + item
-                    break
-                case key.startsWith("SF"):
-                    item = "/api/cors?link=http://www.solidfiles.com/v/" + item
-                    break
-                case isOk:
-                    method = 'POST'
-                    item = "https://cors.bridged.cc/https://ok.ru/dk?cmd=videoPlayerMetadata&mid=" + item
-                    break
-                default:
-                    break
+            const useJSON = shouldDecodeJSON(serverKey)
+            const formattedEndpoint = getFormattedEndpoint(serverKey, item)
+            if (!nativeServers.includes(serverKey)) {
+                // Use iframe instead of DPlayer
+                setUnsupportedServer(key, formattedEndpoint, index)
+                return
             }
-            const controller = new AbortController()
-            controllers.current[index] = controller
-            fetch(encodeURI(item), {
-                method: method,
-                headers: new Headers(headers),
-                signal: controller.signal
+            fetch(encodeURI(formattedEndpoint), {
+                method: getFetchMethod(serverKey),
+                headers: new Headers({ 'User-Agent': navigator.userAgent }),
+                signal: controllers.current[index].signal
             })
-                .then((response) => {
-                    if (isOk || isFd) {
-                        return response.json()
-                    } else {
-                        return response.text()
-                    }
-                })
-                .then((data) => {
-                    let ds = isOk || isFd ? decodeServers(key, data) : decodeHTML(key, data, key.substr(-3, 3))
-                    if (ds[0].length && ds[1].length) {
-                        updateSources(oldEpisodeSources => {
-                            const oldLinks = oldEpisodeSources[ds[0]]
-                            if (oldLinks) {
-                                return {
-                                    ...oldEpisodeSources,
-                                    [ds[0]]: (oldEpisodeSources[ds[0]] as quality).concat(ds[1])
-                                }
-                            } else {
-                                return {
-                                    ...oldEpisodeSources,
-                                    [ds[0]]: ds[1]
-                                }
+            .then(response => {
+                if (useJSON) {
+                    return response.json()
+                } else {
+                    return response.text()
+                }
+            })
+            .then(data => {
+                const ds = useJSON ? decodeJSON(key, data) : decodeHTML(key, data, key.substr(-3, 3))
+                if (ds[0].length && ds[1].length) {
+                    updateSources(oldEpisodeSources => {
+                        const oldLinks = oldEpisodeSources[ds[0]]
+                        if (oldLinks) {
+                            return {
+                                ...oldEpisodeSources,
+                                [ds[0]]: (oldEpisodeSources[ds[0]] as quality).concat(ds[1])
                             }
-                        })
-                        setStatus("parsed", index)
-                    } else {
-                        setStatus("failed", index)
-                    }
-                }).catch(err => {
-                    console.log(err)
+                        } else {
+                            return {
+                                ...oldEpisodeSources,
+                                [ds[0]]: ds[1]
+                            }
+                        }
+                    })
+                    setStatus("parsed", index)
+                } else {
                     setStatus("failed", index)
-                })
+                }
+            }).catch(err => {
+                console.log(err)
+                setStatus("failed", index)
+            })
         })
     }
 
     const getBestQuality = (key: string) => {
-        let sources = episodeSources[key]
+        const sources = episodeSources[key]
         if (Array.isArray(sources)) {
             if ((sources as quality).some(src => src.name == "1080p")) {
                 return " - Full HD"
@@ -233,7 +230,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
 
     return (
         <section className="anime-watch">
-            { currentSource[0] && supportedServers.includes(currentSource[0].slice(0, 2)) && !status.includes("pending") ?
+            { currentSource[0] && nativeServers.includes(currentSource[0].slice(0, 2)) && !status.includes("pending") ?
                 <VideoPlayer
                     openingName={ openingTheme }
                     introInterval={introInterval}
@@ -259,8 +256,8 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
                             <span ref={ downloadListTrigger } id="download-button" className="mdi mdi-download mdi-nm"></span>
                             <select name="server" className="selection" id="server-select" onChange={(e) => updateCurrent([e.target.value, episodeSources[e.target.value]])} value={currentSource[0]}>
                                 {
-                                    Object.keys(episodeSources).map((key, index) => {
-                                        return <option key={key} value={key} id={key}>{supportedServers.includes(key.slice(0, 2)) ? "م. المحلي" : "م. خارجي"}{` - ${serverKeys[key.slice(0, 2)]}${getBestQuality(key)}`}</option>
+                                    Object.keys(episodeSources).map(key => {
+                                        return <option key={key} value={key} id={key}>{nativeServers.includes(key.slice(0, 2)) ? "م. المحلي" : "م. خارجي"}{` - ${serverKeys[key.slice(0, 2)]}${getBestQuality(key)}`}</option>
                                     })
                                 }
                             </select></>
@@ -280,7 +277,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
             <Popup id="download-popup" trigger={ downloadListTrigger } title="تحميل">
                 <div id="downloads-list" className="popup-list">
                     {Object.keys(episodeSources).map(sourceKey => {
-                        if (supportedServers.includes(sourceKey.slice(0,2))) {
+                        if (nativeServers.includes(sourceKey.slice(0,2))) {
                             return (
                                 <div key={ sourceKey } id={sourceKey} className="download-section">
                                     <h2>{serverKeys[sourceKey.slice(0,2)]}</h2>
@@ -300,97 +297,5 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
             </Popup> : null }
         </section>
     )
-
-    /**
-     * This function decodes HTML to extract video sources
-     * @param s Server URL (string)
-     * @param data HTML response (string)
-     * @returns An array with server code & object of different qualities URLs
-     */
-    function decodeHTML(key: string, data: string, qual: string): [string, Record<string, string>[]] {
-        if (key.startsWith("FR")) {
-            // Search for the download button href (yeah i know too simple)
-            var regex = /href="(https?:\/\/download\d{1,6}\.mediafire\.com.*?\.mp4)"/
-            var matches = data.match(regex)
-            if (matches) {
-                return [key, [{ type: "normal", url: "https://quiet-cove-27971.herokuapp.com/" + matches[1], name: qualitiesMap[qual] }]]
-            }
-        } else if (key.startsWith("SF")) {
-            var regex = /"downloadUrl":"(.+solidfilesusercontent.com.+?)"/
-            var matches = data.match(regex)
-            if (matches) {
-                return [key, [{ type: "normal", url: matches[1], name: qualitiesMap[qual] }]]
-            }
-        }
-        return ["", []]
-    }
-
-    /**
-     * This function decodes JSON to extract video sources
-     * @param s Server URL (string)
-     * @param data Response of the request (JSON Object)
-     * @returns An array with server code & object of different qualities URLs
-     */
-    function decodeServers(key: string, data: Record<string, any>): [string, Array<Record<string, string>>] {
-        if (key.startsWith("OK")) {
-            let q: Record<string, string> = { mobile: "144p", lowest: "240p", low: "360p", sd: "480p", hd: "720p" }
-            let qualities: Array<Record<string, string>> = []
-            // Videos links are in "videos" array of the JSON response
-            if ("videos" in data) {
-                data["videos"].forEach((quality: Record<string, string>) => {
-                    if (quality["name"] in q) qualities.push({ type: "normal", url: quality.url, name: q[quality.name] })
-                })
-                return [key, qualities]
-            }
-            return ["", []]
-        } else if (key.startsWith("FD")) {
-            let qualities: Array<Record<string, string>> = []
-            if ("data" in data) {
-                data.data.forEach((quality: Record<string,string>) => {
-                    qualities.push({ type: "normal", url: "https://quiet-cove-27971.herokuapp.com/" + quality.file, name: quality.label })
-                })
-                return [ key, qualities ]
-            }
-            return ["", []]
-        }
-        return ["", []]
-    }
-
 }
-
-/**
- * This function extracts the video sources hidden in an obfuscated JS code (Uptostream for example)
- * @param source The code to be "evaled"
- * @returns The sources after evaluating the code
- */
-function evalSources(source: string) {
-    var sources = new Function(source + "return sources;")
-    return sources()
-}
-
-/**
- * This is an object utility for p,a,c,k,e,d JS code
- */
-var P_A_C_K_E_R = {
-    detect: function (str: string) {
-        return P_A_C_K_E_R._starts_with(str.toLowerCase().replace(/ +/g, ''), 'eval(function(') ||
-            P_A_C_K_E_R._starts_with(str.toLowerCase().replace(/ +/g, ''), 'eval((function(');
-    },
-    unpack: function (str: string) {
-        var unpacked_source = '';
-        if (P_A_C_K_E_R.detect(str)) {
-            try {
-                eval('unpacked_source = ' + str.substring(4) + ';')
-                if (typeof unpacked_source == 'string' && unpacked_source) {
-                    str = unpacked_source;
-                }
-            } catch (error) { }
-        }
-        return str;
-    },
-    _starts_with: function (str: string, what: string) {
-        return str.substr(0, what.length) === what;
-    }
-}
-
 export default React.memo(EpisodePlayer)
