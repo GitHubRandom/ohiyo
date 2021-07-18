@@ -618,7 +618,7 @@ body {
     font-size: 12pt;
     transition: all 0.125s ease-in-out;
     cursor: pointer;
-    z-index: 2;
+    z-index: 3;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -1043,6 +1043,7 @@ body {
     transition: all 0.125s ease-in-out;
     background-color: #aed581;
     overflow: hidden;
+    z-index: 3;
 }
 
 .opening-hint-container {
