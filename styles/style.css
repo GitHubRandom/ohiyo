@@ -1089,7 +1089,7 @@ body {
 }
 
 .dplayer-highlight {
-    z-index: unset !important;
+    z-index: 1 !important;
 }
 
 @media only screen and (min-width: 1600px) {
