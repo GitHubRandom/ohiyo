@@ -665,6 +665,10 @@ body {
     height: 437px;
 }
 
+.episodes-popup-order {
+    flex-shrink: 0;
+}
+
 .episode-link {
     display: block;
     color: white;
@@ -740,7 +744,7 @@ body {
 }
 
 .popup {
-    z-index: 2;
+    z-index: 5;
     height: 100%;
     width: 100%;
     position: fixed;
@@ -779,12 +783,12 @@ body {
     border-radius: 5px;
     padding: 10px 20px;
     max-height: 90%;
-    max-width: 90%;
+    width: 90%;
 }
 
 .popup-list {
     height: 50vh;
-    width: 400px;
+    /*width: 400px;*/
     overflow-y: scroll;
     max-width: 90vw;
     margin-top: 10px;
@@ -863,6 +867,7 @@ body {
     vertical-align: middle;
     border-radius: 5px;
     color: white;
+    max-width: 200px;
 }
 
 .dark-button {
@@ -1071,6 +1076,10 @@ body {
     font-size: 10pt;
 }
 
+.dplayer-highlight {
+    z-index: unset !important;
+}
+
 @media only screen and (min-width: 1600px) {
     .content-page {
         max-width: 1000px
@@ -1190,6 +1199,21 @@ body {
 }
 
 @media only screen and (max-width: 490px) {
+    .opening-hint {
+        max-width: 250px;
+        right: 15px;
+        top: 15px;
+    }
+    .opening-hint-container {
+        padding: 4px 6px;
+    }
+    .opening-hint-text p:last-child {
+        font-size: 8pt;
+    }
+    
+    .opening-hint-text p:first-child {
+        font-size: 7pt;
+    }
     #episode-skip-intro {
         padding: 7px 20px;
         font-size: 9pt;
