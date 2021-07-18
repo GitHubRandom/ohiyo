@@ -173,7 +173,9 @@ const AnimeDetails = ({ animeDetails }: TAnimeDetails) => {
                 </div>
                 { ready && animeDetails.trailer_url ? 
                 <Popup id="trailer-popup" trigger={ trailerPopupTrigger } title="العرض الدعائي">
-                    <iframe allowFullScreen={ true } src={ animeDetails.trailer_url } frameBorder="0"></iframe>
+                    <div className="trailer-container">
+                        <iframe allowFullScreen={ true } src={ animeDetails.trailer_url } frameBorder="0"></iframe>
+                    </div>
                 </Popup> : null }
             </motion.section>
         )
