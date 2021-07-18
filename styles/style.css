@@ -783,14 +783,15 @@ body {
     border-radius: 5px;
     padding: 10px 20px;
     max-height: 90%;
-    width: 90%;
+    max-width: 90%;
 }
 
 .popup-list {
     height: 50vh;
-    /*width: 400px;*/
+    max-width: 400px;
+    min-width: 300px;
     overflow-y: scroll;
-    max-width: 90vw;
+    /*max-width: 90vw;*/
     margin-top: 10px;
 }
 
