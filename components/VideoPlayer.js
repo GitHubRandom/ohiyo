@@ -84,6 +84,7 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
         const keyPressCallback = event => {
             let key = event.key
             if (inIntro && key == "Enter") {
+                event.preventDefault()
                 player.current.seek(introInterval[1])
             }
         }
@@ -138,7 +139,9 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
 
     return (
         <div dir="ltr" ref={ videoPlayerContainer } className="anime-video-player">
-            <div ref={ videoOverlay } className="anime-video-overlay">
+            <div ref={videoOverlay} className="anime-video-overlay">
+                <div id="bebi-ads">
+                </div>
                 <button dir="rtl" onClick={ event => skipIntro(event) } style={{ display: inIntro && UIShown ? "flex" : "none" }} type="button" id="episode-skip-intro">
                     <span data-tippy-content="إلغاء" onClick={ () => setDismiss(true) } className="mdi mdi-close dismiss-skip"></span>
                     <span className="skip-intro-text">تخطي المقدمة</span>
@@ -162,7 +165,7 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
                         <span className="mdi mdi-content-copy"></span>تم النسخ
                     </div>
                 </div>
-                { isMobileDevice ? <>
+                { isMobileDevice() ? <>
                     <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ forwardTen } id="forward" className="control-overlay">
                     </div>  
                     <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ rewindTen }  id="rewind" className="control-overlay">
