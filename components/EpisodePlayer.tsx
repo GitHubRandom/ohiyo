@@ -251,7 +251,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
                     <a id="previous" className="player-episode-skip disabled"><span className="mdi mdi-chevron-right"></span>الحلقة السابقة</a>
                 }
                 <div className="server-settings">
-                    {Object.keys(episodeSources).length && !status.includes("pending") ?
+                    { Object.keys(episodeSources).length && !status.includes("pending") ?
                         <>
                             <span ref={ downloadListTrigger } id="download-button" className="mdi mdi-download mdi-nm"></span>
                             <select name="server" className="selection" id="server-select" onChange={(e) => updateCurrent([e.target.value, episodeSources[e.target.value]])} value={currentSource[0]}>
@@ -261,7 +261,10 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
                                     })
                                 }
                             </select></>
-                        : <span className="servers-loading-message"><span className="mdi mdi-loading mdi-spin"></span>جاري العمل على الخوادم</span>
+                        : <div className="servers-loading-message">
+                            <div className="spinner"></div>
+                            <span>جاري العمل على الخوادم</span>
+                        </div>
                     }
                 </div>
                 { !lastEpisode && switchCooldown ?
