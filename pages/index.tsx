@@ -1,10 +1,11 @@
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ContentList from '../components/ContentList'
 import NavigationWrapper from '../containers/NavigationWrapper'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { MENU_ENTRIES } from '../utils/Constants'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
@@ -38,9 +39,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 export default function Home({ newEpisodes, page }) {
 
-    const [data, updateData] = useState<Record<string, any>[]>([])
-    const [refreshed, updateRefreshed] = useState<boolean>(false)
+    const [ data, updateData ] = useState<Record<string, any>[]>([])
+    const [ refreshed, updateRefreshed ] = useState<boolean>(false)
+    const [ searchValue, updateSearchValue] = useState<string>('')
     const hamburgerButton = useRef()
+    const bottomDetector = useRef()
     const router = useRouter()
 
     useEffect(() => {
@@ -55,7 +58,7 @@ export default function Home({ newEpisodes, page }) {
     }, [newEpisodes])
 
     useEffect(() => {
-        let observer = new IntersectionObserver(entries => {
+        const observer = new IntersectionObserver(entries => {
             if (refreshed && entries[0] && entries[0].isIntersecting) {
                 updateRefreshed(false)
                 router.push({
@@ -64,14 +67,26 @@ export default function Home({ newEpisodes, page }) {
                 }, undefined, { scroll: false })
             }
         })
-        if (document.querySelector(".bottom-detector")) {
-            observer.observe(document.querySelector(".bottom-detector") as Element)
+        if (bottomDetector.current) {
+            observer.observe(bottomDetector.current)
         }
 
         return () => {
             observer.disconnect()
         }
     }, [page,refreshed])
+
+    const handleSubmit = (event:React.FormEvent) => {
+        event.preventDefault()
+        if (searchValue.length) {
+            router.push({
+                pathname: "/all",
+                query: {
+                    search: searchValue
+                }
+            })
+        }
+    }
 
     return (
         <>
@@ -87,14 +102,19 @@ export default function Home({ newEpisodes, page }) {
             </Head>
             <NavigationWrapper navTrigger={ hamburgerButton } contentId="home" selected="home">
                 <div id="home-page" className="content-page">
-                    <h2 className="section-title"><span ref={ hamburgerButton } id="hamburger-menu" className="mdi mdi-menu"></span>آخر الحلقات</h2>
+                    <div className="anime-list-header">
+                        <h2 className="section-title"><span ref={ hamburgerButton } id="hamburger-menu" className="mdi mdi-menu"></span>{ MENU_ENTRIES.find(entry => entry.id == "home").title }</h2>
+                        <form onSubmit={ handleSubmit } className="anime-search-container">
+                            <input onInput={ (e: React.ChangeEvent<HTMLInputElement>) => updateSearchValue(e.target.value) } placeholder="البحث عن الأنمي" type="text" name="anime-search" id="anime-search"/>
+                        </form>
+                    </div>
                     { data.length < page * 25 && page != 1 ? 
-                    <p id="page-warning" className="list-notice"><span className="mdi mdi-information"></span>أنت الآن في الصفحة { page }. <Link href="/" scroll={ true } ><a className="link">العودة للصفحة الأولى</a></Link></p>
+                        <p id="page-warning" className="list-notice"><span className="mdi mdi-information"></span>أنت الآن في الصفحة { page }. <Link href="/" scroll={ true } ><a className="link">العودة للصفحة الأولى</a></Link></p>
                     : null }
                     <div id="bebi-banner">
                     </div>
                     <ContentList latest={true} className="content-list" contentList={page == 1 ? newEpisodes : data} />
-                    <div className="bottom-detector"></div>
+                    <div ref={ bottomDetector } className="bottom-detector"></div>
                 </div>
         </NavigationWrapper>
         </>

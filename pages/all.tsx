@@ -7,6 +7,7 @@ import NavigationWrapper from '../containers/NavigationWrapper'
 import TabIndicator from '../components/TabIndicator'
 import Link from 'next/link'
 import { useRef } from "react"
+import { MENU_ENTRIES } from "../utils/Constants"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Record<string,any> = {}
@@ -20,8 +21,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     props.page = page
 
-    let search = context.query.search
-    let type = context.query.m ? "movies" : "anime"
+    const search = context.query.search
+    const type = context.query.m ? "movies" : "anime"
     if (context.query.m) { 
         props.movies = true
     } else {
@@ -30,15 +31,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     let res: Response
     if (search && search.length > 0) {
-        if (!context.query.page || context.query.page == '1') {
-            res = await fetch(`https://animeify.net/animeify/apis_v2/${type}/filtersort/search.php`, {
-                method: "POST",
-                headers: new Headers({
-                    "Content-Type": "application/x-www-form-urlencoded"
-                }),
-                body: `UserID=0&Language=AR&Text=${search}`
-            })
-        }
+        res = await fetch(`https://animeify.net/animeify/apis_v2/${type}/filtersort/search.php`, {
+            method: "POST",
+            headers: new Headers({
+                "Content-Type": "application/x-www-form-urlencoded"
+            }),
+            body: `UserID=0&Language=AR&Text=${search}&From=${offset}`
+        })
+        props.search = search
     } else if (context.query.genre) {
         res = await fetch(`https://animeify.net/animeify/apis_v2/${type}/filtersort/genre.php`, {
             method: "POST",
@@ -92,7 +92,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 }
 
-const All = ({ results, page, genreSelected, studioSelected, movies }) => {
+const All = ({ results, page, genreSelected, search, studioSelected, movies }) => {
 
     const router = useRouter()
     const [ result, updateResult ] = useState<Record<string,any>>({
@@ -100,21 +100,26 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
         data: []
     })
     const [ refreshed, updateRefreshed ] = useState<boolean>(false)
+    const [ searchValue, updateSearchValue ] = useState<string>(search)
     const [ currentPage, updateCurrent ] = useState<number>(1)
-    const hamburgerButton = useRef()
     const [ queryInit, updateQueryInit ] = useState<boolean>(false)
     const [ actualQuery, updateActualQuery ] = useState<Record<string,any>>({})
+    const hamburgerButton = useRef()
+    const bottomDetector = useRef()
     
-    const updateSearch = (value: string) => {
-        if (value.length == 0) {
-            deleteQueryParam("search", true)
+    useEffect(() => {
+        if (queryInit) {
+            if (!searchValue.length) {
+                deleteQueryParam("search", true)
+            } else {
+                updateActualQuery({
+                    ...actualQuery,
+                    search: searchValue,
+                    page: 1
+                })        
+            }
         }
-        updateActualQuery({
-            ...actualQuery,
-            search: value,
-            page: 1
-        })
-    }
+    }, [searchValue])
 
     useEffect(() => {
         if (Object.keys(results).length) {
@@ -137,15 +142,14 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
     }, [results])
 
     useEffect(() => {
-        let observer = new IntersectionObserver(entries => {
-            console.log(actualQuery)
+        const observer = new IntersectionObserver(entries => {
             if (refreshed && entries[0] && entries[0].isIntersecting) {
                 updateRefreshed(false)
                 updateActualQuery({ ...actualQuery, page: page + 1 })
             }
         })
-        if (document.querySelector(".bottom-detector")) {
-            observer.observe(document.querySelector(".bottom-detector") as Element)
+        if (bottomDetector.current) {
+            observer.observe(bottomDetector.current)
         }
 
         return () => {
@@ -159,7 +163,8 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
             let initialQuery:Record<string,any> = {}
             if (genreSelected) initialQuery.genre = genreSelected
             if (studioSelected) initialQuery.studio = studioSelected
-            if (genreSelected || studioSelected) {
+            if (search) initialQuery.search = search
+            if (genreSelected || studioSelected || search) {
                 updateActualQuery({ ...actualQuery, ...initialQuery })
             }
             return
@@ -191,16 +196,16 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
                 <meta name="description" content="اختر الأنمي ضمن القائمة أو إبحث عن الأنمي"/>
                 <meta property="og:title" content="Animayhem - قائمة الأنمي"/>
                 <meta property="og:site_name" content="Animayhem"/>
-                <meta property="og:url" content="https://animayhem.ga/all" />
+                <meta property="og:url" content="https://www.animayhem.ga/all" />
                 <meta property="og:description" content="اختر الأنمي ضمن القائمة أو إبحث عن الأنمي" />
                 <meta property="og:type" content="website" />
             </Head>
             <NavigationWrapper navTrigger={ hamburgerButton } contentId="all" selected="list-all">
                 <div id="all-page" className="content-page">
                     <div className="anime-list-header">
-                        <h2 className="section-title"><span ref={ hamburgerButton } id="hamburger-menu" className="mdi mdi-menu"></span>قائمة الأنمي</h2>
+                        <h2 className="section-title"><span ref={ hamburgerButton } id="hamburger-menu" className="mdi mdi-menu"></span>{ MENU_ENTRIES.find(entry => entry.id == "list-all").title }</h2>
                         <div className="anime-search-container">
-                            <input onInput={ (e: React.ChangeEvent<HTMLInputElement>) => updateSearch(e.target.value) } placeholder="البحث عن الأنمي" type="text" name="anime-search" id="anime-search"/>
+                            <input onInput={ (e: React.ChangeEvent<HTMLInputElement>) => updateSearchValue(e.target.value) } value={ searchValue } placeholder="البحث عن الأنمي" type="text" name="anime-search" id="anime-search"/>
                         </div>
                     </div>
 
@@ -214,6 +219,7 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
                             icon: "mdi mdi-filmstrip-box"
                         }
                     }} setTab={ (tab) => {
+                        console.log(actualQuery)
                         if (tab == "movies") {
                             updateActualQuery({ ...actualQuery, m: 1, page: 1 })
                         } else {
@@ -229,7 +235,7 @@ const All = ({ results, page, genreSelected, studioSelected, movies }) => {
                     : null }
 
                     <ContentList overrideMovie={ movies } latest={ false } className="content-list" contentList={ page == 1 ? results.data : result.data } />
-                    { result.data.length % 25 == 0 ? <div className="bottom-detector"></div> : null }
+                    { result.data.length % 25 == 0 ? <div ref={ bottomDetector } className="bottom-detector"></div> : null }
                 </div>
             </NavigationWrapper>
         </>
