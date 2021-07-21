@@ -103,7 +103,12 @@ const All = ({ results, page, genreSelected, search, studioSelected, movies }) =
     const [ searchValue, updateSearchValue ] = useState<string>(search)
     const [ currentPage, updateCurrent ] = useState<number>(1)
     const [ queryInit, updateQueryInit ] = useState<boolean>(false)
-    const [ actualQuery, updateActualQuery ] = useState<Record<string,any>>({})
+    const [ actualQuery, updateActualQuery ] = useState<Record<string,any>>(() => ({
+        ...(genreSelected && {genre: genreSelected}),
+        ...(studioSelected && {studio: studioSelected}),
+        ...(search && {search}),
+        ...(movies && {m: 1})
+    }))
     const hamburgerButton = useRef()
     const bottomDetector = useRef()
     
@@ -158,22 +163,19 @@ const All = ({ results, page, genreSelected, search, studioSelected, movies }) =
     }, [page,refreshed,actualQuery])
 
     useEffect(() => {
-        if (!queryInit) {
-            updateQueryInit(true)
-            let initialQuery:Record<string,any> = {}
-            if (genreSelected) initialQuery.genre = genreSelected
-            if (studioSelected) initialQuery.studio = studioSelected
-            if (search) initialQuery.search = search
-            if (genreSelected || studioSelected || search) {
-                updateActualQuery({ ...actualQuery, ...initialQuery })
-            }
-            return
-        }
         if (router.isReady) {
-            router.push({
-                pathname: "/all",
-                query: actualQuery
-            }, undefined, { scroll: false })
+            if (queryInit) {
+                let urlQuery = actualQuery
+                if (urlQuery.page == 1) {
+                    delete urlQuery.page
+                }
+                router.push({
+                    pathname: "/all",
+                    query: { ...urlQuery }
+                }, undefined, { scroll: false })
+            } else {
+                updateQueryInit(true)
+            }
         }
     }, [actualQuery])
 
