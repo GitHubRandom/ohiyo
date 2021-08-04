@@ -60,8 +60,6 @@ export const getServerSideProps: GetServerSideProps = async context => {
         }
     }
 
-    console.log(headers.get("bla").toString())
-
     let movie = false
     let episodesFetch: Response
     episodesFetch = await fetch("https://animeify.net/animeify/apis_v2/episodes/episodes_loader.php", {
