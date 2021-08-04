@@ -9,10 +9,11 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useRef } from 'react'
 import WatchFooter from '../../components/WatchFooter'
+import axios, { CancelTokenSource } from 'axios'
 
-// From all of this I learned how shit is the Anime Slayer API. Just sayin'. @ritzy
+// From all of this I learned how shit is the Anime Slayer's & Animeify's APIs. Just sayin'. @ritzy
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async context => {
 
     const queryParams = context.query.params
     const animeId = queryParams[0].slice(0,queryParams[0].indexOf("-"))
@@ -29,14 +30,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         return
     }
 
-    // Check if both parameters are strings & parameters do not exceed three
-    if (queryParams.length >= 3) {
-        return {
-            notFound: true
-        }
-    }
-
-    if (isNaN(parseInt(queryParams[1])) && queryParams[1] != "latest") {
+    /**
+     * Make sure that the path is valid : 
+     *      /watch/<anime_id>-<mal>/<episode_number>
+     *  or  /watch/<anime_id>-<mal>/latest
+     */
+    if ((!parseInt(queryParams[1]) && queryParams[1] != "latest") || queryParams.length >= 3) {
         return {
             notFound: true
         }
@@ -47,19 +46,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         "Content-Type": "application/x-www-form-urlencoded"
     })
 
+    // Get details from MyAnimeList via Jikan
     const detailsFetch = await fetch(`https://api.jikan.moe/v3/anime/${queryParams[0].slice(queryParams[0].indexOf('-') + 1)}`)
-
-    if ( detailsFetch.ok ) {
+    if (detailsFetch.ok) {
         const detailsData = await detailsFetch.json()
         detailsData.anime_id = animeId
         props.details = detailsData
         console.log("Details found !")
-    } else if ( detailsFetch.status == 404 ) {
+    } else if (detailsFetch.status == 404) {
         console.log("Details not found !")
         return {
             notFound: true
         }
     }
+
+    console.log(headers.get("bla").toString())
 
     let movie = false
     let episodesFetch: Response
@@ -84,15 +85,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         })    
     }
 
-    let plotEndpoint = "https://animeify.net/animeify/apis_v2/anime/series_desc.php"
-    if (movie) plotEndpoint = "https://animeify.net/animeify/apis_v2/movies/movies_desc.php"
+    const plotEndpoint = movie ?
+        "https://animeify.net/animeify/apis_v2/movies/movies_desc.php"
+        : "https://animeify.net/animeify/apis_v2/anime/series_desc.php"
     const plotFetch = await fetch(plotEndpoint, {
         method: "POST",
         headers,
         body: `AnimeID=x${animeId}&Language=AR`
     })
     
-    if ( plotFetch.ok ) {
+    if (plotFetch.ok) {
         const plotData = await plotFetch.json()
         if (plotData.Plot) props.details.synopsis = plotData.Plot
     }
@@ -127,11 +129,10 @@ const Watch = ({ details, episodes, episodeNumber }) => {
     const [ currentEpisodeNumber, updateCurrentEpisodeNumber ] = useState<number>(episodeNumber)
     const [ currentEpisode, updateCurrentEpisode ] = useState<Record<string,any>>(episodes[episodeNumber - 1])
     const [ currentIntroInterval, updateCurrentIntroInterval ] = useState<[number,number]>([0,0])
-    const skipFetchController = useRef<AbortController>()
-    const titleFetchController = useRef<AbortController>()
+    const skipFetchController = useRef<CancelTokenSource>()
     const hamburgerButton = useRef()
 
-    function handleBack(url:string) {
+    function handleBack(url: string) {
         // Router handler to fix the back stack
         let splittedPath = url.split("/")
         if (splittedPath[3] == "latest") {
@@ -155,22 +156,16 @@ const Watch = ({ details, episodes, episodeNumber }) => {
     },[])
 
     useEffect(() => {
+        window.scrollTo(0,60) // Scroll to video
         // Update link (shallow) and episode object
-        window.scrollTo(0, 60) // Return to video
         router.push(`/watch/${details.anime_id}-${details.mal_id}/${currentEpisodeNumber}`, undefined, { shallow: true, scroll: false })
-        let newCurrentEpisode = episodes[currentEpisodeNumber - 1]
-        updateCurrentEpisode(newCurrentEpisode)
+        // Update current epsiode from episode list
+        updateCurrentEpisode(episodes[currentEpisodeNumber - 1])
         // Cancel intro interval fetch if any
         try {
             if (skipFetchController.current) {
-                skipFetchController.current.abort()
+                skipFetchController.current.cancel()
             }    
-        } catch (err) {}
-        // Cancel intro interval fetch if any
-        try {
-            if (titleFetchController.current) {
-                titleFetchController.current.abort()
-            }
         } catch (err) {}
         return () => {
             updateCurrentEpisode({})
@@ -186,22 +181,18 @@ const Watch = ({ details, episodes, episodeNumber }) => {
 
     useEffect(() => {
         // Fetching intro timestamps
-        const introController = new AbortController()
-        skipFetchController.current = introController
-        fetch(encodeURI(`/api/skip?anime=${details.title}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`), { signal: introController.signal })
-            .then(res => {
-                if (res.ok) {
-                    return res.json()
-                } else {
-                    throw new Error("Timestamps not found")
-                }
-            })
-            .then(data => {
-                updateCurrentIntroInterval([parseInt(data.skip_from) / 1000, parseInt(data.skip_to) / 1000])
-            })
-            .catch(err => {
-                console.info("Timestamps not found !")
-            })
+        skipFetchController.current = axios.CancelToken.source()
+        axios({
+            url: encodeURI(`/api/skip?anime=${details.title}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`),
+            cancelToken: skipFetchController.current.token
+        })
+        .then(response => {
+            const { skip_from, skip_to } = response.data
+            updateCurrentIntroInterval([parseInt(skip_from) / 1000, parseInt(skip_to) / 1000])
+        })
+        .catch(_ => {
+            console.info("Timestamps not found !")
+        })
         return () => {
             updateCurrentIntroInterval([0,0])
         }

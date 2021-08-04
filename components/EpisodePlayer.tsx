@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import VideoPlayer from './VideoPlayer'
+import axios, { AxiosResponse, Method } from "axios"
 import { decodeHTML, decodeJSON } from '../utils/ServerDecoder'
 import Popup from "./Popup"
 
@@ -18,12 +19,12 @@ const serverKeys = {
     GD: "G.Drive"
 }
 
-const getFetchMethod = (serverKey:string):string => {
+const getFetchMethod = (serverKey: string): Method => {
     const postMethod = ["OK", "FD"]
     return postMethod.includes(serverKey) ? "POST" : "GET"
 }
 
-const getFormattedEndpoint = (serverKey:string, item: string):string => {
+const getFormattedEndpoint = (serverKey:string, item: string): string => {
     const prefixes = {
         MA: "https://mega.nz/embed/",
         GD: "https://drive.google.com/file/d/",
@@ -59,7 +60,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
     const [ currentSource, updateCurrent ] = useState<[string, string | Record<string, string>[]]>(["", ""])
     const [ switchCooldown, updateSwitchCooldown ] = useState<boolean>(true)
     const [ status, updateStatus ] = useState<string[]>([])
-    const controllers = useRef([])
+    const tokens = useRef([])
     const downloadListTrigger = useRef()
 
     /**
@@ -78,8 +79,8 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
      * Cancels all fetch operations
      */
     const cancelFetches = () => {
-        controllers.current.forEach(controller => {
-            controller.abort()
+        tokens.current.forEach(token => {
+            token.cancel()
         })
     }
 
@@ -90,7 +91,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
     const getServers = (sources: Record<string, string>): void => {
         const sourcesKeys = Object.keys(sources)
         updateStatus(Array(sourcesKeys.length).fill("pending"))
-        controllers.current = Array(sourcesKeys.length).fill(new AbortController())
+        tokens.current = Array(sourcesKeys.length).fill(axios.CancelToken.source())
         updateSwitchCooldown(true)
         const setUnsupportedServer = (server: string, result: string, index: number) => {
             updateSources(oldEpisodeSources => ({
@@ -114,7 +115,39 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
                 setUnsupportedServer(key, formattedEndpoint, index)
                 return
             }
-            fetch(encodeURI(formattedEndpoint), {
+            axios({
+                url: formattedEndpoint,
+                method: getFetchMethod(serverKey),
+                headers: { 'User-Agent': navigator.userAgent },
+                cancelToken: tokens.current[index].token
+            })
+            .then(response => {
+                const data = response.data
+                const ds = useJSON ? decodeJSON(key, data) : decodeHTML(key, data, key.substr(-3,3))
+                if (ds[0].length && ds[1].length) {
+                    updateSources(oldEpisodeSources => {
+                        const oldLinks = oldEpisodeSources[ds[0]]
+                        if (oldLinks) {
+                            return {
+                                ...oldEpisodeSources,
+                                [ds[0]]: (oldEpisodeSources[ds[0]] as quality).concat(ds[1])
+                            }
+                        } else {
+                            return {
+                                ...oldEpisodeSources,
+                                [ds[0]]: ds[1]
+                            }
+                        }
+                    })
+                    setStatus("parsed", index)
+                } else {
+                    setStatus("failed", index)
+                }
+            })
+            .catch(_ => {
+                setStatus('failed', index)
+            })
+            /*fetch(encodeURI(formattedEndpoint), {
                 method: getFetchMethod(serverKey),
                 headers: new Headers({ 'User-Agent': navigator.userAgent }),
                 signal: controllers.current[index].signal
@@ -150,7 +183,7 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
             }).catch(err => {
                 console.log(err)
                 setStatus("failed", index)
-            })
+            })*/
         })
     }
 
