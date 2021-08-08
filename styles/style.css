@@ -1038,14 +1038,37 @@ body {
     color: var(--accent-color);
 }
 
-.opening-hint {
+.anime-video-info {
+    transition: all 0.125s ease-in-out;
+    display: block;
+    width: 100%;
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 0;
+    right: 0;
+    padding: 20px;
+    background: linear-gradient(to bottom, #000000b4, #00000000);
+    direction: rtl;
+}
+
+.anime-video-info > * {
+    box-sizing: border-box;
+    max-width: calc(90vw - 40px);
+}
+
+.anime-video-player:not(:fullscreen) .anime-video-info {
+    background: none;
+}
+
+.anime-video-player:not(:fullscreen) .anime-video-info > *:not(.opening-hint) {
+    display: none;
+}
+
+.opening-hint {
     direction: rtl;
     color: black;
     border-radius: 5px;
-    max-width: 300px;
+    display: inline-flex;
+    flex-direction: column;
     transition: all 0.125s ease-in-out;
     background-color: #aed581;
     overflow: hidden;
@@ -1055,10 +1078,10 @@ body {
 .opening-hint-container {
     background-color: var(--accent-color);
     border-radius: 5px;
-    display: flex;
+    display: inline-flex;
     display: -ms-flexbox;
     align-items: center;
-    padding: 5px 10px;
+    padding: 2px 10px;
 }
 
 .opening-hint-copy-confirm {
@@ -1067,7 +1090,7 @@ body {
     padding: 0 10px;
     font-size: 10pt;
     height: 0;
-    display: flex;
+    display: inline-flex;
     display: -ms-flexbox;
     align-items: center;
     transition: all 0.125s ease-in-out;
@@ -1081,18 +1104,11 @@ body {
     margin-left: 5px;
 }
 
-.opening-hint-text p {
-    margin: 0;
-}
-
-.opening-hint-text p:last-child {
+.opening-hint-text {
     direction: ltr;
     font-weight: bold;
     text-align: right;
-}
-
-.opening-hint-text p:first-child {
-    font-size: 10pt;
+    margin: 0;
 }
 
 .dplayer-highlight {
@@ -1203,7 +1219,7 @@ body {
     .trailer-container {
         width: 75vw;
     }
-    .player-episode-skip#next { order: 3; }
+    .player-episode-skip#next { order: 3 }
     .player-episode-skip#previous { order: 2 }
     .top-bar-anime-title {
         font-size: 17pt;

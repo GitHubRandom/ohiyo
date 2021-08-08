@@ -12,17 +12,22 @@ const ContentList = ({ overrideMovie, className, contentList, latest }: IContent
     return (
         <div className={ className }>
             { contentList.map((episode,index) => {
-                let episodeName = ""
                 if (episode.AnimeData) {
-                    episodeName = episode.EpisodeData.Episode
-                    episode = episode.AnimeData
+                    episode = {
+                        ...episode.EpisodeData,
+                        Title: episode.AnimeData.Title,
+                        MainId: episode.AnimeData.MainId,
+                        JicanKey: episode.AnimeData.JicanKey,
+                        Thumbnail: episode.AnimeData.Thumbnail,
+                        Type: episode.AnimeData.Type
+                    }
                 }
                 return <Episode key = { index }
                     animeName={ episode.Title }
                     showEpisodeName={ latest }
-                    url={ latest ? `/watch/${episode.MainId.slice(1)}-${episode.JicanKey}/latest` : `/watch/${episode.MainId.slice(1)}-${episode.JicanKey}/1` }
+                    url={ latest ? `/watch/${episode.MainId.slice(1)}-${episode.JicanKey}?eId=${episode.eId}` : `/watch/${episode.MainId.slice(1)}-${episode.JicanKey}/1` }
                     cover={ episode.Type != "Movie" && !overrideMovie ? `https://animeify.net/animeify/files/thumbnails/series/${episode.Thumbnail}` : `https://animeify.net/animeify/files/thumbnails/movies/${episode.Thumbnail}` }
-                    episodeName={ `الحلقة ${episodeName}` } />
+                    episodeName={ `الحلقة ${episode.Episode}` } />
             }) }
         </div>
     )

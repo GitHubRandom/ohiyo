@@ -1,7 +1,8 @@
 import { useRef, useEffect, useState, memo } from 'react'
+import { getEpisodeTags } from './WatchTopBar'
 import tippy from 'tippy.js'
 
-const VideoPlayer = ({ introInterval, sources, openingName }) => {
+const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitle }) => {
 
     const [ inIntro, setInIntro ] = useState(false)
     const [ showCopyConfirm, setShowCopyConfirm ] = useState(false)
@@ -53,7 +54,7 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
         })
         // DPlayer puts crossorigin attribute by default
         document.querySelector(".dplayer-video").removeAttribute("crossorigin")
-        // Reimplement overlay elements (DPlayer removes all container's children).
+        // Reimplementing overlay elements (DPlayer removes all container's children).
         videoPlayerContainer.current.appendChild(videoOverlay.current) 
         
         let mutationObserver = new MutationObserver((mutations) => {
@@ -139,32 +140,31 @@ const VideoPlayer = ({ introInterval, sources, openingName }) => {
 
     return (
         <div dir="ltr" ref={ videoPlayerContainer } className="anime-video-player">
-            <div ref={videoOverlay} className="anime-video-overlay">
+            <div ref={ videoOverlay } className="anime-video-overlay">
                 <div id="bebi-ads">
+                </div>
+                <div style={{ opacity: UIShown ? 1 : 0 }} className="anime-video-info">
+                    <h1 style={{ margin: 0 }} className="top-bar-anime-title">{ episode.Title }</h1>
+                    <p style={{ marginBottom: 7 }} className="top-bar-episode-name">{ episode.Episode ? `الحلقة ${episode.Episode}` : "الفلم" }{ getEpisodeTags(episode) }{ episodeTitle.length ? <><span style={{ marginTop: 2 }} className="mdi mdi-nm mdi-circle-medium"></span><span title="عنوان الحلقة" dir="ltr" className="episode-title">{ episodeTitle }</span></> : null }</p>
+                    <div style={{ opacity: inIntro && UIShown ? 1 : 0 }} className="opening-hint">
+                        <div className="opening-hint-container">
+                            <div className="opening-hint-icon">
+                                <span className="mdi mdi-music-note mdi-nm"></span>
+                            </div>
+                            <p className="opening-hint-text" onClick={ () => { navigator.clipboard.writeText(openingName); setShowCopyConfirm(true) } }>
+                                { openingName }
+                            </p>
+                        </div>
+                        <div style={{ height: showCopyConfirm ? "20px" : "0" }} className="opening-hint-copy-confirm">
+                            <span className="mdi mdi-content-copy"></span>تم النسخ
+                        </div>
+                    </div>
                 </div>
                 <button dir="rtl" onClick={ event => skipIntro(event) } style={{ display: inIntro && UIShown ? "flex" : "none" }} type="button" id="episode-skip-intro">
                     <span data-tippy-content="إلغاء" onClick={ () => setDismiss(true) } className="mdi mdi-close dismiss-skip"></span>
                     <span className="skip-intro-text">تخطي المقدمة</span>
                     { !isMobileDevice() ? <span className="skip-intro-shortcut">Enter</span> : null}
                 </button>
-                <div style={{ opacity: inIntro && UIShown && openingName.length ? 1 : 0 }} className="opening-hint">
-                    <div className="opening-hint-container">
-                        <div className="opening-hint-icon">
-                            <span className="mdi mdi-music-note mdi-nm"></span>
-                        </div>
-                        <div className="opening-hint-text">
-                            <p>
-                                اسم المقدمة
-                            </p>
-                            <p onClick={ () => { navigator.clipboard.writeText(openingName); setShowCopyConfirm(true) } }>
-                                { openingName }
-                            </p>
-                        </div>
-                    </div>
-                    <div style={{ height: showCopyConfirm ? "20px" : "0" }} className="opening-hint-copy-confirm">
-                        <span className="mdi mdi-content-copy"></span>تم النسخ
-                    </div>
-                </div>
                 { isMobileDevice() ? <>
                     <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ forwardTen } id="forward" className="control-overlay">
                     </div>  

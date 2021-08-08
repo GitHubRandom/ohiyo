@@ -20,9 +20,10 @@ export default async function handler(req, res) {
     if (!animeIdFetch.ok) {
         console.log(await animeIdFetch.text())
         res.status(404).send("404 Anime Not Found")
+        return
     }
-    const results = (await animeIdFetch.json()).response.data
-    const animeID = results.find(item => item.anime_name == animeName)?.anime_id
+    const results = (await animeIdFetch.json()).response.data 
+    const animeID = results?.find(item => item.anime_name == animeName)?.anime_id
     if (!animeID) {
         res.status(404).send("404 Anime Not Found")
         return

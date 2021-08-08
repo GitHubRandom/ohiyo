@@ -150,22 +150,22 @@ const AnimeDetails = ({ animeDetails }: TAnimeDetails) => {
                             <><strong>الفئة العمرية : </strong><span dir="ltr">{ getRate(animeDetails.rating) }</span><br /></>
                             : null }
 
-                            { animeDetails["source"] ?
-                            <><strong>المصدر : </strong>{ animeDetails["source"] in source ? source[animeDetails["source"]] : "غير معروف" }<br /></>
+                            { animeDetails.source ?
+                            <><strong>المصدر : </strong>{ animeDetails.source in source ? source[animeDetails["source"]] : "غير معروف" }<br /></>
                             : null }
 
-                            { animeDetails["genres"].length ?
-                                <><strong>الصنف : </strong>{ animeDetails["genres"].map((genre: string, index:number, genres: string[]) => {
-                                    if (genre["name"] in animeGenres) {
-                                        return <React.Fragment key={ index }><Link href={ `/all?genre=${encodeURI(animeGenres[genre["name"]])}` } key={ index }><a className="stealth-link">{ animeGenres[genre["name"]] }</a></Link>{ index != genres.length - 1 ? "، " : null }</React.Fragment>
+                            { animeDetails.genres.length ?
+                                <><strong>الصنف : </strong>{ animeDetails.genres.map((genre: Record<string, any>, index:number, genres: string[]) => {
+                                    if (genre.name in animeGenres) {
+                                        return <React.Fragment key={ index }><Link href={ `/all?genre=${encodeURI(animeGenres[genre.name])}` } key={ index }><a className="stealth-link">{ animeGenres[genre.name] }</a></Link>{ index != genres.length - 1 ? "، " : null }</React.Fragment>
                                     } else {
                                         <React.Fragment key={ index }></React.Fragment>
                                     }
                                 })} <br /></> : null
                             }
 
-                            { animeDetails["episodes"] ?
-                                <><strong>عدد الحلقات : </strong> { animeDetails["episodes"] }</>
+                            { animeDetails.episodes ?
+                                <><strong>عدد الحلقات : </strong> { animeDetails.episodes }</>
                             : null }
 
                         </p> 

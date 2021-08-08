@@ -17,12 +17,12 @@ export const getServerSideProps: GetServerSideProps = async context => {
 
     const queryParams = context.query.params
     const animeId = queryParams[0].slice(0,queryParams[0].indexOf("-"))
+    const eId = queryParams.length == 1 ? context.query.eId : undefined
 
     /**
-     * Make sure there is a from-episode query parameter if only animeId is specified
-     * Redirect to first episode otherwise
+     * Redirect to first episode if no episode is specified
      */
-    if (queryParams.length < 2) {
+    if (queryParams.length < 2 && !eId) {
         context.res.writeHead(301, {
             Location: `/watch/${queryParams[0]}/1`
         })
@@ -35,7 +35,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
      *      /watch/<anime_id>-<mal>/<episode_number>
      *  or  /watch/<anime_id>-<mal>/latest
      */
-    if ((!parseInt(queryParams[1]) && queryParams[1] != "latest") || queryParams.length >= 3) {
+    if ((!parseInt(queryParams[1]) && !eId) || queryParams.length >= 3) {
         return {
             notFound: true
         }
@@ -58,6 +58,8 @@ export const getServerSideProps: GetServerSideProps = async context => {
         return {
             notFound: true
         }
+    } else {
+        throw Error("Couldn't fetch details of anime !")
     }
 
     let movie = false
@@ -71,6 +73,11 @@ export const getServerSideProps: GetServerSideProps = async context => {
     let episodesData
     if (episodesFetch.ok) {
         episodesData = await episodesFetch.json()
+        // Parse eId
+        if (eId && episodesData.length) {
+            const eNumByEId = episodesData.findIndex(episode => episode.eId == eId) + 1
+            props.toReplace = eNumByEId
+        }
     }
 
     // Check if it's not a movie. Fetch the other endpoint if it's the case
@@ -79,7 +86,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
         episodesFetch = await fetch("https://animeify.net/animeify/apis_v2/servers/movie_links.php", {
             method: "POST",
             headers,
-            body: `MovieId=x${animeId}&Part=0`
+            body: `MovieId=x${animeId}&Part=0` 
         })    
     }
 
@@ -105,8 +112,10 @@ export const getServerSideProps: GetServerSideProps = async context => {
             episodesData = [episodesData]
         }
         props.episodes = episodesData
-        if (queryParams[1] == "latest") {
+        if (queryParams[1] && queryParams[1] == "latest") {
             props.episodeNumber = episodesData.length 
+        } else if (eId) {
+            props.episodeNumber = props.toReplace
         } else {
             if (parseInt(queryParams[1]) > episodesData.length) {
                 console.log("Episode not found !")
@@ -121,19 +130,21 @@ export const getServerSideProps: GetServerSideProps = async context => {
     return { props }
 }
 
-const Watch = ({ details, episodes, episodeNumber }) => {
+const Watch = ({ details, episodes, episodeNumber, toReplace }) => {
 
     const router = useRouter()
     const [ currentEpisodeNumber, updateCurrentEpisodeNumber ] = useState<number>(episodeNumber)
     const [ currentEpisode, updateCurrentEpisode ] = useState<Record<string,any>>(episodes[episodeNumber - 1])
     const [ currentIntroInterval, updateCurrentIntroInterval ] = useState<[number,number]>([0,0])
-    const skipFetchController = useRef<CancelTokenSource>()
+    const [ currentEpisodeTitle, updateCurrentEpisodeTitle ] = useState<string>("")
+    const skipFetchToken = useRef<CancelTokenSource>()
+    const titleFetchToken = useRef<CancelTokenSource>()
     const hamburgerButton = useRef()
 
     function handleBack(url: string) {
         // Router handler to fix the back stack
-        let splittedPath = url.split("/")
-        if (splittedPath[3] == "latest") {
+        const splittedPath = url.split("/")
+        if (url.includes("?eId=")) {
             router.back()
             return
         }
@@ -151,20 +162,30 @@ const Watch = ({ details, episodes, episodeNumber }) => {
         return () => {
             router.events.off("routeChangeComplete", handleBack)
         } 
-    },[])
+    }, [])
 
     useEffect(() => {
         window.scrollTo(0,60) // Scroll to video
         // Update link (shallow) and episode object
         router.push(`/watch/${details.anime_id}-${details.mal_id}/${currentEpisodeNumber}`, undefined, { shallow: true, scroll: false })
         // Update current epsiode from episode list
-        updateCurrentEpisode(episodes[currentEpisodeNumber - 1])
+        const newCurrentEpisode = episodes[currentEpisodeNumber - 1]
+        newCurrentEpisode.Title = details.title
+        updateCurrentEpisode(newCurrentEpisode)
         // Cancel intro interval fetch if any
         try {
-            if (skipFetchController.current) {
-                skipFetchController.current.cancel()
+            if (skipFetchToken.current) {
+                skipFetchToken.current.cancel()
             }    
         } catch (err) {}
+        // Cancel title fetch if any
+        try {
+            if (titleFetchToken.current) {
+                titleFetchToken.current.cancel()
+            }    
+        } catch (err) {}
+
+        // Clean effect
         return () => {
             updateCurrentEpisode({})
         }
@@ -178,11 +199,12 @@ const Watch = ({ details, episodes, episodeNumber }) => {
     }, [])
 
     useEffect(() => {
+
         // Fetching intro timestamps
-        skipFetchController.current = axios.CancelToken.source()
+        skipFetchToken.current = axios.CancelToken.source()
         axios({
             url: encodeURI(`/api/skip?anime=${details.title}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`),
-            cancelToken: skipFetchController.current.token
+            cancelToken: skipFetchToken.current.token
         })
         .then(response => {
             const { skip_from, skip_to } = response.data
@@ -191,8 +213,24 @@ const Watch = ({ details, episodes, episodeNumber }) => {
         .catch(_ => {
             console.info("Timestamps not found !")
         })
+
+        // Fetching episode title
+        titleFetchToken.current = axios.CancelToken.source()
+        axios({
+            url: "https://api.jikan.moe/v3/anime/" + details.mal_id + "/episodes/" + Math.ceil(parseInt(currentEpisode.Episode) / 100),
+            cancelToken: titleFetchToken.current.token
+        })
+        .then(response => {
+            let epData = response.data.episodes.find((ep: Record<string,any>) => ep.episode_id == parseInt(currentEpisode.Episode))
+            updateCurrentEpisodeTitle(epData.title)
+        }).catch(_ => {
+            console.info("Couldn't fetch episode title !")
+        })
+
+        // Cleaning effect
         return () => {
             updateCurrentIntroInterval([0,0])
+            updateCurrentEpisodeTitle("")
         }
     }, [currentEpisode])
 
@@ -220,7 +258,7 @@ const Watch = ({ details, episodes, episodeNumber }) => {
                     <WatchTopBar
                         type={ details.type }
                         setEpisodeNumber={ updateCurrentEpisodeNumber }
-                        mal={ details.mal_id }
+                        episodeTitle={ currentEpisodeTitle }
                         episodesList={ episodes }
                         episodeNumber={ currentEpisodeNumber }
                         animeTitle={ details.title }
@@ -232,6 +270,7 @@ const Watch = ({ details, episodes, episodeNumber }) => {
                         changeEpisodeNumber={ (increment: boolean) => updateCurrentEpisodeNumber(oldEpisodeNumber => increment ? oldEpisodeNumber + 1 : oldEpisodeNumber - 1) }
                         episode={ currentEpisode }
                         introInterval={ currentIntroInterval }
+                        episodeTitle={ currentEpisodeTitle }
                         firstEpisode={ currentEpisodeNumber == 1 }
                         lastEpisode={ currentEpisodeNumber == episodes.length } />   
 

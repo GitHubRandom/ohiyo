@@ -43,6 +43,7 @@ const shouldDecodeJSON = (serverKey:string):boolean => serverKey == "OK" || serv
 
 interface TEpisodePlayer {
     episode: Record<string,any>,
+    episodeTitle: string,
     introInterval: [number, number],
     changeEpisodeNumber: (increment: boolean) => void,
     firstEpisode: boolean,
@@ -50,14 +51,15 @@ interface TEpisodePlayer {
     openingsInfo?: string[]
 }
 
-const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpisode, lastEpisode, openingsInfo }: TEpisodePlayer) => {
+const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumber, firstEpisode, lastEpisode, openingsInfo }: TEpisodePlayer) => {
 
     type quality = Record<string, string>[]
 
     const [ openingTheme, updateOpening ] = useState<string>("")
     const [ openingLifeSpan, updateOpeningLifeSpan ] = useState<[number,number]>([NaN,NaN])
     const [ episodeSources, updateSources ] = useState<Record<string, quality | string>>({})
-    const [ currentSource, updateCurrent ] = useState<[string, string | Record<string, string>[]]>(["", ""])
+    // const [ currentSource, updateCurrent ] = useState<[string, string | Record<string, string>[]]>(["", ""])
+    const [ currentSource, updateCurrent ] = useState<string>("")
     const [ switchCooldown, updateSwitchCooldown ] = useState<boolean>(true)
     const [ status, updateStatus ] = useState<string[]>([])
     const tokens = useRef([])
@@ -147,43 +149,6 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
             .catch(_ => {
                 setStatus('failed', index)
             })
-            /*fetch(encodeURI(formattedEndpoint), {
-                method: getFetchMethod(serverKey),
-                headers: new Headers({ 'User-Agent': navigator.userAgent }),
-                signal: controllers.current[index].signal
-            })
-            .then(response => {
-                if (useJSON) {
-                    return response.json()
-                } else {
-                    return response.text()
-                }
-            })
-            .then(data => {
-                const ds = useJSON ? decodeJSON(key, data) : decodeHTML(key, data, key.substr(-3, 3))
-                if (ds[0].length && ds[1].length) {
-                    updateSources(oldEpisodeSources => {
-                        const oldLinks = oldEpisodeSources[ds[0]]
-                        if (oldLinks) {
-                            return {
-                                ...oldEpisodeSources,
-                                [ds[0]]: (oldEpisodeSources[ds[0]] as quality).concat(ds[1])
-                            }
-                        } else {
-                            return {
-                                ...oldEpisodeSources,
-                                [ds[0]]: ds[1]
-                            }
-                        }
-                    })
-                    setStatus("parsed", index)
-                } else {
-                    setStatus("failed", index)
-                }
-            }).catch(err => {
-                console.log(err)
-                setStatus("failed", index)
-            })*/
         })
     }
 
@@ -218,14 +183,14 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
         if (Object.keys(episodeSources) && !status.includes('pending')) {
             let selected = Object.keys(episodeSources)[0]
             for (var key in episodeSources) {
-                if ( key == "FRFhdQ" || key == "FRLink" || key == "SFLink" ||
+                if (key == "FRFhdQ" || key == "FRLink" || key == "SFLink" ||
                 ( key.startsWith("OU") && selected != "FRLink" ) ||
-                ( key.startsWith("FD") && selected != "FRLink" ) ) {
+                ( key.startsWith("FD") && selected != "FRLink" )) {
                     selected = key
                     if (key == "FRFhdQ") break
                 }
             }
-            updateCurrent([selected, episodeSources[selected]])
+            updateCurrent(selected)
         }
     }, [status])
 
@@ -239,41 +204,44 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
         getServers(sources)
         let episodeNameNumber = parseInt(episode.Episode)
         if (openingsInfo && !((episodeNameNumber <= openingLifeSpan[1] || isNaN(openingLifeSpan[1]) && episodeNameNumber >= openingLifeSpan[0])) ) {
-            let theOpening = ""
             if (openingsInfo.length > 1) {
-                theOpening = openingsInfo.find(opening => {
-                    let episodesInterval = opening.match(/\(eps\s(.+?)\)/)
+                var theOpening = openingsInfo.find(opening => {
+                    const episodesInterval = opening.match(/\(eps\s(.+?)\)/)
                     if (episodesInterval) {
-                        let episodesIntervalLimits = episodesInterval[1].split('-')
+                        const episodesIntervalLimits = episodesInterval[1].split('-')
                         updateOpeningLifeSpan([parseInt(episodesIntervalLimits[0]), parseInt(episodesIntervalLimits[1])])
                         return (episodeNameNumber <= parseInt(episodesIntervalLimits[1]) || isNaN(parseInt(episodesIntervalLimits[1]))) && episodeNameNumber >= parseInt(episodesIntervalLimits[0])
                     }
                 })
             } else if (openingsInfo.length) {
-                theOpening = openingsInfo[0]
+                var theOpening = openingsInfo[0]
             }
             theOpening !== undefined ? updateOpening(theOpening.replace(/#\d{1,4}: /, "").replace(/\(eps\s(.+?)\)/, "")) : updateOpening("")
         }
         return () => {
             cancelFetches()
             updateSources({})
-            updateCurrent(["",""])    
+            updateCurrent("")    
         }
     }, [episode])
 
     return (
         <section className="anime-watch">
-            { currentSource[0] && nativeServers.includes(currentSource[0].slice(0, 2)) && !status.includes("pending") ?
+            { currentSource && nativeServers.includes(currentSource.slice(0, 2)) && !status.includes("pending") ?
                 <VideoPlayer
                     openingName={ openingTheme }
-                    introInterval={introInterval}
-                    sources={currentSource[0] != "" ? (currentSource[1] as Record<string, string>[]).sort((a, b) => parseInt(b.name.slice(0, -1)) - parseInt(a.name.slice(0, -1))) : []}
+                    introInterval={ introInterval }
+                    sources={ currentSource != "" ? (episodeSources[currentSource] as Record<string, string>[]).sort((a, b) => parseInt(b.name.slice(0, -1)) - parseInt(a.name.slice(0, -1))) : [] }
+                    episode={ episode }
+                    episodeTitle={ episodeTitle }
                 />
-                : <div className={Object.keys(episodeSources).length && !status.includes("pending") ? "iframe-video-player" : "iframe-video-player loading"}>
-                    {!status.includes("pending") ?
-                        <iframe allowFullScreen={true} className="iframe-video" src={currentSource[1] as string} />
-                        : null}
-                </div>}
+                :
+                <div className={ Object.keys(episodeSources).length && !status.includes("pending") ? "iframe-video-player" : "iframe-video-player loading" }>
+                    { !status.includes("pending") ?
+                        <iframe allowFullScreen={ true } className="iframe-video" src={ episodeSources[currentSource] as string } />
+                    : null}
+                </div>
+            }
             <div className="player-settings">
                 { !firstEpisode && switchCooldown ?
                     <div onClick={ () => { updateSwitchCooldown(false); changeEpisodeNumber(false) } } id="previous" className="player-episode-skip">
@@ -287,12 +255,10 @@ const EpisodePlayer = ({ episode, introInterval, changeEpisodeNumber, firstEpiso
                     { Object.keys(episodeSources).length && !status.includes("pending") ?
                         <>
                             <span ref={ downloadListTrigger } id="download-button" className="mdi mdi-download mdi-nm"></span>
-                            <select name="server" className="selection" id="server-select" onChange={(e) => updateCurrent([e.target.value, episodeSources[e.target.value]])} value={currentSource[0]}>
-                                {
-                                    Object.keys(episodeSources).map(key => {
-                                        return <option key={key} value={key} id={key}>{nativeServers.includes(key.slice(0, 2)) ? "م. المحلي" : "م. خارجي"}{` - ${serverKeys[key.slice(0, 2)]}${getBestQuality(key)}`}</option>
-                                    })
-                                }
+                            <select name="server" className="selection" id="server-select" onChange={ e => updateCurrent(e.target.value) } value={ currentSource }>
+                                { Object.keys(episodeSources).map(key => {
+                                    return <option key={ key } value={ key } id={ key }>{nativeServers.includes(key.slice(0, 2)) ? "م. المحلي" : "م. خارجي"}{` - ${serverKeys[key.slice(0, 2)]}${getBestQuality(key)}`}</option>
+                                })}
                             </select></>
                         : <div className="servers-loading-message">
                             <div className="spinner"></div>
