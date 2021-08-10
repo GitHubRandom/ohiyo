@@ -39,7 +39,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitl
 
     // Destroy & initialize player when sources changes
     useEffect(() => {
-        let video = sources.length == 1 ? {
+        const video = sources.length == 1 ? {
             url: sources[0].url,
             type: "normal"
         } : {
@@ -52,6 +52,18 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitl
             theme: '#fffb00',
             video
         })
+        if (introInterval[0] != introInterval[1]) {
+            player.current.options.highlight = [
+                {
+                    text: 'بداية المقدمة',
+                    time: introInterval[0],
+                },
+                {
+                    text: 'نهاية المقدمة',
+                    time: introInterval[1]
+                },
+            ]
+        }
         // DPlayer puts crossorigin attribute by default
         document.querySelector(".dplayer-video").removeAttribute("crossorigin")
         // Reimplementing overlay elements (DPlayer removes all container's children).
@@ -111,7 +123,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitl
     }, [introInterval])
 
     useEffect(() => {
-        let introCheck = !dismiss ? window.setInterval(() => {
+        const introCheck = !dismiss ? window.setInterval(() => {
             if (player.current) {
                 const currentTime = player.current.video.currentTime
                 if (currentTime >= introInterval[0] && currentTime < introInterval[1]) {

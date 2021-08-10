@@ -23,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
      * Redirect to first episode if no episode is specified
      */
     if (queryParams.length < 2 && !eId) {
-        context.res.writeHead(301, {
+        context.res.writeHead(301,{
             Location: `/watch/${queryParams[0]}/1`
         })
         context.res.end()
@@ -130,7 +130,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
     return { props }
 }
 
-const Watch = ({ details, episodes, episodeNumber, toReplace }) => {
+const Watch = ({ details, episodes, episodeNumber }) => {
 
     const router = useRouter()
     const [ currentEpisodeNumber, updateCurrentEpisodeNumber ] = useState<number>(episodeNumber)
