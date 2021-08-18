@@ -210,18 +210,27 @@ const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumb
     }, [episode])
 
     useEffect(() => {
+        /**
+         * Process opening themes data
+         * Openings are (generally) listed as :
+         *     "#01: <opening_title> (eps 1-10)"
+         *     "#02: <opening_title> (eps 11-99)"
+         */
         const episodeNameNumber = parseInt(episode.Episode)
         if (openingsInfo && !((episodeNameNumber <= openingLifeSpan[1] || isNaN(openingLifeSpan[1]) && episodeNameNumber >= openingLifeSpan[0])) ) {
             if (openingsInfo.length > 1) {
                 var theOpening = openingsInfo.find(opening => {
+                    // Detect intro valid episodes' interval
                     const episodesInterval = opening.match(/\(eps\s(.+?)\)/)
                     if (episodesInterval) {
                         const episodesIntervalLimits = episodesInterval[1].split('-')
+                        // Update lifespan where current opening will still be valid
                         updateOpeningLifeSpan([parseInt(episodesIntervalLimits[0]), parseInt(episodesIntervalLimits[1])])
                         return (episodeNameNumber <= parseInt(episodesIntervalLimits[1]) || isNaN(parseInt(episodesIntervalLimits[1]))) && episodeNameNumber >= parseInt(episodesIntervalLimits[0])
                     }
                 })
             } else if (openingsInfo.length) {
+                // If list contains only one opening, select it as the valid opening
                 var theOpening = openingsInfo[0]
             }
             theOpening !== undefined ? updateOpening(theOpening.replace(/#\d{1,4}: /, "").replace(/\(eps\s(.+?)\)/, "")) : updateOpening("")
@@ -236,13 +245,12 @@ const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumb
                     introInterval={ introInterval }
                     sources={ currentSource != "" ? (episodeSources[currentSource] as Record<string, string>[]).sort((a, b) => parseInt(b.name.slice(0, -1)) - parseInt(a.name.slice(0, -1))) : [] }
                     episode={ episode }
-                    episodeTitle={ episodeTitle }
-                />
+                    episodeTitle={ episodeTitle } />
                 :
                 <div className={ Object.keys(episodeSources).length && !status.includes("pending") ? "iframe-video-player" : "iframe-video-player loading" }>
-                    { !status.includes("pending") ?
+                    { !status.includes("pending") &&
                         <iframe allowFullScreen={ true } className="iframe-video" src={ episodeSources[currentSource] as string } />
-                    : null}
+                    }
                 </div>
             }
             <div className="player-settings">
@@ -278,28 +286,28 @@ const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumb
                     <a id="next" className="player-episode-skip disabled">الحلقة القادمة<span className="mdi mdi-chevron-left mdi-left"></span></a>
                 }
             </div>
-            { !status.includes("pending") ?
-            <Popup id="download-popup" trigger={ downloadListTrigger } title="تحميل">
-                <div id="downloads-list" className="popup-list">
-                    {Object.keys(episodeSources).map(sourceKey => {
-                        if (nativeServers.includes(sourceKey.slice(0,2))) {
-                            return (
-                                <div key={ sourceKey } id={sourceKey} className="download-section">
-                                    <h2>{serverKeys[sourceKey.slice(0,2)]}</h2>
-                                    {(episodeSources[sourceKey] as quality).map(source => {
-                                        return (
-                                            <div key={ sourceKey } id={ source.name } className="download-link">
-                                                <p className="download-link-quality">{ source.name }</p>
-                                                <a className="link" href={ source.url }>تحميل</a>
-                                            </div>
-                                        )
-                                    })}
-                                </div>
-                            )
-                        }
-                    })}
-                </div>
-            </Popup> : null }
+            { !status.includes("pending") &&
+                <Popup id="download-popup" trigger={ downloadListTrigger } title="تحميل">
+                    <div id="downloads-list" className="popup-list">
+                        {Object.keys(episodeSources).map(sourceKey => {
+                            if (nativeServers.includes(sourceKey.slice(0,2))) {
+                                return (
+                                    <div key={ sourceKey } id={sourceKey} className="download-section">
+                                        <h2>{serverKeys[sourceKey.slice(0,2)]}</h2>
+                                        {(episodeSources[sourceKey] as quality).map(source => {
+                                            return (
+                                                <div key={ sourceKey } id={ source.name } className="download-link">
+                                                    <p className="download-link-quality">{ source.name }</p>
+                                                    <a className="link" href={ source.url }>تحميل</a>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )
+                            }
+                        })}
+                    </div>
+                </Popup> }
         </section>
     )
 }
