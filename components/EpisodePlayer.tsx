@@ -202,7 +202,15 @@ const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumb
             }
         })
         getServers(sources)
-        let episodeNameNumber = parseInt(episode.Episode)
+        return () => {
+            cancelFetches()
+            updateSources({})
+            updateCurrent("")    
+        }
+    }, [episode])
+
+    useEffect(() => {
+        const episodeNameNumber = parseInt(episode.Episode)
         if (openingsInfo && !((episodeNameNumber <= openingLifeSpan[1] || isNaN(openingLifeSpan[1]) && episodeNameNumber >= openingLifeSpan[0])) ) {
             if (openingsInfo.length > 1) {
                 var theOpening = openingsInfo.find(opening => {
@@ -218,12 +226,7 @@ const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumb
             }
             theOpening !== undefined ? updateOpening(theOpening.replace(/#\d{1,4}: /, "").replace(/\(eps\s(.+?)\)/, "")) : updateOpening("")
         }
-        return () => {
-            cancelFetches()
-            updateSources({})
-            updateCurrent("")    
-        }
-    }, [episode])
+    }, [episode, openingsInfo])
 
     return (
         <section className="anime-watch">

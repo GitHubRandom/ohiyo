@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react"
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from "react"
 import Head from 'next/head'
 import Popup from "./Popup"
@@ -53,10 +53,13 @@ const WatchTopBar = ({ setEpisodeNumber, episodeTitle, type, episodesList, episo
     useEffect(() => {
         const episode = episodesList[episodeNumber - 1]
         // Update episodeName
-        if (type == "Movie") {
+        if (type == "MOVIE") {
             updateEpisodeName("الفلم")
         } else {
             updateEpisodeName(`الحلقة ${episode.Episode}${episode.ExtraEpisodes ? `-${episode.ExtraEpisodes}` : ""}`)
+        }
+        return () => {
+            updateEpisodeName("")
         }
     }, [episodeNumber])
 
@@ -71,14 +74,38 @@ const WatchTopBar = ({ setEpisodeNumber, episodeTitle, type, episodesList, episo
             </Head>
             <div className="top-bar">
                 <div className="top-bar-text">
-                    { animeTitle ? <h1 className="top-bar-anime-title" title={ altTitle ? altTitle : null }>{ animeTitle }</h1> : <div className="anime-title-placeholder loading"></div>}
-                    { episodeName ? <motion.p variants={ episodeNameVariants } animate="visible" initial="hidden" className="top-bar-episode-name"><span className="episode-name">{ episodeName }{ getEpisodeTags(episodesList[episodeNumber - 1]) }</span>{ episodeTitle.length ? <><span style={{ marginTop: 2 }} className="mdi mdi-nm mdi-circle-medium"></span><span title="عنوان الحلقة" dir="ltr" className="episode-title">{ episodeTitle }</span></> : null }</motion.p> : <div className="episode-name-placeholder loading"></div> }
+                    { animeTitle ? <h1 className="top-bar-anime-title" title={ altTitle || "" }>{ animeTitle }</h1> : <div className="anime-title-placeholder loading"></div>}
+                    { episodeName ?
+                        <motion.p
+                            variants={ episodeNameVariants }
+                            initial="hidden"
+                            animate="visible"
+                            exit="hidden"
+                            className="top-bar-episode-name">
+                                <span className="episode-name">
+                                    { episodeName }{ getEpisodeTags(episodesList[episodeNumber - 1]) }
+                                </span>
+                                { episodeTitle &&
+                                    <motion.span
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}>
+                                            <span style={{ marginTop: 2 }} className="mdi mdi-nm mdi-circle-medium"></span>
+                                            <span title="عنوان الحلقة" dir="ltr" className="episode-title">
+                                                { episodeTitle }
+                                            </span>
+                                    </motion.span> }
+                        </motion.p> 
+                        : <div className="episode-name-placeholder loading"></div>
+                    }
                 </div>
-                { episodesList.length > 1 ?
-                <motion.div ref={ episodesPopupTrigger } initial={{ scale: 0 }} animate={{ scale: 1.0 }} transition={{ delay: 0.5 }} id="episodes-button" className="floating-button"><span className="mdi mdi-cards-variant"></span>
-                الحلقات
-                </motion.div> : null }
-                { episodesList.length > 1 ?
+                { episodesList.length > 1 &&
+                    <motion.div ref={ episodesPopupTrigger } initial={{ scale: 0 }} animate={{ scale: 1.0 }} transition={{ delay: 0.5 }} id="episodes-button" className="floating-button">
+                        <span className="mdi mdi-cards-variant"></span>
+                        الحلقات
+                    </motion.div>
+                }
+                { episodesList.length > 1 &&
                     <Popup onShow={ () => { if (episodeSearchInput.current) { episodeSearchInput.current.focus() } } } id="episodes-popup" dismissOnRouterEvent={ true } trigger={ episodesPopupTrigger } title="الحلقات">
                         <>
                             <div className="episode-popup-parameters">
@@ -107,7 +134,8 @@ const WatchTopBar = ({ setEpisodeNumber, episodeTitle, type, episodesList, episo
                                 }
                             </div>
                         </>
-                    </Popup> : null }
+                    </Popup>
+                }
             </div>
         </>
     )

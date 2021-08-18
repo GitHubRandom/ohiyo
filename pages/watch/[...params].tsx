@@ -9,20 +9,22 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useRef } from 'react'
 import WatchFooter from '../../components/WatchFooter'
-import axios, { CancelTokenSource } from 'axios'
+import axios, { AxiosError, AxiosRequestConfig, CancelTokenSource } from 'axios'
+import { getTrailerEmbed } from '../../utils/Formatters'
 
 // From all of this I learned how shit is the Anime Slayer's & Animeify's APIs. Just sayin'. @ritzy
 
 export const getServerSideProps: GetServerSideProps = async context => {
 
     const queryParams = context.query.params
-    const animeId = queryParams[0].slice(0,queryParams[0].indexOf("-"))
-    const eId = queryParams.length == 1 ? context.query.eId : undefined
+    const animeID = queryParams[0].slice(0,queryParams[0].indexOf("-"))
+    const malID = queryParams[0].slice(queryParams[0].indexOf('-') + 1)
+    const eID = queryParams.length == 1 ? context.query.eId : undefined
 
     /**
      * Redirect to first episode if no episode is specified
      */
-    if (queryParams.length < 2 && !eId) {
+    if (queryParams.length < 2 && !eID) {
         context.res.writeHead(301,{
             Location: `/watch/${queryParams[0]}/1`
         })
@@ -35,31 +37,90 @@ export const getServerSideProps: GetServerSideProps = async context => {
      *      /watch/<anime_id>-<mal>/<episode_number>
      *  or  /watch/<anime_id>-<mal>/latest
      */
-    if ((!parseInt(queryParams[1]) && !eId) || queryParams.length >= 3) {
+    if ((!parseInt(queryParams[1]) && !eID) || queryParams.length >= 3) {
         return {
             notFound: true
         }
     }
 
-    let props: Record<string,any> = {}
+    const props: Record<string,any> = {}
     const headers = new Headers({
         "Content-Type": "application/x-www-form-urlencoded"
     })
 
-    // Get details from MyAnimeList via Jikan
-    const detailsFetch = await fetch(`https://api.jikan.moe/v3/anime/${queryParams[0].slice(queryParams[0].indexOf('-') + 1)}`)
-    if (detailsFetch.ok) {
-        const detailsData = await detailsFetch.json()
-        detailsData.anime_id = animeId
-        props.details = detailsData
-        console.log("Details found !")
-    } else if (detailsFetch.status == 404) {
-        console.log("Details not found !")
-        return {
-            notFound: true
+    // Get details from Anilist.co API
+    const query = `
+        query ($id: Int) {
+            Media (idMal: $id, type: ANIME) {
+                idMal
+                coverImage {
+                    large
+                }
+                title {
+                    romaji
+                    english
+                }
+                format
+                seasonYear
+                episodes
+                genres
+                studios(isMain: true) {
+                    nodes {
+                        name
+                    }
+                }
+                status
+                source
+                trailer {
+                    id
+                    site
+                }
+                averageScore
+                isAdult
+                streamingEpisodes {
+                    title
+                }
+            }
         }
-    } else {
-        throw Error("Couldn't fetch details of anime !")
+    `;
+
+    const variables = {
+        id: malID
+    };
+
+    const url = 'https://graphql.anilist.co',
+        options: AxiosRequestConfig = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            data: JSON.stringify({
+                query: query,
+                variables: variables
+            })
+        };
+        
+    try {
+        const detailsFetch = await axios({
+            url,
+            ...options
+        })
+        const detailsData = (await detailsFetch.data).data.Media
+        detailsData.animeID = animeID
+        props.details = detailsData
+    } catch (error) {
+        // Return 404 if info is not found
+        if (error.response && error.response.status == 404) {
+            console.log("Details not found !")
+            return {
+                notFound: true
+            }
+        } else {
+            // Throw server error if 
+            console.log(error.toJSON())
+            throw Error("Couldn't fetch details of anime !")
+        }
     }
 
     let movie = false
@@ -67,15 +128,15 @@ export const getServerSideProps: GetServerSideProps = async context => {
     episodesFetch = await fetch("https://animeify.net/animeify/apis_v2/episodes/episodes_loader.php", {
         method: "POST",
         headers,
-        body: `AnimeID=x${animeId}`
+        body: `AnimeID=x${animeID}`
     })
 
     let episodesData
     if (episodesFetch.ok) {
         episodesData = await episodesFetch.json()
         // Parse eId
-        if (eId && episodesData.length) {
-            const eNumByEId = episodesData.findIndex(episode => episode.eId == eId) + 1
+        if (eID && episodesData.length) {
+            const eNumByEId = episodesData.findIndex(episode => episode.eId == eID) + 1
             props.toReplace = eNumByEId
         }
     }
@@ -86,7 +147,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
         episodesFetch = await fetch("https://animeify.net/animeify/apis_v2/servers/movie_links.php", {
             method: "POST",
             headers,
-            body: `MovieId=x${animeId}&Part=0` 
+            body: `MovieId=x${animeID}&Part=0` 
         })    
     }
 
@@ -96,7 +157,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
     const plotFetch = await fetch(plotEndpoint, {
         method: "POST",
         headers,
-        body: `AnimeID=x${animeId}&Language=AR`
+        body: `AnimeID=x${animeID}&Language=AR`
     })
     
     if (plotFetch.ok) {
@@ -114,7 +175,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
         props.episodes = episodesData
         if (queryParams[1] && queryParams[1] == "latest") {
             props.episodeNumber = episodesData.length 
-        } else if (eId) {
+        } else if (eID) {
             props.episodeNumber = props.toReplace
         } else {
             if (parseInt(queryParams[1]) > episodesData.length) {
@@ -137,11 +198,12 @@ const Watch = ({ details, episodes, episodeNumber }) => {
     const [ currentEpisode, updateCurrentEpisode ] = useState<Record<string,any>>(episodes[episodeNumber - 1])
     const [ currentIntroInterval, updateCurrentIntroInterval ] = useState<[number,number]>([0,0])
     const [ currentEpisodeTitle, updateCurrentEpisodeTitle ] = useState<string>("")
+    const [ openingThemes, updateOpeningThemes ] = useState<string[]>([])
     const skipFetchToken = useRef<CancelTokenSource>()
     const titleFetchToken = useRef<CancelTokenSource>()
     const hamburgerButton = useRef()
 
-    function handleBack(url: string) {
+    const handleBack = (url: string) => {
         // Router handler to fix the back stack
         const splittedPath = url.split("/")
         if (url.includes("?eId=")) {
@@ -158,6 +220,16 @@ const Watch = ({ details, episodes, episodeNumber }) => {
     }
 
     useEffect(() => {
+        // Fetch opening themes
+        axios({
+            url: `/api/openings?mal=${details.idMal}`
+        }).then(response => {
+            console.log(response.data)
+            updateOpeningThemes(response.data.openings)
+        }).catch(_ => {
+            console.error("Could not get openings info !")
+        })
+        // Fix for back action
         router.events.on("routeChangeComplete", handleBack)
         return () => {
             router.events.off("routeChangeComplete", handleBack)
@@ -167,10 +239,10 @@ const Watch = ({ details, episodes, episodeNumber }) => {
     useEffect(() => {
         window.scrollTo(0,60) // Scroll to video
         // Update link (shallow) and episode object
-        router.push(`/watch/${details.anime_id}-${details.mal_id}/${currentEpisodeNumber}`, undefined, { shallow: true, scroll: false })
+        router.push(`/watch/${details.animeID}-${details.idMal}/${currentEpisodeNumber}`, undefined, { shallow: true, scroll: false })
         // Update current epsiode from episode list
         const newCurrentEpisode = episodes[currentEpisodeNumber - 1]
-        newCurrentEpisode.Title = details.title
+        newCurrentEpisode.Title = details.title.romaji
         updateCurrentEpisode(newCurrentEpisode)
         // Cancel intro interval fetch if any
         try {
@@ -192,9 +264,9 @@ const Watch = ({ details, episodes, episodeNumber }) => {
     }, [currentEpisodeNumber])
 
     useEffect(() => {
-        // Replace the current URL with "/anime_id/episode_number"
+        // Replace the current URL with "/<anime_id>/episode_number"
         if (router.query.params[1] == "latest") {
-            router.replace(`/watch/${details.anime_id}-${details.mal_id}/${episodeNumber}`, undefined, { shallow: true, scroll: false })
+            router.replace(`/watch/${details.animeID}-${details.idMal}/${episodeNumber}`, undefined, { shallow: true, scroll: false })
         }
     }, [])
 
@@ -203,7 +275,7 @@ const Watch = ({ details, episodes, episodeNumber }) => {
         // Fetching intro timestamps
         skipFetchToken.current = axios.CancelToken.source()
         axios({
-            url: encodeURI(`/api/skip?anime=${details.title}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`),
+            url: encodeURI(`/api/skip?anime=${details.title.english}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`),
             cancelToken: skipFetchToken.current.token
         })
         .then(response => {
@@ -217,7 +289,7 @@ const Watch = ({ details, episodes, episodeNumber }) => {
         // Fetching episode title
         titleFetchToken.current = axios.CancelToken.source()
         axios({
-            url: "https://api.jikan.moe/v3/anime/" + details.mal_id + "/episodes/" + Math.ceil(parseInt(currentEpisode.Episode) / 100),
+            url: "https://api.jikan.moe/v3/anime/" + details.idMal + "/episodes/" + Math.ceil(parseInt(currentEpisode.Episode) / 100),
             cancelToken: titleFetchToken.current.token
         })
         .then(response => {
@@ -237,14 +309,14 @@ const Watch = ({ details, episodes, episodeNumber }) => {
     return (
         <>
             <Head>
-                <meta name="description" content={ `شاهد ${details.title} على Animayhem بجودة عالية` }/>
-                <meta property="og:title" content={ `${details.title} على Animayhem` }/>
+                <meta name="description" content={ `شاهد ${details.title.romaji || details.title.english} على Animayhem بجودة عالية` }/>
+                <meta property="og:title" content={ `${details.title.romaji || details.title.english} على Animayhem` }/>
                 <meta property="og:site_name" content="Animayhem"/>
                 <meta property="og:url" content={ "https://animayhem.ga" + router.asPath } />
                 <meta property="og:description" content={ details.synopsis } />
-                <meta property="og:type" content={ details.type == "Movie" ? "video.movie" : "video.episode" } />
-                <meta property="og:image" content={ details.image_url } />
-                { details.trailer_url ? <meta property="og:video" content={ details.trailer_url } /> : null }
+                <meta property="og:type" content={ details.format == "MOVIE" ? "video.movie" : "video.episode" } />
+                <meta property="og:image" content={ details.coverImage.large } />
+                { details.trailer ? <meta property="og:video" content={ getTrailerEmbed(details.trailer) } /> : null }
                 <style jsx>{`
                     html {
                         scroll-behavior: smooth;
@@ -256,17 +328,17 @@ const Watch = ({ details, episodes, episodeNumber }) => {
                 <Navigation trigger={ hamburgerButton } secondary={ true } selected="none" shown={ false } />
                 <div className="watch-page">
                     <WatchTopBar
-                        type={ details.type }
+                        type={ details.format }
                         setEpisodeNumber={ updateCurrentEpisodeNumber }
                         episodeTitle={ currentEpisodeTitle }
                         episodesList={ episodes }
                         episodeNumber={ currentEpisodeNumber }
-                        animeTitle={ details.title }
-                        // Use english title as altTitle. Check if title_english is present in API response, and use title_synonyms if not.
-                        altTitle={ details.title_english ? details.title_english : ( details.title_synonyms && details.title_synonyms[0] ? details.title_synonyms[0] : "" ) } />
+                        animeTitle={ details.title.romaji || details.title.english }
+                        // Anilist native version of title
+                        altTitle={ details.title.english || "" } />
 
                     <EpisodePlayer
-                        openingsInfo={ details.opening_themes }
+                        openingsInfo={ openingThemes } // TODO: Reimplement openings
                         changeEpisodeNumber={ (increment: boolean) => updateCurrentEpisodeNumber(oldEpisodeNumber => increment ? oldEpisodeNumber + 1 : oldEpisodeNumber - 1) }
                         episode={ currentEpisode }
                         introInterval={ currentIntroInterval }

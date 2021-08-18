@@ -658,6 +658,7 @@ body {
 .tab-selection {
     border-radius: 5px;
     display: inline-flex;
+    display: -ms-inline-flexbox;
     overflow: hidden;
     border: 1px solid var(--accent-color);
 }
@@ -1068,6 +1069,7 @@ body {
     color: black;
     border-radius: 5px;
     display: inline-flex;
+    display: -ms-inline-flexbox;
     flex-direction: column;
     transition: all 0.125s ease-in-out;
     background-color: #aed581;
@@ -1079,7 +1081,7 @@ body {
     background-color: var(--accent-color);
     border-radius: 5px;
     display: inline-flex;
-    display: -ms-flexbox;
+    display: -ms-inline-flexbox;
     align-items: center;
     padding: 2px 10px;
 }
@@ -1091,9 +1093,9 @@ body {
     font-size: 10pt;
     height: 0;
     display: inline-flex;
-    display: -ms-flexbox;
+    display: -ms-inline-flexbox;
     align-items: center;
-    transition: all 0.125s ease-in-out;
+    transition: all 0.125s ease-in-oinline-flexut;
     overflow: hidden;
 }
 

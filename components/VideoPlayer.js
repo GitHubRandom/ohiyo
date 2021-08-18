@@ -158,19 +158,20 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitl
                 <div style={{ opacity: UIShown ? 1 : 0 }} className="anime-video-info">
                     <h1 style={{ margin: 0 }} className="top-bar-anime-title">{ episode.Title }</h1>
                     <p style={{ marginBottom: 7 }} className="top-bar-episode-name">{ episode.Episode ? `الحلقة ${episode.Episode}` : "الفلم" }{ getEpisodeTags(episode) }{ episodeTitle.length ? <><span style={{ marginTop: 2 }} className="mdi mdi-nm mdi-circle-medium"></span><span title="عنوان الحلقة" dir="ltr" className="episode-title">{ episodeTitle }</span></> : null }</p>
-                    <div style={{ opacity: inIntro && UIShown ? 1 : 0 }} className="opening-hint">
-                        <div className="opening-hint-container">
-                            <div className="opening-hint-icon">
-                                <span className="mdi mdi-music-note mdi-nm"></span>
+                    { openingName &&
+                        <div style={{ opacity: inIntro && UIShown ? 1 : 0 }} className="opening-hint">
+                            <div className="opening-hint-container">
+                                <div className="opening-hint-icon">
+                                    <span className="mdi mdi-music-note mdi-nm"></span>
+                                </div>
+                                <p className="opening-hint-text" onClick={ () => { navigator.clipboard.writeText(openingName); setShowCopyConfirm(true) } }>
+                                    { openingName }
+                                </p>
                             </div>
-                            <p className="opening-hint-text" onClick={ () => { navigator.clipboard.writeText(openingName); setShowCopyConfirm(true) } }>
-                                { openingName }
-                            </p>
-                        </div>
-                        <div style={{ height: showCopyConfirm ? "20px" : "0" }} className="opening-hint-copy-confirm">
-                            <span className="mdi mdi-content-copy"></span>تم النسخ
-                        </div>
-                    </div>
+                            <div style={{ height: showCopyConfirm ? "20px" : "0" }} className="opening-hint-copy-confirm">
+                                <span className="mdi mdi-content-copy"></span>تم النسخ
+                            </div>
+                        </div> }
                 </div>
                 <button dir="rtl" onClick={ event => skipIntro(event) } style={{ display: inIntro && UIShown ? "flex" : "none" }} type="button" id="episode-skip-intro">
                     <span data-tippy-content="إلغاء" onClick={ () => setDismiss(true) } className="mdi mdi-close dismiss-skip"></span>
