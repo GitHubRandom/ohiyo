@@ -275,7 +275,7 @@ const Watch = ({ details, episodes, episodeNumber }) => {
         // Fetching intro timestamps
         skipFetchToken.current = axios.CancelToken.source()
         axios({
-            url: encodeURI(`/api/skip?anime=${details.title.english}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`),
+            url: encodeURI(`/api/skip?anime=${details.title.romaji || details.title.english}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`),
             cancelToken: skipFetchToken.current.token
         })
         .then(response => {
