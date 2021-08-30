@@ -3,43 +3,8 @@ import VideoPlayer from './VideoPlayer'
 import axios, { AxiosResponse, Method } from "axios"
 import { decodeHTML, decodeJSON } from '../utils/ServerDecoder'
 import Popup from "./Popup"
-
-const nativeServers = ["OK", "FR", "SF", "FD"]
-
- // Native player servers + iframe servers
-const supportedServers = nativeServers.concat(["MS", "MA", "GD"])
-
-const serverKeys = {
-    OK: "Ok.ru",
-    FR: "Mediafire",
-    MS: "MyStream",
-    SF: "SolidFiles",
-    FD: "Fembed",
-    MA: "Mega",
-    GD: "G.Drive"
-}
-
-const getFetchMethod = (serverKey: string): Method => {
-    const postMethod = ["OK", "FD"]
-    return postMethod.includes(serverKey) ? "POST" : "GET"
-}
-
-const getFormattedEndpoint = (serverKey:string, item: string): string => {
-    const prefixes = {
-        MA: "https://mega.nz/embed/",
-        GD: "https://drive.google.com/file/d/",
-        MS: "https://embed.mystream.to/",
-        FD: "https://quiet-cove-27971.herokuapp.com/www.fembed.com/api/source/",
-        FR: "https://quiet-cove-27971.herokuapp.com/www.mediafire.com/?",
-        SF: "/api/cors?link=http://www.solidfiles.com/v/",
-        OK: "https://cors.bridged.cc/https://ok.ru/dk?cmd=videoPlayerMetadata&mid="
-    }
-    const prefix = prefixes.hasOwnProperty(serverKey) ? prefixes[serverKey] : ""
-    const suffix = serverKey == "GD" ? "/preview" : ""
-    return prefix + item + suffix
-}
-
-const shouldDecodeJSON = (serverKey:string):boolean => serverKey == "OK" || serverKey == "FD"
+import SourceSelector from "./SourceSelector"
+import { serverKeys, nativeServers, supportedServers, shouldDecodeJSON, getFetchMethod, getFormattedEndpoint, getQualityLabel, quality } from '../utils/Servers'
 
 interface TEpisodePlayer {
     episode: Record<string,any>,
@@ -53,12 +18,9 @@ interface TEpisodePlayer {
 
 const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumber, firstEpisode, lastEpisode, openingsInfo }: TEpisodePlayer) => {
 
-    type quality = Record<string, string>[]
-
     const [ openingTheme, updateOpening ] = useState<string>("")
     const [ openingLifeSpan, updateOpeningLifeSpan ] = useState<[number,number]>([NaN,NaN])
     const [ episodeSources, updateSources ] = useState<Record<string, quality | string>>({})
-    // const [ currentSource, updateCurrent ] = useState<[string, string | Record<string, string>[]]>(["", ""])
     const [ currentSource, updateCurrent ] = useState<string>("")
     const [ switchCooldown, updateSwitchCooldown ] = useState<boolean>(true)
     const [ status, updateStatus ] = useState<string[]>([])
@@ -152,33 +114,6 @@ const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumb
         })
     }
 
-    const getBestQuality = (key: string) => {
-        const sources = episodeSources[key]
-        if (Array.isArray(sources)) {
-            if ((sources as quality).some(src => src.name == "1080p")) {
-                return " - Full HD"
-            }
-            if ((sources as quality).some(src => src.name == "720p")) {
-                return " - HD"
-            }
-            if ((sources as quality).some(src => src.name == "480p")) {
-                return " - SD"
-            }
-            return ""
-        } else {
-            if (key.endsWith("hdQ")) {
-                return " - Full HD"
-            }
-            if (key.endsWith("Link")) {
-                return ""
-            }
-            if (key.endsWith("LowQ")) {
-                return " - SD"
-            }
-            return ""
-        }
-    }
-
     useEffect(() => {
         if (Object.keys(episodeSources) && !status.includes('pending')) {
             let selected = Object.keys(episodeSources)[0]
@@ -266,11 +201,18 @@ const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumb
                     { Object.keys(episodeSources).length && !status.includes("pending") ?
                         <>
                             <span ref={ downloadListTrigger } id="download-button" className="mdi mdi-download mdi-nm"></span>
-                            <select name="server" className="selection" id="server-select" onChange={ e => updateCurrent(e.target.value) } value={ currentSource }>
+                            { currentSource ?
+                                <SourceSelector 
+                                    value={ currentSource }
+                                    sources={ episodeSources }
+                                    onSelectSource={ sourceKey => updateCurrent(sourceKey) } />
+                            : null }
+                            {/*<select name="server" className="selection" id="server-select" onChange={ e => updateCurrent(e.target.value) } value={ currentSource }>
                                 { Object.keys(episodeSources).map(key => {
-                                    return <option key={ key } value={ key } id={ key }>{nativeServers.includes(key.slice(0, 2)) ? "م. المحلي" : "م. خارجي"}{` - ${serverKeys[key.slice(0, 2)]}${getBestQuality(key)}`}</option>
+                                    return <option key={ key } value={ key } id={ key }>{nativeServers.includes(key.slice(0, 2)) ? "م. المحلي" : "م. خارجي"}{` - ${serverKeys[key.slice(0, 2)]}${getQualityLabel(key, episodeSources[key])}`}</option>
                                 })}
-                            </select></>
+                            </select>*/}
+                        </>
                         : <div className="servers-loading-message">
                             <div className="spinner"></div>
                             <span>جاري العمل على الخوادم</span>

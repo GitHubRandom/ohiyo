@@ -13,16 +13,22 @@ const qualitiesMap = {
 const decodeHTML = (key: string, data: string, qual: string): [string, Record<string, string>[]] => {
     if (key.startsWith("FR")) {
         // Search for the download button href
-        var regex = /href="(https?:\/\/download\d{1,6}\.mediafire\.com.*?\.mp4)"/
-        var matches = data.match(regex)
+        const regex = /href="(https?:\/\/download\d{1,6}\.mediafire\.com.*?\.mp4)"/
+        const matches = data.match(regex)
         if (matches) {
             return [key, [{ type: "normal", url: "https://quiet-cove-27971.herokuapp.com/" + matches[1], name: qualitiesMap[qual] }]]
         }
     } else if (key.startsWith("SF")) {
-        var regex = /"downloadUrl":"(.+solidfilesusercontent.com.+?)"/
-        var matches = data.match(regex)
+        const regex = /"downloadUrl":"(.+solidfilesusercontent.com.+?)"/
+        const matches = data.match(regex)
         if (matches) {
             return [key, [{ type: "normal", url: matches[1], name: qualitiesMap[qual] }]]
+        }
+    } else if (key.startsWith("SV")) {
+        const regex = /<source src="(.*?)"/
+        const matches = data.match(regex)
+        if (matches) {
+            return [key, [{ type: "hls", url: "https://quiet-cove-27971.herokuapp.com/" + matches[1], name: qualitiesMap[qual] }]]
         }
     }
     return ["", []]

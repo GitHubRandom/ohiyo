@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, memo } from 'react'
 import { getEpisodeTags } from './WatchTopBar'
 import tippy from 'tippy.js'
+import 'hls.js'
 
 const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitle }) => {
 
@@ -40,8 +41,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitl
     // Destroy & initialize player when sources changes
     useEffect(() => {
         const video = sources.length == 1 ? {
-            url: sources[0].url,
-            type: "normal"
+            ...sources[0]
         } : {
             quality: sources,
             defaultQuality: 0

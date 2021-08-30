@@ -508,7 +508,7 @@ body {
 }
 
 .anime-watch {
-    overflow: hidden;
+    /*overflow: hidden;*/
     justify-content: center;
     grid-area: content;
 }
@@ -541,14 +541,6 @@ body {
 
 .servers-loading-message span {
     margin-right: 10px;
-}
-
-.selection {
-    border-radius: 5px;
-    padding: 5px 10px;
-    color: white;
-    background-color: #151515;
-    border: none;
 }
 
 #server-select {
@@ -1124,6 +1116,81 @@ body {
     border-radius: 100%;  
     -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
     animation: sk-scaleout 1.0s infinite ease-in-out;
+}
+
+.sources-list {
+    background-color: #1D1D1D;
+    border-radius: 5px;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+.selection {
+    user-select: none;
+    display: flex;
+    border-radius: 5px;
+    padding: 5px 10px;
+    color: white;
+    background-color: #151515;
+    border: none;
+}
+
+.sources-list-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.sources-list-item:hover {
+    background-color: #131313;
+}
+
+.sources-list-item-quality,
+.selection-quality {
+    width: 50px;
+    color: var(--accent-color);
+    text-align: center;
+    font-weight: 600;
+    font-family: Ilisarniq;
+    letter-spacing: -0.1em;
+}
+
+.selection-quality {
+    text-align: center;
+    margin-left: 10px
+}
+
+.selection span {
+    position: absolute;
+    height: 100%;
+    left: 0;
+}
+
+.sources-list-item-info {
+    margin-right: 10px;
+    font-weight: normal;
+    text-align: right;
+}
+
+.sources-list-item-info * {
+    margin: 0
+}
+
+.sources-list-item-info h5 {
+    margin-bottom: 2px;
+}
+
+.sources-list-item-info p {
+    font-size: 10pt;
+}
+
+.sources {
+    position: relative;
+    width: 200px;
+    cursor: pointer;
 }
 
 @-webkit-keyframes sk-scaleout {
