@@ -15,7 +15,6 @@
     "dplayer": "^1.26.0",
     "follow-redirects": "^1.14.0",
     "framer-motion": "^4.1.13",
-    "hls.js": "^1.0.10",
     "indigo-player": "^1.5.1",
     "next": "10.1.3",
     "nprogress": "^0.2.0",

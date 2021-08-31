@@ -13,22 +13,24 @@ interface ISourceSelector {
 const SourceSelector = ({ sources, value, onSelectSource }: ISourceSelector) => {
 
     const [ showDropdown, updateShowDropdown ] = useState<boolean>(false)
-    const self = useRef<HTMLDivElement>()
+    const selectionButton = useRef<HTMLDivElement>()
 
     useEffect(() => {
-        const dismissDropdown = event => {
-            if (!(self.current && self.current.contains(event.target))) {
-                updateShowDropdown(false)
+        if (showDropdown) {
+            const handleOutsideClick = event => {
+                if (event.target != selectionButton.current) {
+                    updateShowDropdown(false)
+                }
             }
+            document.addEventListener('click', handleOutsideClick, { passive: true })
+            return () => {
+                document.removeEventListener('click', handleOutsideClick)
+            }    
         }
-        document.addEventListener('click', dismissDropdown)
-        return () => {
-            document.removeEventListener('click', dismissDropdown)
-        }
-    })
+    }, [showDropdown])
 
     return (
-        <div ref={ self } className="sources">
+        <div className="sources">
             <div onClick={ () => updateShowDropdown(show => !show) } className="selection">
                 <div className="selection-quality">{ getQualityLabel(value, sources[value]) }</div>
                 <div className="selection-name">{ serverKeys[value.slice(0,2)] }</div>
@@ -46,25 +48,25 @@ const SourceSelector = ({ sources, value, onSelectSource }: ISourceSelector) => 
                             opacity: 1,
                             translateY: 0
                         }}
+                        exit={{
+                            opacity: 0
+                        }}
                         transition={{
                             duration: 0.125,
                             ease: 'easeOut'
                         }}>
 
                         { Object.keys(sources).sort().map(sourceKey => {
-                            if (sourceKey != value) {
-                                const source = sources[sourceKey]
-                                return (
-                                    <div key={ sourceKey } onClick={ () => { onSelectSource(sourceKey); updateShowDropdown(false) } } className="sources-list-item">
-                                        <div className="sources-list-item-quality">{ getQualityLabel(sourceKey, source) }</div>
-                                        <div className="sources-list-item-info">
-                                            <h4>{ serverKeys[sourceKey.slice(0,2)] }</h4>
-                                            <p>{ nativeServers.includes(sourceKey.slice(0,2)) ? "المشغل المحلي" : "مشغل مدمج" }</p>
-                                        </div>
-                                    </div>)
-                            } else {
-                                return null
-                            }
+                            const source = sources[sourceKey]
+                            return (
+                                <div key={ sourceKey } onClick={ () => { onSelectSource(sourceKey); updateShowDropdown(false) } } className={ `sources-list-item` }>
+                                    <div className="sources-list-item-quality">{ getQualityLabel(sourceKey, source) }</div>
+                                    <div className="sources-list-item-info">
+                                        <h4>{ serverKeys[sourceKey.slice(0,2)] }</h4>
+                                        <p>{ nativeServers.includes(sourceKey.slice(0,2)) ? "المشغل المحلي" : "مشغل مدمج" }</p>
+                                    </div>
+                                    { sourceKey == value ? <span className="sources-list-selected-icon mdi mdi-circle-medium"></span> : null }
+                                </div>)
                         }) }
                     </motion.div>
                 : null }

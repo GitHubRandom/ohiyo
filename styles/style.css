@@ -80,7 +80,7 @@ body {
     --primary-color: #090909;
     --accent-color: #fffb00;
     --accent-color-disabled: #fffb005e;
-    --plyr-color-main: #b3b000;    
+    --plyr-color-main: #fffb00;    
 }
 
 ::-webkit-scrollbar {
@@ -701,6 +701,18 @@ body {
     padding-bottom: 56.25%;
 }
 
+.plyr--video {
+    height: 100%;
+}
+
+.anime-video-player:not(:fullscreen) .plyr--video {
+    position: absolute !important;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+}
+
 .anime-video-player:not(:fullscreen) .dplayer-video-wrap {
     position: absolute !important;
     top: 0;
@@ -1015,6 +1027,7 @@ body {
     display: flex;
     display: -ms-flexbox;
     justify-content: center;
+    margin-top: 60px;
 }
 
 .copyright {
@@ -1087,7 +1100,7 @@ body {
     display: inline-flex;
     display: -ms-inline-flexbox;
     align-items: center;
-    transition: all 0.125s ease-in-oinline-flexut;
+    transition: all 0.125s ease-in-out;
     overflow: hidden;
 }
 
@@ -1119,8 +1132,6 @@ body {
 }
 
 .sources-list {
-    background-color: #1D1D1D;
-    border-radius: 5px;
     position: absolute;
     bottom: calc(100% + 10px);
     right: 0;
@@ -1138,13 +1149,37 @@ body {
     border: none;
 }
 
+.sources-list-selected-icon {
+    height: 100%;
+    left: 0;
+    bottom: 0;
+    top: 0;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    margin-left: 10px !important;
+    color: var(--accent-color);
+}
+
 .sources-list-item {
+    background-color: #1D1D1D;
     display: flex;
     align-items: center;
     padding: 10px;
+    max-width: 100%;
+    position: relative;
 }
 
-.sources-list-item:hover {
+.sources-list-item:first-child {
+    border-radius: 5px 5px 0 0;
+}
+
+.sources-list-item:last-child {
+    border-radius: 0 0 5px 5px;
+}
+
+.sources-list-item:hover,
+.sources-list-item.selected {
     background-color: #131313;
 }
 
@@ -1191,6 +1226,7 @@ body {
     position: relative;
     width: 200px;
     cursor: pointer;
+    flex: 1;
 }
 
 @-webkit-keyframes sk-scaleout {
@@ -1219,6 +1255,9 @@ body {
 }
 
 @media only screen and (max-width: 1065px) {
+    .watch-footer {
+        margin-bottom: 60px;
+    }
     .main-menu {
         position: fixed;
         background-color: var(--primary-color);
@@ -1285,6 +1324,26 @@ body {
 }
 
 @media only screen and (max-width: 600px) {
+    .watch-footer {
+        font-size: 8pt;
+    }
+    .sources-list-item {
+        width: 100%;
+    }
+    .sources-list {
+        background-color: #0009;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        top: 0;
+        padding: 30px 20px;
+        z-index: 4;
+    }
     .trailer-container {
         width: 75vw;
     }
@@ -1334,15 +1393,13 @@ body {
 }
 
 @media only screen and (max-width: 490px) {
-    .opening-hint {
-        max-width: 250px;
-        right: 15px;
-        top: 15px;
+    .anime-video-info {
+        padding: 10px;
     }
     .opening-hint-container {
-        padding: 4px 6px;
+        padding: 0 10px;
     }
-    .opening-hint-text p:last-child {
+    .opening-hint-text {
         font-size: 8pt;
     }
     
@@ -1358,7 +1415,9 @@ body {
         color: var(--accent-color);
         margin-bottom: 10px;
     }
-
+    .anime-details {
+        font-size: 9pt;
+    }
     .anime-details-cover {
         height: 190px;
         width: 135px;

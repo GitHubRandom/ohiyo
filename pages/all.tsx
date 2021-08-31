@@ -221,7 +221,6 @@ const All = ({ results, page, genreSelected, search, studioSelected, movies }) =
                             icon: "mdi mdi-filmstrip-box"
                         }
                     }} setTab={ (tab) => {
-                        console.log(actualQuery)
                         if (tab == "movies") {
                             updateActualQuery({ ...actualQuery, m: 1, page: 1 })
                         } else {

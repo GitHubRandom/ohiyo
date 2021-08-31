@@ -10,25 +10,31 @@ const qualitiesMap = {
  * @param data HTML response (string)
  * @returns An array with server code & an array of objects of different qualities URLs
  */
-const decodeHTML = (key: string, data: string, qual: string): [string, Record<string, string>[]] => {
+const decodeHTML = (key: string, data: string, qual: string): [string, Record<string, any>[]] => {
     if (key.startsWith("FR")) {
         // Search for the download button href
         const regex = /href="(https?:\/\/download\d{1,6}\.mediafire\.com.*?\.mp4)"/
         const matches = data.match(regex)
         if (matches) {
-            return [key, [{ type: "normal", url: "https://quiet-cove-27971.herokuapp.com/" + matches[1], name: qualitiesMap[qual] }]]
+            return ["FR", [{ type: "normal", url: "https://quiet-cove-27971.herokuapp.com/" + matches[1], name: qualitiesMap[qual] }]]
         }
     } else if (key.startsWith("SF")) {
         const regex = /"downloadUrl":"(.+solidfilesusercontent.com.+?)"/
         const matches = data.match(regex)
         if (matches) {
-            return [key, [{ type: "normal", url: matches[1], name: qualitiesMap[qual] }]]
+            return ["SF", [{ type: "normal", url: matches[1], name: qualitiesMap[qual] }]]
         }
     } else if (key.startsWith("SV")) {
         const regex = /<source src="(.*?)"/
         const matches = data.match(regex)
         if (matches) {
-            return [key, [{ type: "hls", url: "https://quiet-cove-27971.herokuapp.com/" + matches[1], name: qualitiesMap[qual] }]]
+            return ["SV", [
+                { 
+                    type: "hls",
+                    url: "https://quiet-cove-27971.herokuapp.com/" + matches[1],
+                    name: qualitiesMap[qual],
+                }
+            ]]
         }
     }
     return ["", []]
@@ -42,7 +48,7 @@ const decodeHTML = (key: string, data: string, qual: string): [string, Record<st
  */
 const decodeJSON = (key: string, data: Record<string, any>): [string, Array<Record<string, string>>] => {
     if (key.startsWith("OK")) {
-        let q: Record<string, string> = { mobile: "144p", lowest: "240p", low: "360p", sd: "480p", hd: "720p" }
+        let q: Record<string, string> = { mobile: "144p", lowest: "240p", low: "360p", sd: "480p", hd: "720p", full: "1080p"}
         let qualities: Array<Record<string, string>> = []
         // Videos links are in "videos" array of the JSON response
         if ("videos" in data) {

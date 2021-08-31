@@ -1,7 +1,6 @@
 import { useRef, useEffect, useState, memo } from 'react'
 import { getEpisodeTags } from './WatchTopBar'
 import tippy from 'tippy.js'
-import 'hls.js'
 
 const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitle }) => {
 
@@ -12,8 +11,28 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitl
     const player = useRef() // DPlayer
     const videoPlayerContainer = useRef()
     const videoOverlay = useRef()
+    /*const swipeStart = useRef()
+    const [ swipeDelta, updateSwipeDelta ] = useState(0)*/
 
-    const skipIntro = (event) => {
+    /*const startTouchHandler = event => {
+        swipeStart.current = event.changedTouches[0].screenX 
+    }
+
+    const moveTouchHandler = event => {
+        if (event.changedTouches) {
+            const swipeDeltaX = event.changedTouches[0].screenX - swipeStart.current
+            updateSwipeDelta(swipeDeltaX)
+        }  
+    }
+
+    const endTouchHandler = () => {
+        if (player.current && (swipeDelta > 1 || swipeDelta < -1)) {
+            player.current.seek(player.current.video.currentTime + swipeDelta * 0.1)
+        }
+        updateSwipeDelta(0)    
+    }*/
+
+    const skipIntro = event => {
         /**
          * The event is needed to check if skip intro was actually clicked or
          * the dismiss button.
@@ -47,6 +66,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitl
             defaultQuality: 0
         }
         const DPlayer = require('dplayer')
+        // TODO: Fix Hls issues
         player.current = new DPlayer({
             container: videoPlayerContainer.current,
             theme: '#fffb00',
@@ -61,9 +81,10 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitl
                 {
                     text: 'نهاية المقدمة',
                     time: introInterval[1]
-                },
+                }
             ]
         }
+        window.player = player.current
         // DPlayer puts crossorigin attribute by default
         document.querySelector(".dplayer-video").removeAttribute("crossorigin")
         // Reimplementing overlay elements (DPlayer removes all container's children).
@@ -92,6 +113,21 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitl
             player.current.destroy()
         }
     }, [sources])
+
+    /*
+
+    useEffect(() => {
+        if (videoPlayerContainer.current) {
+            videoPlayerContainer.current.addEventListener('touchstart', startTouchHandler, { passive: true })
+            videoPlayerContainer.current.addEventListener('touchmove', moveTouchHandler, { passive: true })
+            videoPlayerContainer.current.addEventListener('touchend', endTouchHandler, { passive: true })
+            return () => {
+                videoPlayerContainer.current.removeEventListener('touchstart', startTouchHandler)
+                videoPlayerContainer.current.removeEventListener('touchmove', moveTouchHandler)
+                videoPlayerContainer.current.removeEventListener('touchend', endTouchHandler)
+            }
+        }
+    }, [sources])*/
 
     useEffect(() => {
         const keyPressCallback = event => {
@@ -182,7 +218,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitl
                     <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ forwardTen } id="forward" className="control-overlay">
                     </div>  
                     <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ rewindTen }  id="rewind" className="control-overlay">
-                    </div></> : null }
+                </div></> : null }
             </div>
         </div>    
     )

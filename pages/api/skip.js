@@ -1,7 +1,22 @@
+const axios = require('axios')
+
 export default async function handler(req, res) {
-    const animeName = req.query.anime
     const epNumber = parseInt(req.query.num)
     const epNameNumber = req.query.detail
+    const malID = req.query.mal
+
+    // Get anime name in MAL
+    const jikanResponse = await axios({
+        url: `https://api.jikan.moe/v3/anime/${malID}`,
+        method: 'GET'
+    })
+    const animeName = jikanResponse.data.title
+    console.log(animeName)
+    if (!animeName) {
+        console.log("Jikan fetch failed")
+        return res.status(404).send("404 Anime Not Found")
+    }
+
     const headers = {
         "Client-Id": "android-app2",
         "Client-Secret": "7befba6263cc14c90d2f1d6da2c5cf9b251bfbbd"
@@ -11,7 +26,7 @@ export default async function handler(req, res) {
         _limit: 30,
         _order_by: "latest_first",
         list_type: "filter",
-        anime_name: req.query.anime,
+        anime_name: animeName,
         just_info: "Yes"
     }
     const animeIdFetch = await fetch('https://anslayer.com/anime/public/animes/get-published-animes?json=' + JSON.stringify(searchJSON), {
@@ -19,11 +34,12 @@ export default async function handler(req, res) {
     })
     if (!animeIdFetch.ok) {
         console.log(await animeIdFetch.text())
-        res.status(404).send("404 Anime Not Found")
-        return
+        return res.status(404).send("404 Anime Not Found")
     }
     const results = (await animeIdFetch.json()).response.data 
+    console.log(results)
     const animeID = results?.find(item => item.anime_name == animeName)?.anime_id
+    
     if (!animeID) {
         res.status(404).send("404 Anime Not Found")
         return

@@ -224,7 +224,6 @@ const Watch = ({ details, episodes, episodeNumber }) => {
         axios({
             url: `/api/openings?mal=${details.idMal}`
         }).then(response => {
-            console.log(response.data)
             updateOpeningThemes(response.data.openings)
         }).catch(_ => {
             console.error("Could not get openings info !")
@@ -275,7 +274,7 @@ const Watch = ({ details, episodes, episodeNumber }) => {
         // Fetching intro timestamps
         skipFetchToken.current = axios.CancelToken.source()
         axios({
-            url: encodeURI(`/api/skip?anime=${details.title.romaji || details.title.english}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`),
+            url: encodeURI(`/api/skip?mal=${details.idMal}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`),
             cancelToken: skipFetchToken.current.token
         })
         .then(response => {

@@ -1,8 +1,8 @@
 import { Method } from "axios"
 
-export type quality = Record<string, string>[]
+export type quality = Record<string, any>[]
 
-export const nativeServers = ["OK", "FR", "SF", "FD", "SV"]
+export const nativeServers = ["OK", "FR", "SF", "FD"]
 
  // Native player servers + iframe servers
 export const supportedServers = nativeServers.concat(["MS", "MA", "GD"])
