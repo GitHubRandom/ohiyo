@@ -5,6 +5,7 @@ import { decodeHTML, decodeJSON } from '../utils/ServerDecoder'
 import Popup from "./Popup"
 import SourceSelector from "./SourceSelector"
 import { serverKeys, nativeServers, supportedServers, shouldDecodeJSON, getFetchMethod, getFormattedEndpoint, getQualityLabel, quality } from '../utils/Servers'
+import VideoPlyr from "./VideoPlyr"
 
 interface TEpisodePlayer {
     episode: Record<string,any>,
@@ -118,11 +119,11 @@ const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumb
         if (Object.keys(episodeSources) && !status.includes('pending')) {
             let selected = Object.keys(episodeSources)[0]
             for (var key in episodeSources) {
-                if (key == "FRFhdQ" || key == "FRLink" || key == "SFLink" ||
-                ( key.startsWith("OU") && selected != "FRLink" ) ||
-                ( key.startsWith("FD") && selected != "FRLink" )) {
+                if (key == "FR" ||
+                ( key == "OU" && selected != "FR" ) ||
+                ( key == "FD" && selected != "FR" )) {
                     selected = key
-                    if (key == "FRFhdQ") break
+                    if (key == "FR") break
                 }
             }
             updateCurrent(selected)
@@ -231,14 +232,14 @@ const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumb
             { !status.includes("pending") &&
                 <Popup id="download-popup" trigger={ downloadListTrigger } title="تحميل">
                     <div id="downloads-list" className="popup-list">
-                        {Object.keys(episodeSources).map(sourceKey => {
+                        {Object.keys(episodeSources).map((sourceKey, index) => {
                             if (nativeServers.includes(sourceKey.slice(0,2))) {
                                 return (
-                                    <div key={ sourceKey } id={sourceKey} className="download-section">
+                                    <div key={ index } id={sourceKey} className="download-section">
                                         <h2>{serverKeys[sourceKey.slice(0,2)]}</h2>
-                                        {(episodeSources[sourceKey] as quality).map(source => {
+                                        {(episodeSources[sourceKey] as quality).map((source, index) => {
                                             return (
-                                                <div key={ sourceKey } id={ source.name } className="download-link">
+                                                <div key={ index } id={ source.name } className="download-link">
                                                     <p className="download-link-quality">{ source.name }</p>
                                                     <a className="link" href={ source.url }>تحميل</a>
                                                 </div>
