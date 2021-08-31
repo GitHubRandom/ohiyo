@@ -3,7 +3,6 @@ import { getEpisodeTags } from './WatchTopBar'
 import tippy from 'tippy.js'
 import Plyr, { QualityOptions } from 'plyr'
 import 'plyr/dist/plyr.css'
-import Hls from 'hls.js'
 
 const VideoPlyr = ({ introInterval, sources, openingName, episode, episodeTitle }) => {
 
@@ -121,23 +120,11 @@ const VideoPlyr = ({ introInterval, sources, openingName, episode, episodeTitle 
     }, [swipeDelta])
 
     useEffect(() => {
-        if (sources.length == 1 && sources[0].type == "hls") {
-            player.current.source = {
-                type: 'video',
-                sources: []
-            }
-            if (!Hls.isSupported()) {
-                if (plyrHost.current) plyrHost.current.src = sources[0].src
-            } else {
-                const hls = new Hls()
-                hls.loadSource(sources[0].src)
-                hls.attachMedia(plyrHost.current)
-            }
-        } else {
+        if (player.current) {
             player.current.source = {
                 type: 'video',
                 sources: sources
-            }    
+            }
         }
     }, [sources])
 
