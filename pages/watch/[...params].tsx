@@ -1,5 +1,5 @@
 import { GetServerSideProps } from 'next'
-import AnimeDetails from '../../components/AnimeDetails'
+import AnimeDetails from '../../components/AnimeDetailsAnilist'
 import WatchTopBar from '../../components/WatchTopBar'
 import EpisodePlayer from '../../components/EpisodePlayer'
 import Navigation from '../../components/Navigation'
@@ -11,6 +11,8 @@ import { useRef } from 'react'
 import WatchFooter from '../../components/WatchFooter'
 import axios, { AxiosError, AxiosRequestConfig, CancelTokenSource } from 'axios'
 import { getTrailerEmbed } from '../../utils/Formatters'
+import AnimeDetailsAnilist from '../../components/AnimeDetailsAnilist'
+import AnimeDetailsJikan from '../../components/AnimeDetailsJikan'
 
 // From all of this I learned how shit is the Anime Slayer's & Animeify's APIs. Just sayin'. @ritzy
 
@@ -44,84 +46,99 @@ export const getServerSideProps: GetServerSideProps = async context => {
     }
 
     const props: Record<string,any> = {}
+
+    try {
+        const jikanResponse = await axios({
+            url: `https://api.jikan.moe/v3/anime/${malID}`
+        })
+        props.details = jikanResponse.data
+        props.details.animeID = animeID
+        props.detailsSource = 'jikan'
+    } catch (error) {
+        console.log(error.response ? error.response : error)
+    }
+    
+    if (!props.details) {
+        // Get details from Anilist.co API
+        const query = `
+            query ($id: Int) {
+                Media (idMal: $id, type: ANIME) {
+                    idMal
+                    coverImage {
+                        large
+                    }
+                    title {
+                        romaji
+                        english
+                    }
+                    format
+                    seasonYear
+                    episodes
+                    genres
+                    studios(isMain: true) {
+                        nodes {
+                            name
+                        }
+                    }
+                    status
+                    source
+                    trailer {
+                        id
+                        site
+                    }
+                    averageScore
+                    isAdult
+                    streamingEpisodes {
+                        title
+                    }
+                }
+            }
+        `;
+
+        const variables = {
+            id: malID
+        };
+
+        const url = 'https://graphql.anilist.co',
+            options: AxiosRequestConfig = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                data: JSON.stringify({
+                    query: query,
+                    variables: variables
+                })
+            };
+            
+        try {
+            const detailsFetch = await axios({
+                url,
+                ...options
+            })
+            const detailsData = (await detailsFetch.data).data.Media
+            detailsData.animeID = animeID
+            props.details = detailsData
+            props.detailsSource = 'anilist'
+        } catch (error) {
+            // Return 404 if info is not found
+            if (error.response && error.response.status == 404) {
+                console.log("Details not found !")
+                return {
+                    notFound: true
+                }
+            } else {
+                // Throw server error if 
+                console.log(error.toJSON())
+                throw Error("Couldn't fetch details of anime !")
+            }
+        }
+    }
+
     const headers = new Headers({
         "Content-Type": "application/x-www-form-urlencoded"
     })
-
-    // Get details from Anilist.co API
-    const query = `
-        query ($id: Int) {
-            Media (idMal: $id, type: ANIME) {
-                idMal
-                coverImage {
-                    large
-                }
-                title {
-                    romaji
-                    english
-                }
-                format
-                seasonYear
-                episodes
-                genres
-                studios(isMain: true) {
-                    nodes {
-                        name
-                    }
-                }
-                status
-                source
-                trailer {
-                    id
-                    site
-                }
-                averageScore
-                isAdult
-                streamingEpisodes {
-                    title
-                }
-            }
-        }
-    `;
-
-    const variables = {
-        id: malID
-    };
-
-    const url = 'https://graphql.anilist.co',
-        options: AxiosRequestConfig = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            data: JSON.stringify({
-                query: query,
-                variables: variables
-            })
-        };
-        
-    try {
-        const detailsFetch = await axios({
-            url,
-            ...options
-        })
-        const detailsData = (await detailsFetch.data).data.Media
-        detailsData.animeID = animeID
-        props.details = detailsData
-    } catch (error) {
-        // Return 404 if info is not found
-        if (error.response && error.response.status == 404) {
-            console.log("Details not found !")
-            return {
-                notFound: true
-            }
-        } else {
-            // Throw server error if 
-            console.log(error.toJSON())
-            throw Error("Couldn't fetch details of anime !")
-        }
-    }
 
     let movie = false
     let episodesFetch: Response
@@ -191,16 +208,16 @@ export const getServerSideProps: GetServerSideProps = async context => {
     return { props }
 }
 
-const Watch = ({ details, episodes, episodeNumber }) => {
+const Watch = ({ details, episodes, episodeNumber, detailsSource }) => {
 
     const router = useRouter()
     const [ currentEpisodeNumber, updateCurrentEpisodeNumber ] = useState<number>(episodeNumber)
     const [ currentEpisode, updateCurrentEpisode ] = useState<Record<string,any>>(episodes[episodeNumber - 1])
     const [ currentIntroInterval, updateCurrentIntroInterval ] = useState<[number,number]>([0,0])
-    const [ currentEpisodeTitle, updateCurrentEpisodeTitle ] = useState<string>("")
+    const [ currentEpisodeDetails, updateCurrentEpisodeDetails ] = useState<Record<string,any>>({})
     const [ openingThemes, updateOpeningThemes ] = useState<string[]>([])
     const skipFetchToken = useRef<CancelTokenSource>()
-    const titleFetchToken = useRef<CancelTokenSource>()
+    const episodeDetailsFetchToken = useRef<CancelTokenSource>()
     const hamburgerButton = useRef()
 
     const handleBack = (url: string) => {
@@ -220,14 +237,17 @@ const Watch = ({ details, episodes, episodeNumber }) => {
     }
 
     useEffect(() => {
-        // Fetch opening themes
-        axios({
-            url: `/api/openings?mal=${details.idMal}`
-        }).then(response => {
-            updateOpeningThemes(response.data.openings)
-        }).catch(_ => {
-            console.error("Could not get openings info !")
-        })
+        if (detailsSource == 'anilist') {
+            // Fetch opening themes
+            axios({
+                url: `/api/openings?mal=${details.mal_id || details.idMal}`
+            }).then(response => {
+                updateOpeningThemes(response.data.openings)
+            }).catch(_ => {
+                console.error("Could not get openings info !")
+            })
+        }
+
         // Fix for back action
         router.events.on("routeChangeComplete", handleBack)
         return () => {
@@ -238,10 +258,10 @@ const Watch = ({ details, episodes, episodeNumber }) => {
     useEffect(() => {
         window.scrollTo(0,60) // Scroll to video
         // Update link (shallow) and episode object
-        router.push(`/watch/${details.animeID}-${details.idMal}/${currentEpisodeNumber}`, undefined, { shallow: true, scroll: false })
+        router.push(`/watch/${details.animeID}-${details.mal_id || details.idMal}/${currentEpisodeNumber}`, undefined, { shallow: true, scroll: false })
         // Update current epsiode from episode list
         const newCurrentEpisode = episodes[currentEpisodeNumber - 1]
-        newCurrentEpisode.Title = details.title.romaji
+        newCurrentEpisode.Title = detailsSource == 'anilist' ? details.title.romaji : details.title
         updateCurrentEpisode(newCurrentEpisode)
         // Cancel intro interval fetch if any
         try {
@@ -251,8 +271,8 @@ const Watch = ({ details, episodes, episodeNumber }) => {
         } catch (err) {}
         // Cancel title fetch if any
         try {
-            if (titleFetchToken.current) {
-                titleFetchToken.current.cancel()
+            if (episodeDetailsFetchToken.current) {
+                episodeDetailsFetchToken.current.cancel()
             }    
         } catch (err) {}
 
@@ -265,7 +285,7 @@ const Watch = ({ details, episodes, episodeNumber }) => {
     useEffect(() => {
         // Replace the current URL with "/<anime_id>/episode_number"
         if (router.query.params[1] == "latest") {
-            router.replace(`/watch/${details.animeID}-${details.idMal}/${episodeNumber}`, undefined, { shallow: true, scroll: false })
+            router.replace(`/watch/${details.animeID}-${details.mal_id || details.idMal}/${episodeNumber}`, undefined, { shallow: true, scroll: false })
         }
     }, [])
 
@@ -274,7 +294,7 @@ const Watch = ({ details, episodes, episodeNumber }) => {
         // Fetching intro timestamps
         skipFetchToken.current = axios.CancelToken.source()
         axios({
-            url: encodeURI(`/api/skip?mal=${details.idMal}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`),
+            url: encodeURI(`/api/skip?mal=${details.mal_id || details.idMal}&num=${currentEpisodeNumber}&detail=${currentEpisode.Episode}`),
             cancelToken: skipFetchToken.current.token
         })
         .then(response => {
@@ -285,37 +305,30 @@ const Watch = ({ details, episodes, episodeNumber }) => {
             console.info("Timestamps not found !")
         })
 
-        // Fetching episode title
-        titleFetchToken.current = axios.CancelToken.source()
+        // Fetching episode details
+        episodeDetailsFetchToken.current = axios.CancelToken.source()
         axios({
-            url: "https://api.jikan.moe/v3/anime/" + details.idMal + "/episodes/" + Math.ceil(parseInt(currentEpisode.Episode) / 100),
-            cancelToken: titleFetchToken.current.token
+            url: "https://api.jikan.moe/v4/anime/" + (details.mal_id || details.idMal) + "/episodes/" + currentEpisode.Episode,
+            cancelToken: episodeDetailsFetchToken.current.token
         })
         .then(response => {
-            let epData = response.data.episodes.find((ep: Record<string,any>) => ep.episode_id == parseInt(currentEpisode.Episode))
-            updateCurrentEpisodeTitle(epData.title)
+            /*let epData = response.data.episodes.find((ep: Record<string,any>) => ep.episode_id == parseInt(currentEpisode.Episode))
+            updateCurrentEpisodeTitle(epData.title)*/
+            updateCurrentEpisodeDetails(response.data.data)
         }).catch(_ => {
-            console.info("Couldn't fetch episode title !")
+            console.info("Couldn't fetch episode details !")
         })
 
         // Cleaning effect
         return () => {
             updateCurrentIntroInterval([0,0])
-            updateCurrentEpisodeTitle("")
+            updateCurrentEpisodeDetails({})
         }
     }, [currentEpisode])
 
     return (
         <>
             <Head>
-                <meta name="description" content={ `شاهد ${details.title.romaji || details.title.english} على Animayhem بجودة عالية` }/>
-                <meta property="og:title" content={ `${details.title.romaji || details.title.english} على Animayhem` }/>
-                <meta property="og:site_name" content="Animayhem"/>
-                <meta property="og:url" content={ "https://animayhem.ga" + router.asPath } />
-                <meta property="og:description" content={ details.synopsis } />
-                <meta property="og:type" content={ details.format == "MOVIE" ? "video.movie" : "video.episode" } />
-                <meta property="og:image" content={ details.coverImage.large } />
-                { details.trailer ? <meta property="og:video" content={ getTrailerEmbed(details.trailer) } /> : null }
                 <style jsx>{`
                     html {
                         scroll-behavior: smooth;
@@ -327,25 +340,27 @@ const Watch = ({ details, episodes, episodeNumber }) => {
                 <Navigation trigger={ hamburgerButton } secondary={ true } selected="none" shown={ false } />
                 <div className="watch-page">
                     <WatchTopBar
-                        type={ details.format }
+                        type={ details.type || details.format }
                         setEpisodeNumber={ updateCurrentEpisodeNumber }
-                        episodeTitle={ currentEpisodeTitle }
+                        episodeDetails={ currentEpisodeDetails }
                         episodesList={ episodes }
                         episodeNumber={ currentEpisodeNumber }
-                        animeTitle={ details.title.romaji || details.title.english }
-                        // Anilist native version of title
-                        altTitle={ details.title.english || "" } />
+                        animeTitle={ detailsSource == 'anilist' ? details.title.romaji || details.title.english : details.title }
+                        altTitle={ detailsSource == 'anilist' ? details.title.english || "" : details.title_english } />
 
                     <EpisodePlayer
-                        openingsInfo={ openingThemes } // TODO: Reimplement openings
+                        openingsInfo={ detailsSource == 'anilist' ? openingThemes : details.opening_themes } // TODO: Reimplement openings
                         changeEpisodeNumber={ (increment: boolean) => updateCurrentEpisodeNumber(oldEpisodeNumber => increment ? oldEpisodeNumber + 1 : oldEpisodeNumber - 1) }
                         episode={ currentEpisode }
                         introInterval={ currentIntroInterval }
-                        episodeTitle={ currentEpisodeTitle }
+                        episodeDetails={ currentEpisodeDetails }
                         firstEpisode={ currentEpisodeNumber == 1 }
                         lastEpisode={ currentEpisodeNumber == episodes.length } />   
 
-                    <AnimeDetails animeDetails={ details } />
+                    { detailsSource == 'jikan' ?
+                        <AnimeDetailsJikan animeDetails={ details } />
+                        : <AnimeDetailsAnilist animeDetails={ details } />
+                    }
                 </div>
                 <WatchFooter />
             </div>

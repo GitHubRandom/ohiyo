@@ -1170,11 +1170,13 @@ body {
     position: relative;
 }
 
-.sources-list-item:first-child {
+.sources-list-item:first-child,
+.sources-list h5:first-child {
     border-radius: 5px 5px 0 0;
 }
 
-.sources-list-item:last-child {
+.sources-list-item:last-child,
+.sources-list h5:last-child {
     border-radius: 0 0 5px 5px;
 }
 
@@ -1222,11 +1224,25 @@ body {
     font-size: 10pt;
 }
 
+.sources-list h5 {
+    margin: 0;
+    padding: 10px;
+    background-color: #1D1D1D;
+}
+
+.sources-list p span {
+    font-family: "Ninja Naruto";
+    font-size: 8pt;
+}
+
 .sources {
     position: relative;
     width: 200px;
-    cursor: pointer;
     flex: 1;
+}
+
+.sources *:not(h5) {
+    cursor: pointer;
 }
 
 @-webkit-keyframes sk-scaleout {

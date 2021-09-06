@@ -10,6 +10,18 @@ interface ISourceSelector {
     onSelectSource: (sourceKey: string) => void
 }
 
+const listItem = ([ sourceKey, source ], selected: boolean, onClickItem: () => void) => (
+    <div key={ sourceKey } onClick={ onClickItem } className={ `sources-list-item` }>
+        <div className="sources-list-item-quality">{ getQualityLabel(sourceKey, source) }</div>
+        <div className="sources-list-item-info">
+            <h4>{ serverKeys[sourceKey.slice(0,2)] }</h4>
+            { nativeServers.includes(sourceKey.slice(0,2)) && <p>المشغل المحلي</p> }
+            {/*<p>{ nativeServers.includes(sourceKey.slice(0,2)) ? "المشغل المحلي" : "مشغل مدمج" }</p>*/}
+        </div>
+        { selected ? <span className="sources-list-selected-icon mdi mdi-circle-medium"></span> : null }
+    </div>
+)
+
 const SourceSelector = ({ sources, value, onSelectSource }: ISourceSelector) => {
 
     const [ showDropdown, updateShowDropdown ] = useState<boolean>(false)
@@ -55,19 +67,25 @@ const SourceSelector = ({ sources, value, onSelectSource }: ISourceSelector) => 
                             duration: 0.125,
                             ease: 'easeOut'
                         }}>
+                        
+                        {
+                            Object
+                                .entries(sources)
+                                .filter(entry => nativeServers.includes(entry[0].slice(0,2)))
+                                .map(entry => (
+                                    listItem(entry, entry[0] === value, () => { onSelectSource(entry[0]); updateShowDropdown(false) })
+                                ))
+                        }
 
-                        { Object.keys(sources).sort().map(sourceKey => {
-                            const source = sources[sourceKey]
-                            return (
-                                <div key={ sourceKey } onClick={ () => { onSelectSource(sourceKey); updateShowDropdown(false) } } className={ `sources-list-item` }>
-                                    <div className="sources-list-item-quality">{ getQualityLabel(sourceKey, source) }</div>
-                                    <div className="sources-list-item-info">
-                                        <h4>{ serverKeys[sourceKey.slice(0,2)] }</h4>
-                                        <p>{ nativeServers.includes(sourceKey.slice(0,2)) ? "المشغل المحلي" : "مشغل مدمج" }</p>
-                                    </div>
-                                    { sourceKey == value ? <span className="sources-list-selected-icon mdi mdi-circle-medium"></span> : null }
-                                </div>)
-                        }) }
+                        {
+                            Object
+                                .entries(sources)
+                                .filter(entry => !nativeServers.includes(entry[0].slice(0,2)))
+                                .map(entry => (
+                                    listItem(entry, entry[0] === value, () => { onSelectSource(entry[0]); updateShowDropdown(false) })
+                                ))
+                        }
+
                     </motion.div>
                 : null }
             </AnimatePresence>

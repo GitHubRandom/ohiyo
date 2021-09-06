@@ -11,9 +11,7 @@ export default async function handler(req, res) {
         method: 'GET'
     })
     const animeName = jikanResponse.data.title
-    console.log(animeName)
     if (!animeName) {
-        console.log("Jikan fetch failed")
         return res.status(404).send("404 Anime Not Found")
     }
 
@@ -33,11 +31,9 @@ export default async function handler(req, res) {
         headers
     })
     if (!animeIdFetch.ok) {
-        console.log(await animeIdFetch.text())
         return res.status(404).send("404 Anime Not Found")
     }
     const results = (await animeIdFetch.json()).response.data 
-    console.log(results)
     const animeID = results?.find(item => item.anime_name == animeName)?.anime_id
     
     if (!animeID) {

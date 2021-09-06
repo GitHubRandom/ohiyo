@@ -2,7 +2,7 @@ import { useRef, useEffect, useState, memo } from 'react'
 import { getEpisodeTags } from './WatchTopBar'
 import tippy from 'tippy.js'
 
-const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitle }) => {
+const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDetails }) => {
 
     const [ inIntro, setInIntro ] = useState(false)
     const [ showCopyConfirm, setShowCopyConfirm ] = useState(false)
@@ -193,7 +193,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeTitl
                 </div>
                 <div style={{ opacity: UIShown ? 1 : 0 }} className="anime-video-info">
                     <h1 style={{ margin: 0 }} className="top-bar-anime-title">{ episode.Title }</h1>
-                    <p style={{ marginBottom: 7 }} className="top-bar-episode-name">{ episode.Episode ? `الحلقة ${episode.Episode}` : "الفلم" }{ getEpisodeTags(episode) }{ episodeTitle.length ? <><span style={{ marginTop: 2 }} className="mdi mdi-nm mdi-circle-medium"></span><span title="عنوان الحلقة" dir="ltr" className="episode-title">{ episodeTitle }</span></> : null }</p>
+                    <p style={{ marginBottom: 7 }} className="top-bar-episode-name">{ episode.Episode ? `الحلقة ${episode.Episode}` : "الفلم" }{ getEpisodeTags(episode, episodeDetails) }{ episodeDetails && episodeDetails.title ? <><span style={{ marginTop: 2 }} className="mdi mdi-nm mdi-circle-medium"></span><span title="عنوان الحلقة" dir="ltr" className="episode-title">{ episodeDetails.title }</span></> : null }</p>
                     { openingName &&
                         <div style={{ opacity: inIntro && UIShown ? 1 : 0 }} className="opening-hint">
                             <div className="opening-hint-container">

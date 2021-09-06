@@ -5,7 +5,7 @@ export type quality = Record<string, any>[]
 export const nativeServers = ["OK", "FR", "SF", "FD"]
 
  // Native player servers + iframe servers
-export const supportedServers = nativeServers.concat(["MS", "MA", "GD"])
+export const supportedServers = nativeServers.concat(["MS", "MA", "GD", "SV"])
 
 export const getQualityLabel = (key: string, episodeSource: quality | string ) => {
     if (Array.isArray(episodeSource)) {
@@ -42,8 +42,7 @@ export const serverKeys = {
 }
 
 export const getFetchMethod = (serverKey: string): Method => {
-    const postMethod = ["OK", "FD"]
-    return postMethod.includes(serverKey) ? "POST" : "GET"
+    return ["OK", "FD"].includes(serverKey) ? "POST" : "GET"
 }
 
 export const getFormattedEndpoint = (serverKey:string, item: string): string => {

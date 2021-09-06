@@ -9,7 +9,7 @@ import VideoPlyr from "./VideoPlyr"
 
 interface TEpisodePlayer {
     episode: Record<string,any>,
-    episodeTitle: string,
+    episodeDetails: Record<string,any>,
     introInterval: [number, number],
     changeEpisodeNumber: (increment: boolean) => void,
     firstEpisode: boolean,
@@ -17,7 +17,7 @@ interface TEpisodePlayer {
     openingsInfo?: string[]
 }
 
-const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumber, firstEpisode, lastEpisode, openingsInfo }: TEpisodePlayer) => {
+const EpisodePlayer = ({ episode, episodeDetails, introInterval, changeEpisodeNumber, firstEpisode, lastEpisode, openingsInfo }: TEpisodePlayer) => {
 
     const [ openingTheme, updateOpening ] = useState<string>("")
     const [ openingLifeSpan, updateOpeningLifeSpan ] = useState<[number,number]>([NaN,NaN])
@@ -181,7 +181,7 @@ const EpisodePlayer = ({ episode, episodeTitle, introInterval, changeEpisodeNumb
                     introInterval={ introInterval }
                     sources={ currentSource != "" ? (episodeSources[currentSource] as Record<string, string>[]).sort((a, b) => parseInt(b.name.slice(0, -1)) - parseInt(a.name.slice(0, -1))) : [] }
                     episode={ episode }
-                    episodeTitle={ episodeTitle } />
+                    episodeDetails={ episodeDetails } />
                 :
                 <div className={ Object.keys(episodeSources).length && !status.includes("pending") ? "iframe-video-player" : "iframe-video-player loading" }>
                     { !status.includes("pending") &&
