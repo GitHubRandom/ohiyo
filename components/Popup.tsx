@@ -1,4 +1,4 @@
-import React, { useState, useEffect, RefObject } from "react"
+import React, { useState, useEffect, RefObject, KeyboardEvent } from "react"
 import { AnimatePresence, motion } from 'framer-motion'
 import { Router } from "next/router"
 
@@ -15,11 +15,18 @@ const Popup = ({ children, trigger, id, title, dismissOnRouterEvent, onShow, onD
 
     const [ visible, updateVisibility ] = useState(false)
 
+    const handleEscape = event => {
+        console.log(event.key)
+        if (event.key === 'Escape') {
+            updateVisibility(false)
+        }
+    }
+
     useEffect(() => {
         if (trigger.current) {
             trigger.current.addEventListener('click', () => {
                 updateVisibility(true)
-            }) 
+            }, { passive: true }) 
         }
     }, [trigger])
     
@@ -28,7 +35,13 @@ const Popup = ({ children, trigger, id, title, dismissOnRouterEvent, onShow, onD
             onShow()
         } else if (!visible && onDismiss) {
             onDismiss()
-        } 
+        }
+        if (visible) {
+            window.addEventListener('keydown', handleEscape, { passive: true })
+            return () => {
+                window.removeEventListener('keydown', handleEscape)
+            }
+        }
     }, [visible])
 
     useEffect(() => {
@@ -37,15 +50,18 @@ const Popup = ({ children, trigger, id, title, dismissOnRouterEvent, onShow, onD
                 updateVisibility(false)
             })
         }
-    },[])
+    }, [])
 
     return (
         <AnimatePresence>
             { visible ? 
             <div id={id} className="popup">
-                <motion.div initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
+                <motion.div initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{
+                            duration: 0.125
+                        }}
                         className="popup-container">
                     <div className="popup-header">
                         <h2 className="popup-title">{ title }</h2>
