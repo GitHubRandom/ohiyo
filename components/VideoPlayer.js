@@ -6,7 +6,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
 
     const [ inIntro, setInIntro ] = useState(false)
     const [ showCopyConfirm, setShowCopyConfirm ] = useState(false)
-    const [ dismiss, setDismiss ] = useState(false)
+    const [ dismissIntroSkip, setDismissIntroSkip ] = useState(false)
     const [ UIShown, setUIShown ] = useState(false)
     const player = useRef() // DPlayer
     const videoPlayerContainer = useRef()
@@ -108,7 +108,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
         return () => {
             // Clean effect
             setInIntro(false)
-            setDismiss(false)
+            setDismissIntroSkip(false)
             mutationObserver.disconnect()
             player.current.destroy()
         }
@@ -158,7 +158,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
     }, [introInterval])
 
     useEffect(() => {
-        const introCheck = !dismiss ? window.setInterval(() => {
+        const introCheck = !dismissIntroSkip ? window.setInterval(() => {
             if (player.current) {
                 const currentTime = player.current.video.currentTime
                 if (currentTime >= introInterval[0] && currentTime < introInterval[1]) {
@@ -174,7 +174,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
                 setInIntro(false)
             }
         }
-    }, [introInterval, dismiss])
+    }, [introInterval, dismissIntroSkip])
 
     // An effect for timing out copying opening name confirmation.
     useEffect(() => {
@@ -209,7 +209,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
                         </div> }
                 </div>
                 <button dir="rtl" onClick={ event => skipIntro(event) } style={{ display: inIntro && UIShown ? "flex" : "none" }} type="button" id="episode-skip-intro">
-                    <span data-tippy-content="إلغاء" onClick={ () => setDismiss(true) } className="mdi mdi-close dismiss-skip"></span>
+                    <span data-tippy-content="إلغاء" onClick={ () => setDismissIntroSkip(true) } className="mdi mdi-close dismiss-skip"></span>
                     <span className="skip-intro-text">تخطي المقدمة</span>
                     { !isMobileDevice() ? <span className="skip-intro-shortcut">Enter</span> : null}
                 </button>
