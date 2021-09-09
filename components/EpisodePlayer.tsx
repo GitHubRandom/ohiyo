@@ -208,11 +208,6 @@ const EpisodePlayer = ({ episode, episodeDetails, introInterval, changeEpisodeNu
                                     sources={ episodeSources }
                                     onSelectSource={ sourceKey => updateCurrent(sourceKey) } />
                             : null }
-                            {/*<select name="server" className="selection" id="server-select" onChange={ e => updateCurrent(e.target.value) } value={ currentSource }>
-                                { Object.keys(episodeSources).map(key => {
-                                    return <option key={ key } value={ key } id={ key }>{nativeServers.includes(key.slice(0, 2)) ? "م. المحلي" : "م. خارجي"}{` - ${serverKeys[key.slice(0, 2)]}${getQualityLabel(key, episodeSources[key])}`}</option>
-                                })}
-                            </select>*/}
                         </>
                         : <div className="servers-loading-message">
                             <div className="spinner"></div>
