@@ -63,7 +63,7 @@ export default async function handler(req, res) {
         }
         const episode = episodes.find(ep => ep.episode_name.includes(epNameNumber))
         const { skip_from, skip_to } = episode
-        res.status(200).send(JSON.stringify({ skip_from, skip_to }))   
+        res.status(200).json(JSON.stringify({ skip_from, skip_to }))   
         return 
     } catch (err) {
         console.error(err)
