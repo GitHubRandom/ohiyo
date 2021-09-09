@@ -131,8 +131,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
 
     useEffect(() => {
         const keyPressCallback = event => {
-            let key = event.key
-            if (inIntro && key == "Enter") {
+            if (inIntro && event.key === "Enter") {
                 event.preventDefault()
                 player.current.seek(introInterval[1])
             }
