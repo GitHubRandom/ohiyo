@@ -6,8 +6,6 @@ Animayhem is a website where you can watch HQ Arabic subbed anime for free. It h
 - :sparkles: Great UI/UX
 - :arrow_right: Skip intro *(on episodes released starting from December 2020)*
 
-This project is a personal training for front-end development and growing my programming skills.
-
 ## Tech used
 
 [Next.js](https://nextjs.org/) and a proxy server for video extraction. The website is hosted at [Vercel](https://vercel.com/) and the proxy server at [Heroku](https://www.heroku.com/).

@@ -16,7 +16,6 @@ const listItem = ([ sourceKey, source ], selected: boolean, onClickItem: () => v
         <div className="sources-list-item-info">
             <h4>{ serverKeys[sourceKey.slice(0,2)] }</h4>
             { nativeServers.includes(sourceKey.slice(0,2)) && <p>المشغل المحلي</p> }
-            {/*<p>{ nativeServers.includes(sourceKey.slice(0,2)) ? "المشغل المحلي" : "مشغل مدمج" }</p>*/}
         </div>
         { selected ? <span className="sources-list-selected-icon mdi mdi-circle-medium"></span> : null }
     </div>
