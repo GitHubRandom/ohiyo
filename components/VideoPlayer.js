@@ -11,26 +11,6 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
     const player = useRef() // DPlayer
     const videoPlayerContainer = useRef()
     const videoOverlay = useRef()
-    /*const swipeStart = useRef()
-    const [ swipeDelta, updateSwipeDelta ] = useState(0)*/
-
-    /*const startTouchHandler = event => {
-        swipeStart.current = event.changedTouches[0].screenX 
-    }
-
-    const moveTouchHandler = event => {
-        if (event.changedTouches) {
-            const swipeDeltaX = event.changedTouches[0].screenX - swipeStart.current
-            updateSwipeDelta(swipeDeltaX)
-        }  
-    }
-
-    const endTouchHandler = () => {
-        if (player.current && (swipeDelta > 1 || swipeDelta < -1)) {
-            player.current.seek(player.current.video.currentTime + swipeDelta * 0.1)
-        }
-        updateSwipeDelta(0)    
-    }*/
 
     const skipIntro = event => {
         /**
@@ -113,21 +93,6 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
             player.current.destroy()
         }
     }, [sources])
-
-    /*
-
-    useEffect(() => {
-        if (videoPlayerContainer.current) {
-            videoPlayerContainer.current.addEventListener('touchstart', startTouchHandler, { passive: true })
-            videoPlayerContainer.current.addEventListener('touchmove', moveTouchHandler, { passive: true })
-            videoPlayerContainer.current.addEventListener('touchend', endTouchHandler, { passive: true })
-            return () => {
-                videoPlayerContainer.current.removeEventListener('touchstart', startTouchHandler)
-                videoPlayerContainer.current.removeEventListener('touchmove', moveTouchHandler)
-                videoPlayerContainer.current.removeEventListener('touchend', endTouchHandler)
-            }
-        }
-    }, [sources])*/
 
     useEffect(() => {
         const keyPressCallback = event => {
