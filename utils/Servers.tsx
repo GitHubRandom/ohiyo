@@ -54,7 +54,7 @@ export const getFormattedEndpoint = (serverKey:string, item: string): string => 
         FR: "https://quiet-cove-27971.herokuapp.com/www.mediafire.com/?",
         SF: "/api/cors?link=http://www.solidfiles.com/v/",
         OK: "https://cors.bridged.cc/https://ok.ru/dk?cmd=videoPlayerMetadata&mid=",
-        SV: "https://quiet-cove-27971.herokuapp.com/sendvid.com/embed/"
+        SV: "https://sendvid.com/embed/"
     }
     const prefix = prefixes.hasOwnProperty(serverKey) ? prefixes[serverKey] : ""
     const suffix = serverKey == "GD" ? "/preview" : ""
