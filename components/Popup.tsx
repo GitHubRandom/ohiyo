@@ -55,21 +55,23 @@ const Popup = ({ children, trigger, id, title, dismissOnRouterEvent, onShow, onD
     return (
         <AnimatePresence>
             { visible ? 
-            <div id={id} className="popup">
-                <motion.div initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{
-                            duration: 0.125
-                        }}
-                        className="popup-container">
+            <motion.div
+                id={id}
+                className="popup"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{
+                    duration: 0.125
+                }}>
+                <div className="popup-container">
                     <div className="popup-header">
                         <h2 className="popup-title">{ title }</h2>
                         <div className="popup-close" onClick={ () => { updateVisibility(false) } }>إغلاق</div>
                     </div>
                     { children }
-                </motion.div>
-            </div> : null }
+                </div>
+            </motion.div> : null }
         </AnimatePresence>
     )
 }

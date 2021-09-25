@@ -16,7 +16,7 @@ const decodeHTML = (key: string, data: string, qual: string): [string, Record<st
         const regex = /href="(https?:\/\/download\d{1,6}\.mediafire\.com.*?\.mp4)"/
         const matches = data.match(regex)
         if (matches) {
-            return ["FR", [{ type: "normal", url: "https://quiet-cove-27971.herokuapp.com/" + matches[1], name: qualitiesMap[qual] }]]
+            return ["FR", [{ type: "normal", url: "https://quiet-cove-27971.herokuapp.com/" + matches[1].replace('http://', 'https://'), name: qualitiesMap[qual] }]]
         }
     } else if (key.startsWith("SF")) {
         const regex = /"downloadUrl":"(.+solidfilesusercontent.com.+?)"/

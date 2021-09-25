@@ -1,47 +1,97 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/@mdi/font@5.9.55/css/materialdesignicons.min.css');
 
 @font-face {
-    font-family: "Ilisarniq";
-    font-weight: regular;
-    src: url('../public/fonts/Ilisarniq/Ilisarniq-Regular.otf') format('opentype');
+    font-family: 'Lexend Deca';
+    src: url('../public/fonts/Lexend Deca/LexendDeca-Bold.eot');
+    src: url('../public/fonts/Lexend Deca/LexendDeca-Bold.eot?#iefix') format('embedded-opentype'),
+        url('../public/fonts/Lexend Deca/LexendDeca-Bold.woff2') format('woff2'),
+        url('../public/fonts/Lexend Deca/LexendDeca-Bold.woff') format('woff'),
+        url('../public/fonts/Lexend Deca/LexendDeca-Bold.ttf') format('truetype'),
+        url('../public/fonts/Lexend Deca/LexendDeca-Bold.svg#LexendDeca-Bold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-    font-family: "Ilisarniq";
-    src: url('../public/fonts/Ilisarniq/Ilisarniq-Demi.otf') format('opentype');
+    font-family: 'Lexend Deca';
+    src: url('../public/fonts/Lexend Deca/LexendDeca-Regular.eot');
+    src: url('../public/fonts/Lexend Deca/LexendDeca-Regular.eot?#iefix') format('embedded-opentype'),
+        url('../public/fonts/Lexend Deca/LexendDeca-Regular.woff2') format('woff2'),
+        url('../public/fonts/Lexend Deca/LexendDeca-Regular.woff') format('woff'),
+        url('../public/fonts/Lexend Deca/LexendDeca-Regular.ttf') format('truetype'),
+        url('../public/fonts/Lexend Deca/LexendDeca-Regular.svg#LexendDeca-Regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lexend Deca';
+    src: url('../public/fonts/Lexend Deca/LexendDeca-Light.eot');
+    src: url('../public/fonts/Lexend Deca/LexendDeca-Light.eot?#iefix') format('embedded-opentype'),
+        url('../public/fonts/Lexend Deca/LexendDeca-Light.woff2') format('woff2'),
+        url('../public/fonts/Lexend Deca/LexendDeca-Light.woff') format('woff'),
+        url('../public/fonts/Lexend Deca/LexendDeca-Light.ttf') format('truetype'),
+        url('../public/fonts/Lexend Deca/LexendDeca-Light.svg#LexendDeca-Light') format('svg');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lexend Deca';
+    src: url('../public/fonts/Lexend Deca/LexendDeca-SemiBold.eot');
+    src: url('../public/fonts/Lexend Deca/LexendDeca-SemiBold.eot?#iefix') format('embedded-opentype'),
+        url('../public/fonts/Lexend Deca/LexendDeca-SemiBold.woff2') format('woff2'),
+        url('../public/fonts/Lexend Deca/LexendDeca-SemiBold.woff') format('woff'),
+        url('../public/fonts/Lexend Deca/LexendDeca-SemiBold.ttf') format('truetype'),
+        url('../public/fonts/Lexend Deca/LexendDeca-SemiBold.svg#LexendDeca-SemiBold') format('svg');
     font-weight: 600;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-    font-family: "Ilisarniq";
-    src: url('../public/fonts/Ilisarniq/Ilisarniq-Light.otf') format('opentype');
-    font-weight: 200;
-}
-
-@font-face {
-    font-family: "Ilisarniq";
+    font-family: 'Noto Sans Arabic UI';
+    src: url('../public/fonts/Noto Sans/NotoSansArabicUI-Bold.eot');
+    src: url('../public/fonts/Noto Sans/NotoSansArabicUI-Bold.eot?#iefix') format('embedded-opentype'),
+        url('../public/fonts/Noto Sans/NotoSansArabicUI-Bold.woff2') format('woff2'),
+        url('../public/fonts/Noto Sans/NotoSansArabicUI-Bold.woff') format('woff'),
+        url('../public/fonts/Noto Sans/NotoSansArabicUI-Bold.ttf') format('truetype'),
+        url('../public/fonts/Noto Sans/NotoSansArabicUI-Bold.svg#NotoSansArabicUI-Bold') format('svg');
     font-weight: bold;
-    src: url('../public/fonts/Ilisarniq/Ilisarniq-Bold.otf') format('opentype');
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-    font-family: "Noto Sans Arabic UI";
-    src: url('../public/fonts/Noto Sans/Noto_Sans_Arabic_UI_Regular.ttf');
-    font-weight: regular;
+    font-family: 'Noto Sans Arabic UI';
+    src: url('../public/fonts/Noto Sans/NotoSansArabicUI-Regular.eot');
+    src: url('../public/fonts/Noto Sans/NotoSansArabicUI-Regular.eot?#iefix') format('embedded-opentype'),
+        url('../public/fonts/Noto Sans/NotoSansArabicUI-Regular.woff2') format('woff2'),
+        url('../public/fonts/Noto Sans/NotoSansArabicUI-Regular.woff') format('woff'),
+        url('../public/fonts/Noto Sans/NotoSansArabicUI-Regular.ttf') format('truetype'),
+        url('../public/fonts/Noto Sans/NotoSansArabicUI-Regular.svg#NotoSansArabicUI-Regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-    font-family: "Noto Sans Arabic UI";
-    src: url('../public/fonts/Noto Sans/Noto_Sans_Arabic_UI_Bold.ttf');
-    font-weight: bold;
+    font-family: 'Ninja Naruto';
+    src: url('../public/fonts/Ninja\ Naruto/NinjaNaruto.eot');
+    src: url('../public/fonts/Ninja\ Naruto/NinjaNaruto.eot?#iefix') format('embedded-opentype'),
+        url('../public/fonts/Ninja\ Naruto/NinjaNaruto.woff2') format('woff2'),
+        url('../public/fonts/Ninja\ Naruto/NinjaNaruto.woff') format('woff'),
+        url('../public/fonts/Ninja\ Naruto/NinjaNaruto.ttf') format('truetype'),
+        url('../public/fonts/Ninja\ Naruto/NinjaNaruto.svg#NinjaNaruto') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
-@font-face {
-    font-family: "Ninja Naruto";
-    src: url('../public/fonts/Ninja_Naruto.ttf');
-    font-weight: 400;
-}
+
 
 a {
     text-decoration: none;
@@ -49,7 +99,7 @@ a {
 
 * {
     box-sizing: border-box;
-    font-family: "Noto Sans Arabic UI", Ilisarniq, sans-serif;
+    font-family: "Noto Sans Arabic UI", "Lexend Deca", sans-serif;
     outline: none;
     box-sizing: border-box;
     line-height: 1.2;
@@ -1191,7 +1241,7 @@ body {
     color: var(--accent-color);
     text-align: center;
     font-weight: 600;
-    font-family: Ilisarniq;
+    font-family: "Lexend Deca";
     letter-spacing: -0.1em;
 }
 
@@ -1275,37 +1325,59 @@ body {
         margin-bottom: 60px;
     }
     .main-menu {
+        height: unset;
         position: fixed;
         background-color: var(--primary-color);
-        justify-content: start;
+        justify-content: center;
         z-index: 3;
-        width: 275px;
-        border-left: 1px solid #1c1c1c;
-        top: 0;
+        width: 100vw;
+        border-top: 1px solid #1c1c1c;
+        bottom: 0;
+        top: unset;
+        max-width: unset;
+    }
+    .logo-section {
+        display: none;
+    }
+    .main-menu .menu-item {
+        margin: 5px 10px;
+        padding: 5px ;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 9pt;
+    }
+    .main-menu .menu-item span {
+        margin: 0 0 5px 0;
+        font-size: 16pt;
     }
     .main-menu.secondary {
         display: flex;
         display: -ms-flexbox;
     }
-    .main-menu section {
+    .main-menu .menu-section {
+        display: flex;
+    }
+    /*.main-menu section {
         position: absolute;
-    }
-    #hamburger-menu {
+    }*/
+    /*#hamburger-menu {
         display: inline;
-    }
-    .main-menu-close {
+    }*/
+    /*.main-menu-close {
         display: block;
         position: absolute;
         font-size: 16pt;
         top: 20px;
         right: 20px;
     }
-    .main-menu.hidden {
+    */
+    /*.main-menu.hidden {
         right: -275px;
     }
     .main-menu.shown {
         right: 0;
-    }
+    }*/
     .watch-page {
         display: block;
     }
@@ -1409,6 +1481,13 @@ body {
 }
 
 @media only screen and (max-width: 490px) {
+    .menu-section .menu-item {
+        font-size: 8pt;
+    }
+    .menu-section .menu-item span {
+        font-size: 12pt;
+        margin: 0 0 3px 0;
+    }
     .anime-video-info {
         padding: 10px;
     }

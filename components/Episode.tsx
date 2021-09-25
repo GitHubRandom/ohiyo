@@ -9,15 +9,15 @@ interface TEpisode {
     animeName: string
 }
 
-const Episode = (props: TEpisode) => {
+const Episode = ({ url, cover, showEpisodeName, episodeName, animeName }: TEpisode) => {
     return (
-        <Link prefetch={ false } href={ props.url }>
-            <a title={ props.animeName } className="content">
-                <div style={{ backgroundImage: 'url(' + props.cover + ')' }} className="anime-cover">
-                    { props.showEpisodeName ?
-                    <p className="anime-episode-name">{ props.episodeName }</p> : null}
+        <Link prefetch={ false } href={ url }>
+            <a title={ animeName } className="content">
+                <div style={{ backgroundImage: 'url(' + cover + ')' }} className="anime-cover">
+                    { showEpisodeName &&
+                    <p className="anime-episode-name">{ episodeName }</p> }
                 </div>
-                <h4 dir="ltr" className="anime-title">{ props.animeName }</h4>
+                <h4 dir="ltr" className="anime-title">{ animeName }</h4>
             </a>
         </Link>
     )

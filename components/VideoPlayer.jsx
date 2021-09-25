@@ -30,15 +30,12 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
         if (player.current) player.current.seek(player.current.video.currentTime - 10)
     }
 
+    // Detect if mobile device (Very naive approach)
     const isMobileDevice = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-
-    useEffect(() => {
-        // Reinit tippy every re-render
-        tippy("[data-tippy-content]")
-    })
 
     // Destroy & initialize player when sources changes
     useEffect(() => {
+        console.log('Init player...')
         const video = sources.length == 1 ? {
             ...sources[0]
         } : {
@@ -64,13 +61,17 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
                 }
             ]
         }
-        window.player = player.current
+
+        if (process.env.NODE_ENV === 'development') window.player = player.current
+
         // DPlayer puts crossorigin attribute by default
         document.querySelector(".dplayer-video").removeAttribute("crossorigin")
+
         // Reimplementing overlay elements (DPlayer removes all container's children).
         videoPlayerContainer.current.appendChild(videoOverlay.current) 
         
-        let mutationObserver = new MutationObserver((mutations) => {
+        // Observe DPlayer UI to sync with overlay elements
+        const mutationObserver = new MutationObserver(mutations => {
             const classes = mutations[0].target.classList
             if (classes.contains("dplayer-hide-controller")) {
                 setUIShown(false)
@@ -85,6 +86,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
             childList: false,
             characterData: false
         })
+
         return () => {
             // Clean effect
             setInIntro(false)
@@ -117,7 +119,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
                 {
                     text: 'نهاية المقدمة',
                     time: introInterval[1]
-                },
+                }
             ]
         }
     }, [introInterval])
@@ -164,7 +166,14 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
                                 <div className="opening-hint-icon">
                                     <span className="mdi mdi-music-note mdi-nm"></span>
                                 </div>
-                                <p className="opening-hint-text" onClick={ () => { navigator.clipboard.writeText(openingName); setShowCopyConfirm(true) } }>
+                                <p
+                                    className="opening-hint-text"
+                                    onClick={ () => {
+                                        if (openingName) {
+                                            navigator.clipboard.writeText(openingName)
+                                            setShowCopyConfirm(true)
+                                        }
+                                    }}>
                                     { openingName }
                                 </p>
                             </div>
@@ -176,7 +185,7 @@ const VideoPlayer = ({ introInterval, sources, openingName, episode, episodeDeta
                 <button dir="rtl" onClick={ event => skipIntro(event) } style={{ display: inIntro && UIShown ? "flex" : "none" }} type="button" id="episode-skip-intro">
                     <span data-tippy-content="إلغاء" onClick={ () => setDismissIntroSkip(true) } className="mdi mdi-close dismiss-skip"></span>
                     <span className="skip-intro-text">تخطي المقدمة</span>
-                    { !isMobileDevice() ? <span className="skip-intro-shortcut">Enter</span> : null}
+                    { !isMobileDevice() && <span className="skip-intro-shortcut">Enter</span> }
                 </button>
                 { isMobileDevice() ? <>
                     <div onClick={ () => document.querySelector(".dplayer-video-current").click() } onDoubleClick={ forwardTen } id="forward" className="control-overlay">
