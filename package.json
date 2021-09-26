@@ -10,7 +10,6 @@
   "dependencies": {
     "@tippyjs/react": "^4.2.5",
     "@types/axios": "^0.14.0",
-    "adblock-detect-react": "^1.0.4",
     "axios": "^0.21.1",
     "dplayer": "^1.26.0",
     "follow-redirects": "^1.14.0",
