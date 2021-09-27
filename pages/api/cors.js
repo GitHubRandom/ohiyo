@@ -1,9 +1,8 @@
-var http = require('follow-redirects').https
+var https = require('follow-redirects').https
 var requestIp = require('request-ip')
 
 export default async function handler(req, res) {
-    let finished = false
-    var url = new URL(req.query.link)
+    const url = new URL(req.query.link)
 
     const options = {
         method: "GET",
@@ -16,17 +15,13 @@ export default async function handler(req, res) {
             'User-Agent': req.headers['user-agent']
         }
     }
-    console.log(options)
-    http.request(options, response => {
+    https.request(options, response => {
         let data = ""
         response.on("data", chunk => {
             data += chunk.toString()
         })
         response.on("end", () => {
             res.status(200).send(data)
-        })
-        response.on('error', error => {
-            finished = true
         })
     }).end()
 }

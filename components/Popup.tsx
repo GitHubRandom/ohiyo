@@ -16,7 +16,6 @@ const Popup = ({ children, trigger, id, title, dismissOnRouterEvent, onShow, onD
     const [ visible, updateVisibility ] = useState(false)
 
     const handleEscape = event => {
-        console.log(event.key)
         if (event.key === 'Escape') {
             updateVisibility(false)
         }
