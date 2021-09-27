@@ -52,7 +52,7 @@ export const getFormattedEndpoint = (serverKey:string, item: string): string => 
         MS: "https://embed.mystream.to/",
         FD: "https://quiet-cove-27971.herokuapp.com/www.fembed.com/api/source/",
         FR: "https://quiet-cove-27971.herokuapp.com/www.mediafire.com/?",
-        SF: "/api/cors?link=http://www.solidfiles.com/v/",
+        SF: "/api/cors?link=https://www.solidfiles.com/v/",
         OK: "https://cors.bridged.cc/https://ok.ru/dk?cmd=videoPlayerMetadata&mid=",
         SV: "https://sendvid.com/embed/"
     }
@@ -61,4 +61,4 @@ export const getFormattedEndpoint = (serverKey:string, item: string): string => 
     return prefix + item + suffix
 }
 
-export const shouldDecodeJSON = (serverKey:string):boolean => serverKey == "OK" || serverKey == "FD"
+export const shouldDecodeJSON = (serverKey: string): boolean => serverKey == "OK" || serverKey == "FD"
