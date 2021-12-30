@@ -1,6 +1,6 @@
 # Project Ohiyo - Animayhem
 
-Animayhem is a website where you can watch HQ Arabic subbed anime for free. It has many features such as :
+Animayhem is an entertainment website consuming a public API. It has many features such as :
 
 - :zap: Seamless episodes switching
 - :sparkles: Great UI/UX
